@@ -121,3 +121,7 @@ dist/
 
 # ssh
 .ssh
+
+# testing
+/coverage
+*.db
