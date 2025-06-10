@@ -16,8 +16,9 @@ export const getAllCarCategories = async (req: Request, res: Response) => {
 // GET /api/admin/car-categories/:id
 export const getCarCategoryById = async (req: Request, res: Response) => {
   try {
+    const tenantId = tenantIdFromRequest(req);
     const { id } = req.params;
-    const carCategory = await carCategoryService.getCarCategoryById(id);
+    const carCategory = await carCategoryService.getCarCategoryById(tenantId, id);
     if (carCategory) {
       res.json(carCategory);
     } else {
@@ -32,7 +33,7 @@ export const getCarCategoryById = async (req: Request, res: Response) => {
 export const createCarCategory = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);
-    const newCarCategory = await carCategoryService.createCarCategory({ ...req.body, tenant: { connect: { id: tenantId } } });
+    const newCarCategory = await carCategoryService.createCarCategory(tenantId, req.body);
     res.status(201).json(newCarCategory);
   } catch (error) {
     res.status(500).json({ message: 'Error creating car category' });
@@ -42,8 +43,9 @@ export const createCarCategory = async (req: Request, res: Response) => {
 // PUT /api/admin/car-categories/:id
 export const updateCarCategory = async (req: Request, res: Response) => {
   try {
+    const tenantId = tenantIdFromRequest(req);
     const { id } = req.params;
-    const updatedCarCategory = await carCategoryService.updateCarCategory(id, req.body);
+    const updatedCarCategory = await carCategoryService.updateCarCategory(tenantId, id, req.body);
     if (updatedCarCategory) {
       res.json(updatedCarCategory);
     } else {
@@ -57,8 +59,9 @@ export const updateCarCategory = async (req: Request, res: Response) => {
 // DELETE /api/admin/car-categories/:id
 export const deleteCarCategory = async (req: Request, res: Response) => {
   try {
+    const tenantId = tenantIdFromRequest(req);
     const { id } = req.params;
-    await carCategoryService.deleteCarCategory(id);
+    await carCategoryService.deleteCarCategory(tenantId, id);
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ message: 'Error deleting car category' });

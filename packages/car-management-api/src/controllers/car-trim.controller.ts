@@ -5,8 +5,9 @@ import { tenantIdFromRequest } from '../utils/tenant-id';
 // GET /api/admin/car-categories/:categoryId/trims
 export const getAllCarTrims = async (req: Request, res: Response) => {
   try {
+    const tenantId = tenantIdFromRequest(req);
     const { categoryId } = req.params;
-    const carTrims = await carTrimService.getAllCarTrims(categoryId);
+    const carTrims = await carTrimService.getAllCarTrims(tenantId, categoryId);
     res.json(carTrims);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching car trims' });
@@ -16,8 +17,9 @@ export const getAllCarTrims = async (req: Request, res: Response) => {
 // GET /api/admin/car-trims/:id
 export const getCarTrimById = async (req: Request, res: Response) => {
   try {
+    const tenantId = tenantIdFromRequest(req);
     const { id } = req.params;
-    const carTrim = await carTrimService.getCarTrimById(id);
+    const carTrim = await carTrimService.getCarTrimById(tenantId, id);
     if (carTrim) {
       res.json(carTrim);
     } else {
@@ -33,10 +35,9 @@ export const createCarTrim = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);
     const { categoryId } = req.params;
-    const newCarTrim = await carTrimService.createCarTrim({ 
-      ...req.body, 
-      tenant: { connect: { id: tenantId } },
-      category: { connect: { id: categoryId } }
+    const newCarTrim = await carTrimService.createCarTrim(tenantId, {
+      ...req.body,
+      category: { connect: { id: categoryId } },
     });
     res.status(201).json(newCarTrim);
   } catch (error) {
@@ -47,8 +48,9 @@ export const createCarTrim = async (req: Request, res: Response) => {
 // PUT /api/admin/car-trims/:id
 export const updateCarTrim = async (req: Request, res: Response) => {
   try {
+    const tenantId = tenantIdFromRequest(req);
     const { id } = req.params;
-    const updatedCarTrim = await carTrimService.updateCarTrim(id, req.body);
+    const updatedCarTrim = await carTrimService.updateCarTrim(tenantId, id, req.body);
     if (updatedCarTrim) {
       res.json(updatedCarTrim);
     } else {
@@ -62,8 +64,9 @@ export const updateCarTrim = async (req: Request, res: Response) => {
 // DELETE /api/admin/car-trims/:id
 export const deleteCarTrim = async (req: Request, res: Response) => {
   try {
+    const tenantId = tenantIdFromRequest(req);
     const { id } = req.params;
-    await carTrimService.deleteCarTrim(id);
+    await carTrimService.deleteCarTrim(tenantId, id);
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ message: 'Error deleting car trim' });

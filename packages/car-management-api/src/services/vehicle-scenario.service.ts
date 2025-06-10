@@ -1,26 +1,30 @@
-import { PrismaClient, VehicleScenario, Prisma } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { VehicleScenario, Prisma } from '@prisma/client';
+import { createTenantPrismaClient } from '../db/client';
 
 export const getAllVehicleScenarios = async (tenantId: string): Promise<VehicleScenario[]> => {
-  return prisma.vehicleScenario.findMany({ where: { tenantId } });
+  const prisma = createTenantPrismaClient(tenantId);
+  return prisma.vehicleScenario.findMany();
 };
 
-export const getVehicleScenarioById = async (id: string): Promise<VehicleScenario | null> => {
+export const getVehicleScenarioById = async (tenantId: string, id: string): Promise<VehicleScenario | null> => {
+  const prisma = createTenantPrismaClient(tenantId);
   return prisma.vehicleScenario.findUnique({ where: { id } });
 };
 
-export const createVehicleScenario = async (data: Prisma.VehicleScenarioCreateInput): Promise<VehicleScenario> => {
+export const createVehicleScenario = async (tenantId: string, data: Prisma.VehicleScenarioCreateInput): Promise<VehicleScenario> => {
+  const prisma = createTenantPrismaClient(tenantId);
   return prisma.vehicleScenario.create({ data });
 };
 
-export const updateVehicleScenario = async (id: string, data: Prisma.VehicleScenarioUpdateInput): Promise<VehicleScenario | null> => {
+export const updateVehicleScenario = async (tenantId: string, id: string, data: Prisma.VehicleScenarioUpdateInput): Promise<VehicleScenario | null> => {
+  const prisma = createTenantPrismaClient(tenantId);
   return prisma.vehicleScenario.update({
     where: { id },
     data,
   });
 };
 
-export const deleteVehicleScenario = async (id: string): Promise<void> => {
+export const deleteVehicleScenario = async (tenantId: string, id: string): Promise<void> => {
+  const prisma = createTenantPrismaClient(tenantId);
   await prisma.vehicleScenario.delete({ where: { id } });
 }; 
