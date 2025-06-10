@@ -1,11 +1,12 @@
 import { Router } from 'express';
-import { authenticate } from '../middleware/admin-auth.middleware';
+import { authenticate } from '../middleware/admin/auth.middleware';
 import * as vehicleScenarioController from '../controllers/admin/vehicle-scenario.controller';
 import * as carCategoryController from '../controllers/admin/car-category.controller';
 import * as carTrimController from '../controllers/admin/car-trim.controller';
 import * as tenantController from '../controllers/admin/tenant.controller';
 import * as adminUserController from '../controllers/admin/admin-user.controller';
 import * as authController from '../controllers/admin/auth.controller';
+import * as userController from '../controllers/admin/user.controller';
 
 const router = Router();
 
@@ -50,5 +51,9 @@ router.get('/admin-users', adminUserController.getAllAdminUsers);
 router.get('/admin-users/:id', adminUserController.getAdminUserById);
 router.put('/admin-users/:id', adminUserController.updateAdminUser);
 router.delete('/admin-users/:id', adminUserController.deleteAdminUser);
+
+// User Management Routes
+router.get('/users', userController.getAllUsers);
+router.get('/users/:id', userController.getUserById);
 
 export default router; 
