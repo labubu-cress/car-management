@@ -1,9 +1,9 @@
-interface CarFeature {
+export interface CarFeature {
   icon: string;
   text: string;
 }
 
-interface CarTrim {
+export interface CarTrim {
   id: string;
   tenantId: string;
   name: string;
@@ -15,7 +15,7 @@ interface CarTrim {
   features: CarFeature[];
 }
 
-interface CarCategory {
+export interface CarCategory {
   id: string;
   tenantId: string;
   name: string;
@@ -30,7 +30,7 @@ interface CarCategory {
 }
 
 // 车辆使用场景: "家用"、"商用"、"公务" 等等
-interface VehicleScenario {
+export interface VehicleScenario {
   id: string;
   tenantId: string;
   name: string;
@@ -40,7 +40,7 @@ interface VehicleScenario {
 }
 
 
-interface Tenant {
+export interface Tenant {
   id: string;
   // 租户名称: 太平洋保险、公安部门等
   name: string;
@@ -54,7 +54,7 @@ interface Tenant {
   config: Record<string, unknown>;
 }
 
-interface User {
+export interface User {
   id: string;
   tenantId: string;
   nickname: string;
@@ -66,7 +66,7 @@ interface User {
   unionId: string;
 }
 
-interface AdminUser {
+export interface AdminUser {
   id: string;
   username: string;
   passwordHash: string;

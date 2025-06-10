@@ -8,9 +8,103 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Car {
-  id    String @id @default(cuid())
-  name  String
-  price Float
-  img   String
-} 
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  appId     String   @unique
+  appSecret String
+  status    String   @default("active") // 'active' | 'inactive'
+  config    Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users           User[]
+  adminUsers      AdminUser[]
+  vehicleScenarios VehicleScenario[]
+  carCategories   CarCategory[]
+  carTrims        CarTrim[]
+}
+
+model AdminUser {
+  id           String  @id @default(cuid())
+  username     String  @unique
+  passwordHash String
+  role         String // 'super_admin' | 'admin' | 'tenant_admin' | 'tenant_viewer'
+  tenantId     String?
+  tenant       Tenant? @relation(fields: [tenantId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model User {
+  id          String   @id @default(cuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  nickname    String
+  avatarUrl   String
+  phoneNumber String
+  openId      String
+  unionId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([tenantId, openId])
+  @@index([tenantId])
+}
+
+model VehicleScenario {
+  id          String   @id @default(cuid())
+  tenantId    String
+  tenant      Tenant   @relation(fields: [tenantId], references: [id])
+  name        String
+  description String
+  image       String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  categories  CarCategory[] @relation("CarCategoryToVehicleScenario")
+
+  @@index([tenantId])
+}
+
+model CarCategory {
+  id              String   @id @default(cuid())
+  tenantId        String
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+  name            String
+  image           String
+  badge           String?
+  tags            Json // String[]
+  highlights      Json // CarFeature[]
+  interiorImages  Json // String[]
+  exteriorImages  Json // String[]
+  offerPictures   Json // String[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  carTrims        CarTrim[]
+  vehicleScenarios VehicleScenario[] @relation("CarCategoryToVehicleScenario")
+
+  @@index([tenantId])
+}
+
+model CarTrim {
+  id            String   @id @default(cuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  name          String
+  subtitle      String
+  image         String
+  badge         String?
+  originalPrice String
+  currentPrice  String
+  features      Json // CarFeature[]
+  categoryId    String
+  category      CarCategory @relation(fields: [categoryId], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([tenantId])
+  @@index([categoryId])
+}
+

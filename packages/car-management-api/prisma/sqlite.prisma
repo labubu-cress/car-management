@@ -7,9 +7,3 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Car {
-  id    String @id @default(cuid())
-  name  String
-  price Float
-  img   String
-} 
