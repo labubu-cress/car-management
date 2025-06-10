@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import * as vehicleScenarioService from '../services/vehicle-scenario.service';
-import { tenantIdFromRequest } from '../utils/tenant-id';
+import * as vehicleScenarioService from '../../services/vehicle-scenario.service';
+import { tenantIdFromRequest } from '../../utils/tenant-id';
 
 // GET /api/admin/vehicle-scenarios
 export const getAllVehicleScenarios = async (req: Request, res: Response) => {

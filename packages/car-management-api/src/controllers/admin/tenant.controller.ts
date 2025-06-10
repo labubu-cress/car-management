@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import * as tenantService from '../services/tenant.service';
+import * as tenantService from '../../services/tenant.service';
 
 // TODO: Implement the following functions
 

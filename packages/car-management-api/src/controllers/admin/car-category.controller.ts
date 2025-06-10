@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import * as carCategoryService from '../services/car-category.service';
-import { tenantIdFromRequest } from '../utils/tenant-id';
+import * as carCategoryService from '../../services/car-category.service';
+import { tenantIdFromRequest } from '../../utils/tenant-id';
 
 // GET /api/admin/car-categories
 export const getAllCarCategories = async (req: Request, res: Response) => {
