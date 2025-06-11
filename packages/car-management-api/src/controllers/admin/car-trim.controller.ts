@@ -2,19 +2,22 @@ import type { Request, Response } from "express";
 import * as carTrimService from "../../services/car-trim.service";
 import { tenantIdFromRequest } from "../../utils/tenant-id";
 
-// GET /api/admin/car-categories/:categoryId/trims
+// GET /api/v1/admin/car-categories/:categoryId/trims
 export const getAllCarTrims = async (req: Request, res: Response) => {
   try {
+    debugger;
     const tenantId = tenantIdFromRequest(req);
     const { categoryId } = req.params;
     const carTrims = await carTrimService.getAllCarTrims(tenantId, categoryId);
+    debugger;
     res.json(carTrims);
   } catch (error) {
+    debugger;
     res.status(500).json({ message: "Error fetching car trims" });
   }
 };
 
-// GET /api/admin/car-trims/:id
+// GET /api/v1/admin/car-trims/:id
 export const getCarTrimById = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);
@@ -30,7 +33,7 @@ export const getCarTrimById = async (req: Request, res: Response) => {
   }
 };
 
-// POST /api/admin/car-categories/:categoryId/trims
+// POST /api/v1/admin/car-categories/:categoryId/trims
 export const createCarTrim = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);
@@ -45,16 +48,12 @@ export const createCarTrim = async (req: Request, res: Response) => {
   }
 };
 
-// PUT /api/admin/car-trims/:id
+// PUT /api/v1/admin/car-trims/:id
 export const updateCarTrim = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);
     const { id } = req.params;
-    const updatedCarTrim = await carTrimService.updateCarTrim(
-      tenantId,
-      id,
-      req.body
-    );
+    const updatedCarTrim = await carTrimService.updateCarTrim(tenantId, id, req.body);
     if (updatedCarTrim) {
       res.json(updatedCarTrim);
     } else {
@@ -65,7 +64,7 @@ export const updateCarTrim = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE /api/admin/car-trims/:id
+// DELETE /api/v1/admin/car-trims/:id
 export const deleteCarTrim = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);

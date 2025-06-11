@@ -1,6 +1,6 @@
 import { AdminRole, PrismaClient } from "@prisma/client";
-import bcrypt from "bcrypt";
 import { login } from "../src/services/admin/auth.service";
+import { password2hash } from "../src/utils/transform";
 
 export const clearTestDb = async (client: PrismaClient) => {
   await client.carTrim.deleteMany();
@@ -21,18 +21,17 @@ export type TestAdminUserWithToken = {
 export const createTestAdminUser = async (
   client: PrismaClient,
   role: AdminRole,
-  tenantId?: string
+  tenantId?: string,
 ): Promise<TestAdminUserWithToken> => {
   const username = `${role}-test-user`;
   const password = "test-secret-password";
-  const passwordHash = await bcrypt.hash(password, 10);
+  const passwordHash = password2hash(password);
   await client.adminUser.create({
     data: {
       username,
       passwordHash,
       role,
-      tenantId:
-        role === "super_admin" || role === "admin" ? undefined : tenantId,
+      tenantId: role === "super_admin" || role === "admin" ? undefined : tenantId,
     },
   });
   const token = await login(username, password);
@@ -55,18 +54,10 @@ export const createTestTenantAndAdminUsers = async (client: PrismaClient) => {
   const adminUser = await createTestAdminUser(client, "admin");
 
   // create a tenant admin user
-  const tenantAdminUser = await createTestAdminUser(
-    client,
-    "tenant_admin",
-    tenantId
-  );
+  const tenantAdminUser = await createTestAdminUser(client, "tenant_admin", tenantId);
 
   // create a tenant viewer user
-  const tenantViewerUser = await createTestAdminUser(
-    client,
-    "tenant_viewer",
-    tenantId
-  );
+  const tenantViewerUser = await createTestAdminUser(client, "tenant_viewer", tenantId);
 
   return {
     tenantId,

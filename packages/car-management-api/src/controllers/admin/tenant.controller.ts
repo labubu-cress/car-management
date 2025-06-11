@@ -1,22 +1,41 @@
+import type { OmitPasswordHash } from "@/types/typeHelper";
+import type { AdminUser } from "@prisma/client";
 import type { Request, Response } from "express";
 import * as tenantService from "../../services/tenant.service";
 
-// TODO: Implement the following functions
+const hasTenantViewPermission = (user: OmitPasswordHash<AdminUser>, tenantId: string): boolean => {
+  switch (user.role) {
+    case "super_admin":
+    case "admin":
+      return true;
+    case "tenant_admin":
+    case "tenant_viewer":
+      return tenantId === user.tenantId;
+    default:
+      return false;
+  }
+};
 
-// GET /api/admin/tenants
+// GET /api/v1/admin/tenants
 export const getAllTenants = async (req: Request, res: Response) => {
   try {
-    const tenants = await tenantService.getAllTenants();
+    const tenants = (await tenantService.getAllTenants()).filter((tenant) =>
+      hasTenantViewPermission(req.user!, tenant.id),
+    );
     res.json(tenants);
   } catch (error) {
     res.status(500).json({ message: "Error fetching tenants" });
   }
 };
 
-// GET /api/admin/tenants/:id
+// GET /api/v1/admin/tenants/:id
 export const getTenantById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    if (!hasTenantViewPermission(req.user!, id)) {
+      res.status(403).json({ message: "Forbidden" });
+      return;
+    }
     const tenant = await tenantService.getTenantById(id);
     if (tenant) {
       res.json(tenant);
@@ -28,7 +47,7 @@ export const getTenantById = async (req: Request, res: Response) => {
   }
 };
 
-// POST /api/admin/tenants
+// POST /api/v1/admin/tenants
 export const createTenant = async (req: Request, res: Response) => {
   try {
     const newTenant = await tenantService.createTenant(req.body);
@@ -38,7 +57,7 @@ export const createTenant = async (req: Request, res: Response) => {
   }
 };
 
-// PUT /api/admin/tenants/:id
+// PUT /api/v1/admin/tenants/:id
 export const updateTenant = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -53,7 +72,7 @@ export const updateTenant = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE /api/admin/tenants/:id
+// DELETE /api/v1/admin/tenants/:id
 export const deleteTenant = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

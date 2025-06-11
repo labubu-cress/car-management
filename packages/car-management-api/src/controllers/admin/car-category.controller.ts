@@ -2,27 +2,23 @@ import type { Request, Response } from "express";
 import * as carCategoryService from "../../services/car-category.service";
 import { tenantIdFromRequest } from "../../utils/tenant-id";
 
-// GET /api/admin/car-categories
+// GET /api/v1/admin/car-categories
 export const getAllCarCategories = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);
-    const carCategories =
-      await carCategoryService.getAllCarCategories(tenantId);
+    const carCategories = await carCategoryService.getAllCarCategories(tenantId);
     res.json(carCategories);
   } catch (error) {
     res.status(500).json({ message: "Error fetching car categories" });
   }
 };
 
-// GET /api/admin/car-categories/:id
+// GET /api/v1/admin/car-categories/:id
 export const getCarCategoryById = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);
     const { id } = req.params;
-    const carCategory = await carCategoryService.getCarCategoryById(
-      tenantId,
-      id
-    );
+    const carCategory = await carCategoryService.getCarCategoryById(tenantId, id);
     if (carCategory) {
       res.json(carCategory);
     } else {
@@ -33,30 +29,23 @@ export const getCarCategoryById = async (req: Request, res: Response) => {
   }
 };
 
-// POST /api/admin/car-categories
+// POST /api/v1/admin/car-categories
 export const createCarCategory = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);
-    const newCarCategory = await carCategoryService.createCarCategory(
-      tenantId,
-      req.body
-    );
+    const newCarCategory = await carCategoryService.createCarCategory(tenantId, req.body);
     res.status(201).json(newCarCategory);
   } catch (error) {
     res.status(500).json({ message: "Error creating car category" });
   }
 };
 
-// PUT /api/admin/car-categories/:id
+// PUT /api/v1/admin/car-categories/:id
 export const updateCarCategory = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);
     const { id } = req.params;
-    const updatedCarCategory = await carCategoryService.updateCarCategory(
-      tenantId,
-      id,
-      req.body
-    );
+    const updatedCarCategory = await carCategoryService.updateCarCategory(tenantId, id, req.body);
     if (updatedCarCategory) {
       res.json(updatedCarCategory);
     } else {
@@ -67,7 +56,7 @@ export const updateCarCategory = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE /api/admin/car-categories/:id
+// DELETE /api/v1/admin/car-categories/:id
 export const deleteCarCategory = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);

@@ -1,59 +1,91 @@
-import { Router } from 'express';
-import { authenticate } from '../middleware/admin/auth.middleware';
-import * as vehicleScenarioController from '../controllers/admin/vehicle-scenario.controller';
-import * as carCategoryController from '../controllers/admin/car-category.controller';
-import * as carTrimController from '../controllers/admin/car-trim.controller';
-import * as tenantController from '../controllers/admin/tenant.controller';
-import * as adminUserController from '../controllers/admin/admin-user.controller';
-import * as authController from '../controllers/admin/auth.controller';
-import * as userController from '../controllers/admin/user.controller';
+import {
+  createCarCategory,
+  deleteCarCategory,
+  getAllCarCategories,
+  getCarCategoryById,
+  updateCarCategory,
+} from "@/controllers/admin/car-category.controller";
+import {
+  createCarTrim,
+  deleteCarTrim,
+  getAllCarTrims,
+  getCarTrimById,
+  updateCarTrim,
+} from "@/controllers/admin/car-trim.controller";
+import { getAllUsers, getUserById } from "@/controllers/admin/user.controller";
+import {
+  createVehicleScenario,
+  deleteVehicleScenario,
+  getAllVehicleScenarios,
+  getVehicleScenarioById,
+  updateVehicleScenario,
+} from "@/controllers/admin/vehicle-scenario.controller";
+
+import {
+  createTenant,
+  deleteTenant,
+  getAllTenants,
+  getTenantById,
+  updateTenant,
+} from "@/controllers/admin/tenant.controller";
+import { superAdminPermission, tenantManipulationPermission } from "@/middleware/admin/permission.middleware";
+import { Router } from "express";
+import {
+  createAdminUser,
+  deleteAdminUser,
+  getAdminUserById,
+  getAllAdminUsers,
+  updateAdminUser,
+} from "../controllers/admin/admin-user.controller";
+import { login } from "../controllers/admin/auth.controller";
+import { authenticate } from "../middleware/admin/auth.middleware";
 
 const router = Router();
 
 // Auth Routes
 // POST /api/admin/auth/login - Admin user login
-router.post('/auth/login', authController.login);
+router.post("/auth/login", login);
 
 // Apply authentication middleware to all routes below
 router.use(authenticate);
 
+// Tenant Management Routes
+router.post("/tenants", superAdminPermission, createTenant);
+router.get("/tenants", getAllTenants);
+router.get("/tenants/:id", getTenantById);
+router.put("/tenants/:id", superAdminPermission, tenantManipulationPermission, updateTenant);
+router.delete("/tenants/:id", superAdminPermission, tenantManipulationPermission, deleteTenant);
+
 // VehicleScenario Routes
-router.post('/vehicle-scenarios', vehicleScenarioController.createVehicleScenario);
-router.get('/vehicle-scenarios', vehicleScenarioController.getAllVehicleScenarios);
-router.get('/vehicle-scenarios/:id', vehicleScenarioController.getVehicleScenarioById);
-router.put('/vehicle-scenarios/:id', vehicleScenarioController.updateVehicleScenario);
-router.delete('/vehicle-scenarios/:id', vehicleScenarioController.deleteVehicleScenario);
+router.post("/vehicle-scenarios", tenantManipulationPermission, createVehicleScenario);
+router.get("/vehicle-scenarios", getAllVehicleScenarios);
+router.get("/vehicle-scenarios/:id", getVehicleScenarioById);
+router.put("/vehicle-scenarios/:id", tenantManipulationPermission, updateVehicleScenario);
+router.delete("/vehicle-scenarios/:id", tenantManipulationPermission, deleteVehicleScenario);
 
 // CarCategory Routes
-router.post('/car-categories', carCategoryController.createCarCategory);
-router.get('/car-categories', carCategoryController.getAllCarCategories);
-router.get('/car-categories/:id', carCategoryController.getCarCategoryById);
-router.put('/car-categories/:id', carCategoryController.updateCarCategory);
-router.delete('/car-categories/:id', carCategoryController.deleteCarCategory);
+router.post("/car-categories", tenantManipulationPermission, createCarCategory);
+router.get("/car-categories", getAllCarCategories);
+router.get("/car-categories/:id", getCarCategoryById);
+router.put("/car-categories/:id", tenantManipulationPermission, updateCarCategory);
+router.delete("/car-categories/:id", tenantManipulationPermission, deleteCarCategory);
 
 // CarTrim Routes
-router.post('/car-categories/:categoryId/trims', carTrimController.createCarTrim);
-router.get('/car-categories/:categoryId/trims', carTrimController.getAllCarTrims);
-router.get('/car-trims/:id', carTrimController.getCarTrimById);
-router.put('/car-trims/:id', carTrimController.updateCarTrim);
-router.delete('/car-trims/:id', carTrimController.deleteCarTrim);
-
-// Tenant Management Routes
-router.post('/tenants', tenantController.createTenant);
-router.get('/tenants', tenantController.getAllTenants);
-router.get('/tenants/:id', tenantController.getTenantById);
-router.put('/tenants/:id', tenantController.updateTenant);
-router.delete('/tenants/:id', tenantController.deleteTenant);
+router.post("/car-categories/:categoryId/trims", tenantManipulationPermission, createCarTrim);
+router.get("/car-categories/:categoryId/trims", getAllCarTrims);
+router.get("/car-trims/:id", getCarTrimById);
+router.put("/car-trims/:id", tenantManipulationPermission, updateCarTrim);
+router.delete("/car-trims/:id", tenantManipulationPermission, deleteCarTrim);
 
 // AdminUser Management Routes
-router.post('/admin-users', adminUserController.createAdminUser);
-router.get('/admin-users', adminUserController.getAllAdminUsers);
-router.get('/admin-users/:id', adminUserController.getAdminUserById);
-router.put('/admin-users/:id', adminUserController.updateAdminUser);
-router.delete('/admin-users/:id', adminUserController.deleteAdminUser);
+router.post("/admin-users", createAdminUser);
+router.get("/admin-users", getAllAdminUsers);
+router.get("/admin-users/:id", getAdminUserById);
+router.put("/admin-users/:id", updateAdminUser);
+router.delete("/admin-users/:id", deleteAdminUser);
 
 // User Management Routes
-router.get('/users', userController.getAllUsers);
-router.get('/users/:id', userController.getUserById);
+router.get("/users", getAllUsers);
+router.get("/users/:id", getUserById);
 
-export default router; 
+export default router;
