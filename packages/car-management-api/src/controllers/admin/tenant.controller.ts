@@ -20,7 +20,7 @@ const hasTenantViewPermission = (user: OmitPasswordHash<AdminUser>, tenantId: st
 export const getAllTenants = async (req: Request, res: Response) => {
   try {
     const tenants = (await tenantService.getAllTenants()).filter((tenant) =>
-      hasTenantViewPermission(req.user!, tenant.id),
+      hasTenantViewPermission(req.adminUser!, tenant.id),
     );
     res.json(tenants);
   } catch (error) {
@@ -32,7 +32,7 @@ export const getAllTenants = async (req: Request, res: Response) => {
 export const getTenantById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    if (!hasTenantViewPermission(req.user!, id)) {
+    if (!hasTenantViewPermission(req.adminUser!, id)) {
       res.status(403).json({ message: "Forbidden" });
       return;
     }

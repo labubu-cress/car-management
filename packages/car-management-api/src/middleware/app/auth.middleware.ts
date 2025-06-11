@@ -1,13 +1,12 @@
-import * as authService from "@/services/admin/auth.service";
-import type { OmitPasswordHash } from "@/types/typeHelper";
-import type { AdminUser } from "@prisma/client";
+import type { User } from "@prisma/client";
 import type { NextFunction, Request, Response } from "express";
+import * as authService from "../../services/app/auth.service";
 
-// Extend Express Request interface to include 'adminUser'
+// Extend Express Request interface to include 'user'
 declare global {
   namespace Express {
     interface Request {
-      adminUser?: OmitPasswordHash<AdminUser>;
+      user?: User;
     }
   }
 }
@@ -18,9 +17,9 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
   if (authHeader) {
     const token = authHeader.split(" ")[1];
     try {
-      const adminUser = await authService.verify(token);
-      if (adminUser) {
-        req.adminUser = adminUser;
+      const user = await authService.verify(token);
+      if (user) {
+        req.user = user;
         next();
       } else {
         res.sendStatus(401); // Unauthorized

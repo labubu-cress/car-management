@@ -25,7 +25,7 @@ export const hasAdminManipulationPermission = (
 export const getAllAdminUsers = async (req: Request, res: Response) => {
   try {
     const users = (await adminUserService.getAllAdminUsers()).filter((user) =>
-      hasAdminManipulationPermission(req.user!, user),
+      hasAdminManipulationPermission(req.adminUser!, user),
     );
     res.json(users);
   } catch (error) {
@@ -38,7 +38,7 @@ export const getAdminUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const user = await adminUserService.getAdminUserById(id);
-    if (hasAdminManipulationPermission(req.user!, user!)) {
+    if (hasAdminManipulationPermission(req.adminUser!, user!)) {
       res.status(403).json({ message: "Forbidden" });
       return;
     }
@@ -55,8 +55,8 @@ export const getAdminUserById = async (req: Request, res: Response) => {
 // POST /api/v1/admin/users
 export const createAdminUser = async (req: Request, res: Response) => {
   try {
-    const { user } = req;
-    if (!hasAdminManipulationPermission(user!, req.body)) {
+    const { adminUser } = req;
+    if (!hasAdminManipulationPermission(adminUser!, req.body)) {
       res.status(403).json({ message: "Forbidden" });
       return;
     }
@@ -71,8 +71,8 @@ export const createAdminUser = async (req: Request, res: Response) => {
 export const updateAdminUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { user } = req;
-    if (!hasAdminManipulationPermission(user!, req.body)) {
+    const { adminUser } = req;
+    if (!hasAdminManipulationPermission(adminUser!, req.body)) {
       res.status(403).json({ message: "Forbidden" });
       return;
     }
@@ -91,8 +91,8 @@ export const updateAdminUser = async (req: Request, res: Response) => {
 export const deleteAdminUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { user } = req;
-    if (!hasAdminManipulationPermission(user!, req.body)) {
+    const { adminUser } = req;
+    if (!hasAdminManipulationPermission(adminUser!, req.body)) {
       res.status(403).json({ message: "Forbidden" });
       return;
     }

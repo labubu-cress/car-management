@@ -6,14 +6,12 @@ import { verifyPassword } from "../../utils/transform";
 
 const jwtSecret = process.env.JWT_SECRET || "your-default-secret";
 
-export const login = async (
-  username: string,
-  password: string
-): Promise<string | null> => {
+export const login = async (username: string, password: string): Promise<string | null> => {
   const user = await prisma.adminUser.findUnique({ where: { username } });
 
   if (user && verifyPassword(password, user.passwordHash)) {
     const payload: JwtPayload = { id: user.id };
+    // 是不是因该把 tenantId 也放进去？
     const token = jwt.sign(payload, jwtSecret, { expiresIn: "1h" });
     return token;
   }

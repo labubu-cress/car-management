@@ -20,7 +20,7 @@ const hasTenantManipulationPermission = (user: OmitPasswordHash<AdminUser>, tena
 
 export const tenantManipulationPermission = async (req: Request, res: Response, next: NextFunction) => {
   const tenantId = tenantIdFromRequest(req);
-  if (!hasTenantManipulationPermission(req.user!, tenantId)) {
+  if (!hasTenantManipulationPermission(req.adminUser!, tenantId)) {
     res.status(403).json({ message: "Forbidden" });
     return;
   }
@@ -28,7 +28,7 @@ export const tenantManipulationPermission = async (req: Request, res: Response, 
 };
 
 export const superAdminPermission = async (req: Request, res: Response, next: NextFunction) => {
-  if (req.user?.role !== "super_admin") {
+  if (req.adminUser?.role !== "super_admin") {
     res.status(403).json({ message: "Forbidden" });
     return;
   }
