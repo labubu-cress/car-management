@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
-import * as tenantService from '../../services/tenant.service';
+import type { Request, Response } from "express";
+import * as tenantService from "../../services/tenant.service";
 
 // TODO: Implement the following functions
 
@@ -9,7 +9,7 @@ export const getAllTenants = async (req: Request, res: Response) => {
     const tenants = await tenantService.getAllTenants();
     res.json(tenants);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching tenants' });
+    res.status(500).json({ message: "Error fetching tenants" });
   }
 };
 
@@ -21,10 +21,10 @@ export const getTenantById = async (req: Request, res: Response) => {
     if (tenant) {
       res.json(tenant);
     } else {
-      res.status(404).json({ message: 'Tenant not found' });
+      res.status(404).json({ message: "Tenant not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching tenant' });
+    res.status(500).json({ message: "Error fetching tenant" });
   }
 };
 
@@ -34,7 +34,7 @@ export const createTenant = async (req: Request, res: Response) => {
     const newTenant = await tenantService.createTenant(req.body);
     res.status(201).json(newTenant);
   } catch (error) {
-    res.status(500).json({ message: 'Error creating tenant' });
+    res.status(500).json({ message: "Error creating tenant" });
   }
 };
 
@@ -46,10 +46,10 @@ export const updateTenant = async (req: Request, res: Response) => {
     if (updatedTenant) {
       res.json(updatedTenant);
     } else {
-      res.status(404).json({ message: 'Tenant not found' });
+      res.status(404).json({ message: "Tenant not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Error updating tenant' });
+    res.status(500).json({ message: "Error updating tenant" });
   }
 };
 
@@ -60,6 +60,6 @@ export const deleteTenant = async (req: Request, res: Response) => {
     await tenantService.deleteTenant(id);
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ message: 'Error deleting tenant' });
+    res.status(500).json({ message: "Error deleting tenant" });
   }
-}; 
+};

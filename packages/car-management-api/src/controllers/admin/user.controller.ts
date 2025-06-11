@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import * as userService from '../../services/admin/user.service';
-import { tenantIdFromRequest } from '../../utils/tenant-id';
+import type { Request, Response } from "express";
+import * as userService from "../../services/admin/user.service";
+import { tenantIdFromRequest } from "../../utils/tenant-id";
 
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
@@ -8,7 +8,7 @@ export const getAllUsers = async (req: Request, res: Response) => {
     const users = await userService.getAllUsers(tenantId);
     res.json(users);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching users' });
+    res.status(500).json({ message: "Error fetching users" });
   }
 };
 
@@ -20,9 +20,9 @@ export const getUserById = async (req: Request, res: Response) => {
     if (user) {
       res.json(user);
     } else {
-      res.status(404).json({ message: 'User not found' });
+      res.status(404).json({ message: "User not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching user' });
+    res.status(500).json({ message: "Error fetching user" });
   }
-}; 
+};

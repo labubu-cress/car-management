@@ -1,13 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { PrismaClient, AdminUser } from '@prisma/client';
-
-const prisma = new PrismaClient();
-const jwtSecret = process.env.JWT_SECRET || 'your-default-secret';
-
-interface JwtPayload {
-  id: string;
-}
+import type { AdminUser } from "@prisma/client";
+import type { NextFunction, Request, Response } from "express";
+import * as authService from "../../services/admin/auth.service";
 
 // Extend Express Request interface to include 'user'
 declare global {
@@ -18,16 +11,18 @@ declare global {
   }
 }
 
-export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
+export const authenticate = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const authHeader = req.headers.authorization;
 
   if (authHeader) {
-    const token = authHeader.split(' ')[1];
+    const token = authHeader.split(" ")[1];
 
     try {
-      const payload = jwt.verify(token, jwtSecret) as JwtPayload;
-      const user = await prisma.adminUser.findUnique({ where: { id: payload.id } });
-
+      const user = await authService.verify(token);
       if (user) {
         req.user = user;
         next();
@@ -40,4 +35,4 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
   } else {
     res.sendStatus(401); // Unauthorized
   }
-}; 
+};

@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import * as carTrimService from '../../services/car-trim.service';
-import { tenantIdFromRequest } from '../../utils/tenant-id';
+import type { Request, Response } from "express";
+import * as carTrimService from "../../services/car-trim.service";
+import { tenantIdFromRequest } from "../../utils/tenant-id";
 
 // GET /api/admin/car-categories/:categoryId/trims
 export const getAllCarTrims = async (req: Request, res: Response) => {
@@ -10,7 +10,7 @@ export const getAllCarTrims = async (req: Request, res: Response) => {
     const carTrims = await carTrimService.getAllCarTrims(tenantId, categoryId);
     res.json(carTrims);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching car trims' });
+    res.status(500).json({ message: "Error fetching car trims" });
   }
 };
 
@@ -23,10 +23,10 @@ export const getCarTrimById = async (req: Request, res: Response) => {
     if (carTrim) {
       res.json(carTrim);
     } else {
-      res.status(404).json({ message: 'Car trim not found' });
+      res.status(404).json({ message: "Car trim not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching car trim' });
+    res.status(500).json({ message: "Error fetching car trim" });
   }
 };
 
@@ -41,7 +41,7 @@ export const createCarTrim = async (req: Request, res: Response) => {
     });
     res.status(201).json(newCarTrim);
   } catch (error) {
-    res.status(500).json({ message: 'Error creating car trim' });
+    res.status(500).json({ message: "Error creating car trim" });
   }
 };
 
@@ -50,14 +50,18 @@ export const updateCarTrim = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);
     const { id } = req.params;
-    const updatedCarTrim = await carTrimService.updateCarTrim(tenantId, id, req.body);
+    const updatedCarTrim = await carTrimService.updateCarTrim(
+      tenantId,
+      id,
+      req.body
+    );
     if (updatedCarTrim) {
       res.json(updatedCarTrim);
     } else {
-      res.status(404).json({ message: 'Car trim not found' });
+      res.status(404).json({ message: "Car trim not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Error updating car trim' });
+    res.status(500).json({ message: "Error updating car trim" });
   }
 };
 
@@ -69,6 +73,6 @@ export const deleteCarTrim = async (req: Request, res: Response) => {
     await carTrimService.deleteCarTrim(tenantId, id);
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ message: 'Error deleting car trim' });
+    res.status(500).json({ message: "Error deleting car trim" });
   }
-}; 
+};

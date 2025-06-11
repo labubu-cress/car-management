@@ -8,12 +8,24 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum AdminRole {
+  super_admin
+  admin
+  tenant_admin
+  tenant_viewer
+}
+
+enum TenantStatus {
+  active
+  inactive
+}
+
 model Tenant {
   id        String   @id @default(cuid())
   name      String
   appId     String   @unique
   appSecret String
-  status    String   @default("active") // 'active' | 'inactive'
+  status    TenantStatus @default(active)
   config    Json     @default("{}")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -26,14 +38,14 @@ model Tenant {
 }
 
 model AdminUser {
-  id           String  @id @default(cuid())
-  username     String  @unique
+  id           String    @id @default(cuid())
+  username     String    @unique
   passwordHash String
-  role         String // 'super_admin' | 'admin' | 'tenant_admin' | 'tenant_viewer'
+  role         AdminRole
   tenantId     String?
-  tenant       Tenant? @relation(fields: [tenantId], references: [id])
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  tenant       Tenant?   @relation(fields: [tenantId], references: [id])
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@index([tenantId])
 }

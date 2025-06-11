@@ -1,21 +1,28 @@
-import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
+import type { AdminUser } from "@prisma/client";
+import jwt from "jsonwebtoken";
+import { prisma } from "../../db/client";
+import type { JwtPayload } from "../../types/interface";
+import { verifyPassword } from "../../utils/transform";
 
-const prisma = new PrismaClient();
-const jwtSecret = process.env.JWT_SECRET || 'your-default-secret';
+const jwtSecret = process.env.JWT_SECRET || "your-default-secret";
 
-export const login = async (username: string, password: string): Promise<string | null> => {
+export const login = async (
+  username: string,
+  password: string
+): Promise<string | null> => {
   const user = await prisma.adminUser.findUnique({ where: { username } });
 
-  if (user && await bcrypt.compare(password, user.passwordHash)) {
-    const token = jwt.sign(
-      { id: user.id, username: user.username, role: user.role },
-      jwtSecret,
-      { expiresIn: '1h' }
-    );
+  if (user && verifyPassword(password, user.passwordHash)) {
+    const payload: JwtPayload = { id: user.id };
+    const token = jwt.sign(payload, jwtSecret, { expiresIn: "1h" });
     return token;
   }
 
   return null;
-}; 
+};
+
+export const verify = async (token: string): Promise<AdminUser | null> => {
+  const { id } = jwt.verify(token, jwtSecret) as JwtPayload;
+  const user = await prisma.adminUser.findUnique({ where: { id } });
+  return user as AdminUser | null;
+};

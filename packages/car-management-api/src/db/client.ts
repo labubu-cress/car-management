@@ -1,6 +1,7 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+// 创建一个共享的 PrismaClient 实例
+export const prisma = new PrismaClient();
 
 const tenantModels: Prisma.ModelName[] = ['CarTrim', 'CarCategory', 'VehicleScenario', 'User'];
 

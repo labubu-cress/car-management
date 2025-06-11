@@ -1,47 +1,78 @@
-import { PrismaClient, AdminUser, Prisma } from '@prisma/client';
-import bcrypt from 'bcrypt';
+import { type AdminRole, type AdminUser, Prisma } from "@prisma/client";
 
-const prisma = new PrismaClient();
-const saltRounds = 10;
+import {
+  type OmitPasswordHash,
+  type ReplacePasswordHash,
+} from "@/types/typeHelper";
+import { prisma } from "../db/client";
+import { password2hash } from "../utils/transform";
 
-// Helper to remove password hash
-const excludePasswordHash = (user: AdminUser): Omit<AdminUser, 'passwordHash'> => {
-  const { passwordHash, ...userWithoutPassword } = user;
-  return userWithoutPassword;
+const adminUserLevel: Record<AdminRole, number> = {
+  super_admin: 40,
+  admin: 30,
+  tenant_admin: 20,
+  tenant_viewer: 10,
+} as const;
+export const getAdminUserRoleLevel = (role: AdminRole): number => {
+  return adminUserLevel[role];
 };
 
-export const getAllAdminUsers = async (): Promise<Omit<AdminUser, 'passwordHash'>[]> => {
-  const users = await prisma.adminUser.findMany();
+// Helper to remove password hash
+const excludePasswordHash = <T extends AdminUser>(
+  user: T
+): OmitPasswordHash<T> => {
+  const { passwordHash, ...userWithoutPassword } = user;
+  return {
+    ...userWithoutPassword,
+    role: userWithoutPassword.role as AdminRole,
+  };
+};
+
+export const getAllAdminUsers = async (): Promise<
+  OmitPasswordHash<AdminUser>[]
+> => {
+  const users = (await prisma.adminUser.findMany()) as AdminUser[];
   return users.map(excludePasswordHash);
 };
 
-export const getAdminUserById = async (id: string): Promise<Omit<AdminUser, 'passwordHash'> | null> => {
-  const user = await prisma.adminUser.findUnique({ where: { id } });
+export const getAdminUserById = async (
+  id: string
+): Promise<OmitPasswordHash<AdminUser> | null> => {
+  const user = (await prisma.adminUser.findUnique({
+    where: { id },
+  })) as AdminUser | null;
   return user ? excludePasswordHash(user) : null;
 };
 
-export const createAdminUser = async (data: Prisma.AdminUserCreateInput): Promise<Omit<AdminUser, 'passwordHash'>> => {
-  const hashedPassword = await bcrypt.hash(data.passwordHash, saltRounds);
+export const createAdminUser = async (
+  data: ReplacePasswordHash<Prisma.AdminUserCreateInput>
+): Promise<OmitPasswordHash<AdminUser>> => {
+  const passwordHash = password2hash(data.password);
   const newUser = await prisma.adminUser.create({
     data: {
       ...data,
-      passwordHash: hashedPassword,
+      passwordHash,
     },
   });
   return excludePasswordHash(newUser);
 };
 
-export const updateAdminUser = async (id: string, data: Prisma.AdminUserUpdateInput): Promise<Omit<AdminUser, 'passwordHash'> | null> => {
-  if (data.passwordHash && typeof data.passwordHash === 'string') {
-    data.passwordHash = await bcrypt.hash(data.passwordHash, saltRounds);
+export const updateAdminUser = async (
+  id: string,
+  data: ReplacePasswordHash<Prisma.AdminUserUpdateInput>
+): Promise<OmitPasswordHash<AdminUser> | null> => {
+  const { password, ...rest } = data;
+  if (password) {
+    (rest as Prisma.AdminUserUpdateInput).passwordHash =
+      password2hash(password);
   }
   const updatedUser = await prisma.adminUser.update({
     where: { id },
-    data,
+    data: rest,
   });
   return updatedUser ? excludePasswordHash(updatedUser) : null;
 };
 
 export const deleteAdminUser = async (id: string): Promise<void> => {
   await prisma.adminUser.delete({ where: { id } });
-}; 
+};

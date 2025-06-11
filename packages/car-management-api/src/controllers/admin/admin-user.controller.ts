@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
-import * as adminUserService from '../../services/admin-user.service';
+import type { Request, Response } from "express";
+import * as adminUserService from "../../services/admin-user.service";
 
 // GET /api/admin/users
 export const getAllAdminUsers = async (req: Request, res: Response) => {
@@ -7,7 +7,7 @@ export const getAllAdminUsers = async (req: Request, res: Response) => {
     const users = await adminUserService.getAllAdminUsers();
     res.json(users);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching admin users' });
+    res.status(500).json({ message: "Error fetching admin users" });
   }
 };
 
@@ -19,20 +19,28 @@ export const getAdminUserById = async (req: Request, res: Response) => {
     if (user) {
       res.json(user);
     } else {
-      res.status(404).json({ message: 'Admin user not found' });
+      res.status(404).json({ message: "Admin user not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching admin user' });
+    res.status(500).json({ message: "Error fetching admin user" });
   }
 };
 
 // POST /api/admin/users
 export const createAdminUser = async (req: Request, res: Response) => {
   try {
+    const { user } = req;
+    if (
+      adminUserService.getAdminUserRoleLevel(user!.role) <
+      adminUserService.getAdminUserRoleLevel(req.body.role)
+    ) {
+      res.status(403).json({ message: "Forbidden" });
+      return;
+    }
     const newUser = await adminUserService.createAdminUser(req.body);
     res.status(201).json(newUser);
   } catch (error) {
-    res.status(500).json({ message: 'Error creating admin user' });
+    res.status(500).json({ message: "Error creating admin user" });
   }
 };
 
@@ -44,10 +52,10 @@ export const updateAdminUser = async (req: Request, res: Response) => {
     if (updatedUser) {
       res.json(updatedUser);
     } else {
-      res.status(404).json({ message: 'Admin user not found' });
+      res.status(404).json({ message: "Admin user not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Error updating admin user' });
+    res.status(500).json({ message: "Error updating admin user" });
   }
 };
 
@@ -58,6 +66,6 @@ export const deleteAdminUser = async (req: Request, res: Response) => {
     await adminUserService.deleteAdminUser(id);
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ message: 'Error deleting admin user' });
+    res.status(500).json({ message: "Error deleting admin user" });
   }
-}; 
+};

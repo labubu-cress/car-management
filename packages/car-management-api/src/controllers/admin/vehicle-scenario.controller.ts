@@ -1,15 +1,16 @@
-import { Request, Response } from 'express';
-import * as vehicleScenarioService from '../../services/vehicle-scenario.service';
-import { tenantIdFromRequest } from '../../utils/tenant-id';
+import type { Request, Response } from "express";
+import * as vehicleScenarioService from "../../services/vehicle-scenario.service";
+import { tenantIdFromRequest } from "../../utils/tenant-id";
 
 // GET /api/admin/vehicle-scenarios
 export const getAllVehicleScenarios = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);
-    const vehicleScenarios = await vehicleScenarioService.getAllVehicleScenarios(tenantId);
+    const vehicleScenarios =
+      await vehicleScenarioService.getAllVehicleScenarios(tenantId);
     res.json(vehicleScenarios);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching vehicle scenarios' });
+    res.status(500).json({ message: "Error fetching vehicle scenarios" });
   }
 };
 
@@ -18,14 +19,17 @@ export const getVehicleScenarioById = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);
     const { id } = req.params;
-    const vehicleScenario = await vehicleScenarioService.getVehicleScenarioById(tenantId, id);
+    const vehicleScenario = await vehicleScenarioService.getVehicleScenarioById(
+      tenantId,
+      id
+    );
     if (vehicleScenario) {
       res.json(vehicleScenario);
     } else {
-      res.status(404).json({ message: 'Vehicle scenario not found' });
+      res.status(404).json({ message: "Vehicle scenario not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching vehicle scenario' });
+    res.status(500).json({ message: "Error fetching vehicle scenario" });
   }
 };
 
@@ -33,10 +37,11 @@ export const getVehicleScenarioById = async (req: Request, res: Response) => {
 export const createVehicleScenario = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);
-    const newVehicleScenario = await vehicleScenarioService.createVehicleScenario(tenantId, req.body);
+    const newVehicleScenario =
+      await vehicleScenarioService.createVehicleScenario(tenantId, req.body);
     res.status(201).json(newVehicleScenario);
   } catch (error) {
-    res.status(500).json({ message: 'Error creating vehicle scenario' });
+    res.status(500).json({ message: "Error creating vehicle scenario" });
   }
 };
 
@@ -45,14 +50,19 @@ export const updateVehicleScenario = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);
     const { id } = req.params;
-    const updatedVehicleScenario = await vehicleScenarioService.updateVehicleScenario(tenantId, id, req.body);
+    const updatedVehicleScenario =
+      await vehicleScenarioService.updateVehicleScenario(
+        tenantId,
+        id,
+        req.body
+      );
     if (updatedVehicleScenario) {
       res.json(updatedVehicleScenario);
     } else {
-      res.status(404).json({ message: 'Vehicle scenario not found' });
+      res.status(404).json({ message: "Vehicle scenario not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Error updating vehicle scenario' });
+    res.status(500).json({ message: "Error updating vehicle scenario" });
   }
 };
 
@@ -64,6 +74,6 @@ export const deleteVehicleScenario = async (req: Request, res: Response) => {
     await vehicleScenarioService.deleteVehicleScenario(tenantId, id);
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ message: 'Error deleting vehicle scenario' });
+    res.status(500).json({ message: "Error deleting vehicle scenario" });
   }
-}; 
+};

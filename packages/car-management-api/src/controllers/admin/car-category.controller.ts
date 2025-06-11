@@ -1,15 +1,16 @@
-import { Request, Response } from 'express';
-import * as carCategoryService from '../../services/car-category.service';
-import { tenantIdFromRequest } from '../../utils/tenant-id';
+import type { Request, Response } from "express";
+import * as carCategoryService from "../../services/car-category.service";
+import { tenantIdFromRequest } from "../../utils/tenant-id";
 
 // GET /api/admin/car-categories
 export const getAllCarCategories = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);
-    const carCategories = await carCategoryService.getAllCarCategories(tenantId);
+    const carCategories =
+      await carCategoryService.getAllCarCategories(tenantId);
     res.json(carCategories);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching car categories' });
+    res.status(500).json({ message: "Error fetching car categories" });
   }
 };
 
@@ -18,14 +19,17 @@ export const getCarCategoryById = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);
     const { id } = req.params;
-    const carCategory = await carCategoryService.getCarCategoryById(tenantId, id);
+    const carCategory = await carCategoryService.getCarCategoryById(
+      tenantId,
+      id
+    );
     if (carCategory) {
       res.json(carCategory);
     } else {
-      res.status(404).json({ message: 'Car category not found' });
+      res.status(404).json({ message: "Car category not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching car category' });
+    res.status(500).json({ message: "Error fetching car category" });
   }
 };
 
@@ -33,10 +37,13 @@ export const getCarCategoryById = async (req: Request, res: Response) => {
 export const createCarCategory = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);
-    const newCarCategory = await carCategoryService.createCarCategory(tenantId, req.body);
+    const newCarCategory = await carCategoryService.createCarCategory(
+      tenantId,
+      req.body
+    );
     res.status(201).json(newCarCategory);
   } catch (error) {
-    res.status(500).json({ message: 'Error creating car category' });
+    res.status(500).json({ message: "Error creating car category" });
   }
 };
 
@@ -45,14 +52,18 @@ export const updateCarCategory = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);
     const { id } = req.params;
-    const updatedCarCategory = await carCategoryService.updateCarCategory(tenantId, id, req.body);
+    const updatedCarCategory = await carCategoryService.updateCarCategory(
+      tenantId,
+      id,
+      req.body
+    );
     if (updatedCarCategory) {
       res.json(updatedCarCategory);
     } else {
-      res.status(404).json({ message: 'Car category not found' });
+      res.status(404).json({ message: "Car category not found" });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Error updating car category' });
+    res.status(500).json({ message: "Error updating car category" });
   }
 };
 
@@ -64,6 +75,6 @@ export const deleteCarCategory = async (req: Request, res: Response) => {
     await carCategoryService.deleteCarCategory(tenantId, id);
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ message: 'Error deleting car category' });
+    res.status(500).json({ message: "Error deleting car category" });
   }
-}; 
+};

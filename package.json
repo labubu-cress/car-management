@@ -5,7 +5,10 @@
   "workspaces": [
     "packages/*"
   ],
-  "scripts": {},
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -17,6 +20,7 @@
   },
   "devDependencies": {
     "@types/supertest": "^6.0.3",
+    "prettier": "^3.5.3",
     "prisma": "^6.8.2"
   }
 }
