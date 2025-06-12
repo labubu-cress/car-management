@@ -21,6 +21,7 @@ import {
   updateVehicleScenario,
 } from "@/controllers/admin/vehicle-scenario.controller";
 
+import { getImgUploadToken } from "@/controllers/admin/img.controller";
 import {
   createTenant,
   deleteTenant,
@@ -89,5 +90,8 @@ router.delete("/admin-users/:id", deleteAdminUser);
 // User Management Routes
 router.get("/users", getAllUsers);
 router.get("/users/:id", getUserById);
+
+// Img Management Routes
+router.get("/img/upload-token", tenantManipulationPermission, getImgUploadToken);
 
 export default router;
