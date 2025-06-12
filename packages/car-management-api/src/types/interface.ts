@@ -80,6 +80,12 @@
 //   tenantId?: string;
 // }
 
-export interface JwtPayload {
+export interface AdminJwtPayload {
   id: string;
+}
+
+export interface AppJwtPayload {
+  id: string;
+  tenantId: string;
+  openId: string;
 }

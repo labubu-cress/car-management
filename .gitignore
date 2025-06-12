@@ -125,3 +125,6 @@ dist/
 # testing
 /coverage
 *.db
+
+# tmp
+tmp/

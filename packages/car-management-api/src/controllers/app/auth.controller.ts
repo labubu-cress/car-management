@@ -1,4 +1,5 @@
 import { tenantIdFromRequest } from "@/utils/tenant-id";
+import { wechatClient } from "@/wechat/client";
 import type { Request, Response } from "express";
 import * as authService from "../../services/app/auth.service";
 
@@ -6,12 +7,10 @@ export const login = async (req: Request, res: Response) => {
   try {
     const tenantId = tenantIdFromRequest(req);
     const { code } = req.body;
-    // todo: 微信小程序登录
-    const openId = "";
-    const unionId = "";
-    const token = await authService.login(tenantId, openId, unionId);
+    const { openid, unionid } = await wechatClient.code2Session(code);
+    const { token, user } = (await authService.login(tenantId, openid, unionid)) ?? {};
     if (token) {
-      res.json({ token });
+      res.json({ token, user });
     } else {
       res.status(401).json({ message: "Invalid credentials" });
     }

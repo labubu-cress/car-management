@@ -4,9 +4,9 @@ import * as authService from "../../services/admin/auth.service";
 export const login = async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body;
-    const token = await authService.login(username, password);
+    const { token, user } = (await authService.login(username, password)) ?? {};
     if (token) {
-      res.json({ token });
+      res.json({ token, user });
     } else {
       res.status(401).json({ message: "Invalid credentials" });
     }

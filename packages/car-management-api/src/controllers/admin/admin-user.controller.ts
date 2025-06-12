@@ -21,7 +21,12 @@ export const hasAdminManipulationPermission = (
   }
 };
 
-// GET /api/v1/admin/users
+// GET /api/v1/admin/admin-users/current
+export const getCurrentAdminUser = async (req: Request, res: Response) => {
+  res.json(req.adminUser);
+};
+
+// GET /api/v1/admin/admin-users
 export const getAllAdminUsers = async (req: Request, res: Response) => {
   try {
     const users = (await adminUserService.getAllAdminUsers()).filter((user) =>
@@ -33,7 +38,7 @@ export const getAllAdminUsers = async (req: Request, res: Response) => {
   }
 };
 
-// GET /api/v1/admin/users/:id
+// GET /api/v1/admin/admin-users/:id
 export const getAdminUserById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -52,7 +57,7 @@ export const getAdminUserById = async (req: Request, res: Response) => {
   }
 };
 
-// POST /api/v1/admin/users
+// POST /api/v1/admin/admin-users
 export const createAdminUser = async (req: Request, res: Response) => {
   try {
     const { adminUser } = req;
@@ -67,7 +72,7 @@ export const createAdminUser = async (req: Request, res: Response) => {
   }
 };
 
-// PUT /api/v1/admin/users/:id
+// PUT /api/v1/admin/admin-users/:id
 export const updateAdminUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -87,7 +92,7 @@ export const updateAdminUser = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE /api/v1/admin/users/:id
+// DELETE /api/v1/admin/admin-users/:id
 export const deleteAdminUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

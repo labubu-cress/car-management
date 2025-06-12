@@ -35,6 +35,7 @@ import {
   deleteAdminUser,
   getAdminUserById,
   getAllAdminUsers,
+  getCurrentAdminUser,
   updateAdminUser,
 } from "../controllers/admin/admin-user.controller";
 import { login } from "../controllers/admin/auth.controller";
@@ -78,6 +79,7 @@ router.put("/car-trims/:id", tenantManipulationPermission, updateCarTrim);
 router.delete("/car-trims/:id", tenantManipulationPermission, deleteCarTrim);
 
 // AdminUser Management Routes
+router.get("/admin-users/current", getCurrentAdminUser);
 router.post("/admin-users", createAdminUser);
 router.get("/admin-users", getAllAdminUsers);
 router.get("/admin-users/:id", getAdminUserById);
