@@ -1,6 +1,6 @@
 import OSS from "ali-oss";
 
-export const createImgUploadToken = async (tenantId: string) => {
+export const createAliyunImgUploadToken = async (tenantId: string) => {
   const config = {
     // 阿里云 AccessKey ID, 用于访问阿里云 API。STS服务本身也需要鉴权
     accessKeyId: process.env.ALI_ACCESS_KEY_ID!,
