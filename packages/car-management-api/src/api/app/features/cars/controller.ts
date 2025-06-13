@@ -1,8 +1,8 @@
 // Controllers for car-related App APIs will be defined here.
 // These controllers will use services from the 'modules/cars' directory.
 
+import * as carsService from "@/modules/cars/cars.service";
 import type { Context } from "hono";
-import * as carsService from "../../../../modules/cars/cars.service";
 
 // VehicleScenario Controllers
 export const getAllVehicleScenarios = async (c: Context) => {

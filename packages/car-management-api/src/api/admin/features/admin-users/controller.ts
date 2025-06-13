@@ -1,6 +1,6 @@
+import * as adminUserService from "@/modules/users/admin-user.service";
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
-import * as adminUserService from "../../../modules/users/admin-user.service";
 import type { AdminAuthEnv } from "../../middleware/auth";
 import type { CreateAdminUserInput, UpdateAdminUserInput } from "./schema";
 

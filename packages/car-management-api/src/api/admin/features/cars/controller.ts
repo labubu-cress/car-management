@@ -1,5 +1,5 @@
+import * as carsService from "@/modules/cars/cars.service";
 import type { Context } from "hono";
-import * as carsService from "../../../../modules/cars/cars.service";
 import type {
   createCarCategorySchema,
   createCarTrimSchema,
