@@ -2,10 +2,10 @@ import { Hono, type Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import type { AppEnv } from "../../types/hono";
 import appAuthRoutes from "./features/auth/routes";
-import carCategoriesAppRoutes from "./features/cars/car-categories/routes";
-import carTrimsAppRoutes from "./features/cars/car-trims/routes";
-import vehicleScenariosAppRoutes from "./features/cars/vehicle-scenarios/routes";
+import carCategoriesAppRoutes from "./features/car-categories/routes";
+import carTrimsAppRoutes from "./features/car-trims/routes";
 import appUserRoutes from "./features/users/routes";
+import vehicleScenariosAppRoutes from "./features/vehicle-scenarios/routes";
 import { tenantMiddleware } from "./middleware/tenant";
 
 const app = new Hono<AppEnv>();

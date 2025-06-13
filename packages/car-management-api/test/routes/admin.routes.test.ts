@@ -1,11 +1,9 @@
 import type { CreateAdminUserInput } from "@/api/admin/features/admin-users/schema";
 import type { AdminUser } from "@/api/admin/features/admin-users/types";
-import type {
-  CreateCarCategoryInput,
-  CreateCarTrimInput,
-  CreateVehicleScenarioInput,
-} from "@/api/admin/features/cars/schema";
+import type { CreateCarCategoryInput } from "@/api/admin/features/car-categories/schema";
+import type { CreateCarTrimInput } from "@/api/admin/features/car-trims/schema";
 import type { CreateTenantInput } from "@/api/admin/features/tenants/schema";
+import type { CreateVehicleScenarioInput } from "@/api/admin/features/vehicle-scenarios/schema";
 import app from "@/index";
 import { prisma } from "@/lib/db";
 import type { CarCategory, CarTrim, Tenant, User, VehicleScenario } from "@prisma/client";
