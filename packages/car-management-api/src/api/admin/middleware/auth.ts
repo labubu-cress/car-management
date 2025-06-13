@@ -1,8 +1,8 @@
-import * as authService from "@/modules/auth/auth.service";
 import type { AdminUser } from "@prisma/client";
 import { type Context, type Next } from "hono";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
+import * as authService from "../features/auth/service";
 
 // Define the shape of the JWT payload for admin users
 export interface AdminJwtPayload {

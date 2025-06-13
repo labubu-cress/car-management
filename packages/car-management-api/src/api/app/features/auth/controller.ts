@@ -1,8 +1,8 @@
 import { wechatClient } from "@/lib/wechat";
-import * as appAuthService from "@/modules/auth/app-auth.service";
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import type { AppLoginInput } from "./schema";
+import * as appAuthService from "./service";
 
 export const login = async (c: Context) => {
   const { code, tenantId } = c.get("validatedData") as AppLoginInput;

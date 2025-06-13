@@ -1,4 +1,3 @@
-import * as carsService from "@/modules/cars/cars.service";
 import type { Context } from "hono";
 import type {
   createCarCategorySchema,
@@ -8,6 +7,7 @@ import type {
   updateCarTrimSchema,
   updateVehicleScenarioSchema,
 } from "./schema";
+import * as carsService from "./service";
 
 // Controllers for car-related admin APIs will be defined here.
 // These controllers will use services from the 'modules/cars' directory.

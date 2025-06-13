@@ -1,6 +1,6 @@
-import * as tenantService from "@/modules/tenants/tenant.service";
 import type { Context } from "hono";
 import type { createTenantSchema, updateTenantSchema } from "./schema";
+import * as tenantService from "./service";
 
 export const getAllTenants = async (c: Context) => {
   // TODO: Add permission check middleware

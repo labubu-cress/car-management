@@ -1,10 +1,10 @@
 import { wechatClient } from "@/lib/wechat";
-import * as appUserService from "@/modules/users/app-user.service";
 import type { User } from "@prisma/client";
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import type { AppAuthEnv } from "../../middleware/auth";
 import type { UpdatePhoneNumberInput } from "./schema";
+import * as appUserService from "./service";
 
 export const getCurrentUser = async (c: Context<AppAuthEnv>) => {
   const user = c.get("user");

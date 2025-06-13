@@ -1,8 +1,8 @@
+import { prisma } from "@/lib/db";
+import { password2hash, verifyPassword } from "@/lib/transform";
 import { Prisma } from "@prisma/client";
-import type { CreateAdminUserInput, UpdateAdminUserInput } from "../../api/admin/features/admin-users/schema";
-import { prisma } from "../../lib/db";
-import { password2hash, verifyPassword } from "../../lib/transform";
-import type { AdminUser } from "./admin-user.types";
+import type { CreateAdminUserInput, UpdateAdminUserInput } from "./schema";
+import type { AdminUser } from "./types";
 
 export const getAllAdminUsers = async (): Promise<AdminUser[]> => {
   return prisma.adminUser.findMany({

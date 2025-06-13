@@ -1,7 +1,7 @@
-import * as authService from "@/modules/auth/auth.service";
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import type { LoginInput } from "./schema";
+import * as authService from "./service";
 
 export const login = async (c: Context) => {
   const { username, password } = c.get("validatedData") as LoginInput;

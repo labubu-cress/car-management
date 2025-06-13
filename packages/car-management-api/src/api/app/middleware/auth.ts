@@ -1,8 +1,8 @@
-import * as appAuthService from "@/modules/auth/app-auth.service";
 import type { User } from "@prisma/client";
 import { type Context, type Next } from "hono";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
+import * as appAuthService from "../features/auth/service";
 
 // Define the shape of the JWT payload for app users
 export interface AppJwtPayload {

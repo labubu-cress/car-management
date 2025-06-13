@@ -1,7 +1,7 @@
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
-import * as userService from "../../../../modules/users/user.service";
 import type { AdminAuthEnv } from "../../middleware/auth";
+import * as userService from "./service";
 
 export const getAllUsers = async (c: Context<AdminAuthEnv>) => {
   const adminUser = c.get("adminUser");

@@ -1,9 +1,9 @@
-import * as adminUserService from "@/modules/users/admin-user.service";
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
-import type { AdminAuthEnv } from "../../middleware/auth";
-import type { CreateAdminUserInput, UpdateAdminUserInput } from "./schema";
+import type { AdminAuthEnv as BaseAdminAuthEnv } from "../../middleware/auth";
+import * as adminUserService from "./service";
 
+export type AdminAuthEnv = BaseAdminAuthEnv;
 type LoggedInUser = AdminAuthEnv["Variables"]["adminUser"];
 
 const hasAdminManipulationPermission = (user: LoggedInUser, targetUser: Partial<LoggedInUser>): boolean => {
@@ -53,7 +53,7 @@ export const getAdminUserById = async (c: Context<AdminAuthEnv>) => {
 
 export const createAdminUser = async (c: Context<AdminAuthEnv>) => {
   const adminUser = c.get("adminUser");
-  const body = c.get("validatedData") as CreateAdminUserInput;
+  const body = c.req.valid("json");
 
   if (!hasAdminManipulationPermission(adminUser, body)) {
     throw new HTTPException(403, { message: "Forbidden" });
@@ -69,7 +69,7 @@ export const createAdminUser = async (c: Context<AdminAuthEnv>) => {
 export const updateAdminUser = async (c: Context<AdminAuthEnv>) => {
   const { id } = c.req.param();
   const adminUser = c.get("adminUser");
-  const body = c.get("validatedData") as UpdateAdminUserInput;
+  const body = c.req.valid("json");
 
   const targetUser = await adminUserService.getAdminUserById(id);
   if (!targetUser) {
