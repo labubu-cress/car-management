@@ -195,3 +195,68 @@ src/
 
 
 ---
+
+## 重构前后控制器文件对照表
+
+以下是 `Express` 框架下的旧控制器文件与重构至 `Hono` 框架后新文件位置的对照表。
+
+### 后台管理（Admin） API
+
+| 旧文件 (位于 `/src/controllers/admin/`) | 新文件 (位于 `/src/api/admin/features/`) |
+| --------------------------------------- | ---------------------------------------- |
+| `admin-user.controller.ts`              | `admin-users/controller.ts`              |
+| `auth.controller.ts`                    | `auth/controller.ts`                     |
+| `car-category.controller.ts`            | `cars/controller.ts` (已合并)            |
+| `car-trim.controller.ts`                | `cars/controller.ts` (已合并)            |
+| `vehicle-scenario.controller.ts`        | `cars/controller.ts` (已合并)            |
+| `img.controller.ts`                     | `img/controller.ts`                      |
+| `tenant.controller.ts`                  | `tenants/controller.ts`                  |
+| `user.controller.ts`                    | `users/controller.ts`                    |
+
+### 小程序（App） API
+
+| 旧文件 (位于 `/src/controllers/app/`) | 新文件 (位于 `/src/api/app/features/`) |
+| ------------------------------------- | -------------------------------------- |
+| `auth.controller.ts`                  | `auth/controller.ts`                   |
+| `user.controller.ts`                  | `users/controller.ts`                  |
+| `car.controller.ts`                   | `cars/controller.ts`                   |
+
+### 服务层 (Services)
+
+旧的 `services` 目录已被拆分和重组到新的 `modules` 目录下，按功能领域（领域驱动设计思想）进行组织。
+
+| 旧文件 (位于 `/src/services/`)            | 新文件 (位于 `/src/modules/`)                                        | 备注                               |
+| ----------------------------------------- | -------------------------------------------------------------------- | ---------------------------------- |
+| `admin-user.service.ts`                   | `users/admin-user.service.ts`                                        |                                    |
+| `admin/auth.service.ts`                   | `auth/auth.service.ts`                                               |                                    |
+| `admin/user.service.ts`                   | `users/user.service.ts`                                              |                                    |
+| `app/auth.service.ts`                     | `auth/app-auth.service.ts`                                           |                                    |
+| `app/user.service.ts`                     | `users/app-user.service.ts`                                          |                                    |
+| `car-category.service.ts`                 | `cars/cars.service.ts`                                               | 合并到统一的 `cars` 服务中         |
+| `car-trim.service.ts`                     | `cars/cars.service.ts`                                               | 合并到统一的 `cars` 服务中         |
+| `vehicle-scenario.service.ts`             | `cars/cars.service.ts`                                               | 合并到统一的 `cars` 服务中         |
+| `tenant.service.ts`                       | `tenants/tenant.service.ts`                                          |                                    |
+
+### 路由 (Routes) & 中间件 (Middleware)
+
+旧的 `routes` 和 `middleware` 目录被完全移除。新的路由和中间件遵循 `Hono` 框架的最佳实践，被定义在各自的 `api` 功能模块中。
+
+| 旧文件 (位于 `/src/`)         | 新的组织方式 (位于 `/src/api/`)                               | 备注                                                         |
+| ----------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------ |
+| `routes/admin.route.ts`       | 分散到 `admin/features/*/routes.ts` 的各个文件中              | 例如 `api/admin/features/tenants/routes.ts`                  |
+| `routes/app.route.ts`         | 分散到 `app/features/*/routes.ts` 的各个文件中                | 例如 `api/app/features/cars/routes.ts`                       |
+| `middleware/admin/`           | `admin/middleware/auth.ts`                                    | 权限等中间件逻辑已直接整合进新的 `controller` 或 `middleware` |
+| `middleware/app/`             | `app/middleware/auth.ts`                                      | 认证逻辑重构                                                 |
+
+### 工具库与其他 (Utilities & Others)
+
+| 旧文件 (位于 `/src/`)     | 新文件 (位于 `/src/lib/`) | 备注                                 |
+| ------------------------- | ------------------------- | ------------------------------------ |
+| `db/client.ts`            | `db.ts`                   |                                      |
+| `utils/transform.ts`      | `transform.ts`            |                                      |
+| `utils/tenant-id.ts`      | (被移除)                  | 逻辑已整合到中间件和控制器中         |
+| `types/typeHelper.ts`     | `typeHelper.ts`           |                                      |
+| `types/interface.ts`      | (被移除)                  | 由各功能模块下的 Zod `schema.ts` 代替 |
+| `cloud/qcloudCos.ts`      | `oss-sts.ts`              | 与阿里云 OSS 功能合并                |
+| `cloud/aliyunOss.ts`      | `oss-sts.ts`              | 与腾讯云 COS 功能合并                |
+| `wechat/client.ts`        | `wechat.ts`               |                                      |
