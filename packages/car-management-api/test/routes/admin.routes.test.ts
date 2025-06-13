@@ -1,7 +1,6 @@
-import request from "supertest";
 import { beforeEach, describe, expect, it } from "vitest";
-import { prisma } from "../../src/db/client";
-import { app } from "../../src/index";
+import app from "../../src/index";
+import { prisma } from "../../src/lib/db";
 import { clearTestDb, createTestTenantAndAdminUsers, TestAdminUserWithToken } from "../helper";
 
 describe("Admin API", () => {
@@ -40,24 +39,32 @@ describe("Admin API", () => {
         appId: "new-test-app-id",
         appSecret: "a-new-secure-secret",
       };
-      const response = await request(app)
-        .post("/api/v1/admin/tenants")
-        .set("Authorization", `Bearer ${superAdminUser.token}`)
-        .send(newTenant);
+      const response = await app.request("/api/v1/admin/tenants", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${superAdminUser.token}`,
+        },
+        body: JSON.stringify(newTenant),
+      });
       expect(response.status).toBe(201);
-      expect(response.body).toMatchObject({
+      const body = await response.json();
+      expect(body).toMatchObject({
         name: newTenant.name,
         appId: newTenant.appId,
       });
     });
 
     it("should get all tenants", async () => {
-      const response = await request(app)
-        .get("/api/v1/admin/tenants")
-        .set("Authorization", `Bearer ${adminUser.token}`);
+      const response = await app.request("/api/v1/admin/tenants", {
+        headers: {
+          Authorization: `Bearer ${adminUser.token}`,
+        },
+      });
       expect(response.status).toBe(200);
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBeGreaterThan(0);
+      const body = await response.json();
+      expect(Array.isArray(body)).toBe(true);
+      expect(body.length).toBeGreaterThan(0);
     });
   });
 
@@ -69,24 +76,32 @@ describe("Admin API", () => {
         password: "password123",
         role: "admin",
       };
-      const response = await request(app)
-        .post("/api/v1/admin/admin-users")
-        .set("Authorization", `Bearer ${adminUser.token}`)
-        .send(newAdmin);
+      const response = await app.request("/api/v1/admin/admin-users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminUser.token}`,
+        },
+        body: JSON.stringify(newAdmin),
+      });
       expect(response.status).toBe(201);
-      expect(response.body).toMatchObject({
+      const body = await response.json();
+      expect(body).toMatchObject({
         username: newAdmin.username,
         role: newAdmin.role,
       });
     });
 
     it("should get all admin users", async () => {
-      const response = await request(app)
-        .get("/api/v1/admin/admin-users")
-        .set("Authorization", `Bearer ${adminUser.token}`);
+      const response = await app.request("/api/v1/admin/admin-users", {
+        headers: {
+          Authorization: `Bearer ${adminUser.token}`,
+        },
+      });
       expect(response.status).toBe(200);
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBeGreaterThan(0);
+      const body = await response.json();
+      expect(Array.isArray(body)).toBe(true);
+      expect(body.length).toBeGreaterThan(0);
     });
   });
 
@@ -102,22 +117,30 @@ describe("Admin API", () => {
         exteriorImages: '["exterior1.jpg"]',
         offerPictures: '["offer1.jpg"]',
       };
-      const response = await request(app)
-        .post("/api/v1/admin/car-categories")
-        .set("Authorization", `Bearer ${tenantAdminUser.token}`)
-        .send(newCategory);
+      const response = await app.request("/api/v1/admin/car-categories", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tenantAdminUser.token}`,
+        },
+        body: JSON.stringify(newCategory),
+      });
       expect(response.status).toBe(201);
-      expect(response.body).toMatchObject({ name: newCategory.name });
+      const body = await response.json();
+      expect(body).toMatchObject({ name: newCategory.name });
     });
 
     it("should get all car categories", async () => {
-      const response = await request(app)
-        .get("/api/v1/admin/car-categories")
-        .set("Authorization", `Bearer ${tenantViewerUser.token}`);
+      const response = await app.request("/api/v1/admin/car-categories", {
+        headers: {
+          Authorization: `Bearer ${tenantViewerUser.token}`,
+        },
+      });
       expect(response.status).toBe(200);
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBe(1);
-      expect(response.body[0].name).toBe("Test Category");
+      const body = await response.json();
+      expect(Array.isArray(body)).toBe(true);
+      expect(body.length).toBe(1);
+      expect(body[0].name).toBe("Test Category");
     });
   });
 
@@ -132,12 +155,17 @@ describe("Admin API", () => {
         currentPrice: "48000",
         features: "[]",
       };
-      const response = await request(app)
-        .post(`/api/v1/admin/car-categories/${categoryId}/trims`)
-        .set("Authorization", `Bearer ${tenantAdminUser.token}`)
-        .send(newTrim);
+      const response = await app.request(`/api/v1/admin/car-categories/${categoryId}/trims`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tenantAdminUser.token}`,
+        },
+        body: JSON.stringify(newTrim),
+      });
       expect(response.status).toBe(201);
-      expect(response.body).toMatchObject({ name: newTrim.name });
+      const body = await response.json();
+      expect(body).toMatchObject({ name: newTrim.name });
     });
 
     it("should get all car trims for a category", async () => {
@@ -153,12 +181,15 @@ describe("Admin API", () => {
           tenantId: tenantId,
         },
       });
-      const response = await request(app)
-        .get(`/api/v1/admin/car-categories/${categoryId}/trims`)
-        .set("Authorization", `Bearer ${tenantViewerUser.token}`);
+      const response = await app.request(`/api/v1/admin/car-categories/${categoryId}/trims`, {
+        headers: {
+          Authorization: `Bearer ${tenantViewerUser.token}`,
+        },
+      });
       expect(response.status).toBe(200);
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBeGreaterThan(0);
+      const body = await response.json();
+      expect(Array.isArray(body)).toBe(true);
+      expect(body.length).toBeGreaterThan(0);
     });
   });
 
@@ -170,12 +201,17 @@ describe("Admin API", () => {
         image: "test_drive.jpg",
         description: "A test drive scenario",
       };
-      const response = await request(app)
-        .post("/api/v1/admin/vehicle-scenarios")
-        .set("Authorization", `Bearer ${tenantAdminUser.token}`)
-        .send(newScenario);
+      const response = await app.request("/api/v1/admin/vehicle-scenarios", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tenantAdminUser.token}`,
+        },
+        body: JSON.stringify(newScenario),
+      });
       expect(response.status).toBe(201);
-      expect(response.body).toMatchObject({ name: newScenario.name });
+      const body = await response.json();
+      expect(body).toMatchObject({ name: newScenario.name });
     });
 
     it("should get all vehicle scenarios", async () => {
@@ -187,13 +223,16 @@ describe("Admin API", () => {
           tenantId: tenantId,
         },
       });
-      const response = await request(app)
-        .get("/api/v1/admin/vehicle-scenarios")
-        .set("Authorization", `Bearer ${tenantViewerUser.token}`);
+      const response = await app.request("/api/v1/admin/vehicle-scenarios", {
+        headers: {
+          Authorization: `Bearer ${tenantViewerUser.token}`,
+        },
+      });
       expect(response.status).toBe(200);
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBeGreaterThan(0);
-      expect(response.body[0].name).toBe("Existing Scenario");
+      const body = await response.json();
+      expect(Array.isArray(body)).toBe(true);
+      expect(body.length).toBeGreaterThan(0);
+      expect(body[0].name).toBe("Existing Scenario");
     });
   });
 
@@ -229,14 +268,17 @@ describe("Admin API", () => {
         },
       });
 
-      const response = await request(app)
-        .get("/api/v1/admin/users")
-        .set("Authorization", `Bearer ${tenantAdminUser.token}`);
+      const response = await app.request("/api/v1/admin/users", {
+        headers: {
+          Authorization: `Bearer ${tenantAdminUser.token}`,
+        },
+      });
 
       expect(response.status).toBe(200);
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBe(1); // Should only get user for its own tenant
-      expect(response.body[0].nickname).toBe("Test User");
+      const body = await response.json();
+      expect(Array.isArray(body)).toBe(true);
+      expect(body.length).toBe(1); // Should only get user for its own tenant
+      expect(body[0].nickname).toBe("Test User");
     });
   });
 });
