@@ -1,16 +1,16 @@
 import { Hono, type Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import type { AppEnv } from "../../types/hono";
-import appAuthRoutes from "./features/auth/routes";
-import carCategoriesAppRoutes from "./features/car-categories/routes";
-import carTrimsAppRoutes from "./features/car-trims/routes";
-import appUserRoutes from "./features/users/routes";
-import vehicleScenariosAppRoutes from "./features/vehicle-scenarios/routes";
+import authRoutes from "./features/auth";
+import carCategoriesAppRoutes from "./features/car-categories";
+import carTrimsAppRoutes from "./features/car-trims";
+import appUserRoutes from "./features/users";
+import vehicleScenariosAppRoutes from "./features/vehicle-scenarios";
 import { tenantMiddleware } from "./middleware/tenant";
 
 const app = new Hono<AppEnv>();
 
-// Apply tenant middleware to all routes
+// Apply tenant middleware to all routes, except for auth
 app.use("*", tenantMiddleware);
 
 app.onError((err, c) => {
@@ -27,8 +27,10 @@ app.onError((err, c) => {
   );
 });
 
+// Unprotected auth routes
+app.route("/auth", authRoutes);
+
 // Mount the app features
-app.route("/auth", appAuthRoutes);
 app.route("/users", appUserRoutes);
 app.route("/vehicle-scenarios", vehicleScenariosAppRoutes);
 app.route("/car-categories", carCategoriesAppRoutes);

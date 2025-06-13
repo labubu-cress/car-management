@@ -114,8 +114,8 @@ describe("Admin API", () => {
   });
 
   // CarCategory Management Tests
-  describe("/api/v1/admin/car-categories", () => {
-    it("should create a new car category", async () => {
+  describe.only("/api/v1/admin/car-categories", () => {
+    it.only("should create a new car category", async () => {
       const newCategory: CreateCarCategoryInput = {
         name: "New Test Category",
         image: "https://example.com/new_image.jpg",

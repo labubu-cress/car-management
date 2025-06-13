@@ -1,27 +1,31 @@
-import type { Context } from "hono";
+import { zValidator } from "@hono/zod-validator";
+import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import type { AdminAuthEnv } from "../../middleware/auth";
-import * as userService from "./service";
+import { getUserByIdSchema } from "./schema";
+import { getAllUsers, getUserById } from "./service";
 
-export const getAllUsers = async (c: Context<AdminAuthEnv>) => {
+const app = new Hono<{ Variables: AdminAuthEnv["Variables"] }>();
+
+app.use("*", async (c, next) => {
   const { adminUser } = c.var;
   if (!adminUser.tenantId) {
     throw new HTTPException(403, { message: "Forbidden: No tenant associated" });
   }
+  await next();
+});
 
-  const users = await userService.getAllUsers(adminUser.tenantId);
+app.get("/", async (c) => {
+  const { adminUser } = c.var;
+  const users = await getAllUsers(adminUser.tenantId as string);
   return c.json(users);
-};
+});
 
-export const getUserById = async (c: Context<AdminAuthEnv>) => {
+app.get("/:id", zValidator("param", getUserByIdSchema), async (c) => {
   const { adminUser } = c.var;
-  if (!adminUser.tenantId) {
-    throw new HTTPException(403, { message: "Forbidden: No tenant associated" });
-  }
+  const { id } = c.req.valid("param");
 
-  const { id } = c.req.param();
-
-  const user = await userService.getUserById(adminUser.tenantId, id);
+  const user = await getUserById(adminUser.tenantId as string, id);
   if (!user) {
     throw new HTTPException(404, { message: "User not found" });
   }
@@ -31,4 +35,6 @@ export const getUserById = async (c: Context<AdminAuthEnv>) => {
     throw new HTTPException(404, { message: "User not found" });
   }
   return c.json(user);
-};
+});
+
+export default app;

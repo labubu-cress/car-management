@@ -1,21 +1,11 @@
-import type { Context } from "hono";
+import { zValidator } from "@hono/zod-validator";
+import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import type { z } from "zod";
-import type { AdminAuthEnv as BaseAdminAuthEnv } from "../../middleware/auth";
+import type { AdminAuthEnv } from "../../middleware/auth";
 import { createAdminUserSchema, updateAdminUserSchema } from "./schema";
-import * as adminUserService from "./service";
+import { createAdminUser, deleteAdminUser, getAdminUserById, getAllAdminUsers, updateAdminUser } from "./service";
 
-export type AdminAuthEnv = BaseAdminAuthEnv;
 type LoggedInUser = AdminAuthEnv["Variables"]["adminUser"];
-
-type ValidatedContext<T extends z.ZodSchema> = Context<
-  AdminAuthEnv,
-  any,
-  {
-    in: { json: z.infer<T> };
-    out: { json: z.infer<T> };
-  }
->;
 
 const hasAdminManipulationPermission = (user: LoggedInUser, targetUser: Partial<LoggedInUser>): boolean => {
   switch (user.role) {
@@ -32,18 +22,29 @@ const hasAdminManipulationPermission = (user: LoggedInUser, targetUser: Partial<
   }
 };
 
-export const getAllAdminUsers = async (c: Context<AdminAuthEnv>) => {
-  const { adminUser } = c.var;
-  const users = (await adminUserService.getAllAdminUsers()).filter((user) =>
-    hasAdminManipulationPermission(adminUser, user),
-  );
-  return c.json(users);
-};
+const app = new Hono<{ Variables: AdminAuthEnv["Variables"] }>();
 
-export const getAdminUserById = async (c: Context<AdminAuthEnv>) => {
+app.get("/", async (c) => {
+  const { adminUser } = c.var;
+  const users = (await getAllAdminUsers()).filter((user) => hasAdminManipulationPermission(adminUser, user));
+  return c.json(users);
+});
+
+app.post("/", zValidator("json", createAdminUserSchema), async (c) => {
+  const { adminUser } = c.var;
+  const body = c.req.valid("json");
+
+  if (!hasAdminManipulationPermission(adminUser, body)) {
+    throw new HTTPException(403, { message: "Forbidden" });
+  }
+  const newUser = await createAdminUser(body);
+  return c.json(newUser, 201);
+});
+
+app.get("/:id", async (c) => {
   const { adminUser } = c.var;
   const { id } = c.req.param();
-  const user = await adminUserService.getAdminUserById(id);
+  const user = await getAdminUserById(id);
   if (!user) {
     throw new HTTPException(404, { message: "Admin user not found" });
   }
@@ -51,25 +52,14 @@ export const getAdminUserById = async (c: Context<AdminAuthEnv>) => {
     throw new HTTPException(403, { message: "Forbidden" });
   }
   return c.json(user);
-};
+});
 
-export const createAdminUser = async (c: ValidatedContext<typeof createAdminUserSchema>) => {
-  const { adminUser } = c.var;
-  const body = c.req.valid("json");
-
-  if (!hasAdminManipulationPermission(adminUser, body)) {
-    throw new HTTPException(403, { message: "Forbidden" });
-  }
-  const newUser = await adminUserService.createAdminUser(body);
-  return c.json(newUser, 201);
-};
-
-export const updateAdminUser = async (c: ValidatedContext<typeof updateAdminUserSchema>) => {
+app.put("/:id", zValidator("json", updateAdminUserSchema), async (c) => {
   const { id } = c.req.param();
   const { adminUser } = c.var;
   const body = c.req.valid("json");
 
-  const targetUser = await adminUserService.getAdminUserById(id);
+  const targetUser = await getAdminUserById(id);
   if (!targetUser) {
     throw new HTTPException(404, { message: "Admin user not found" });
   }
@@ -78,15 +68,15 @@ export const updateAdminUser = async (c: ValidatedContext<typeof updateAdminUser
     throw new HTTPException(403, { message: "Forbidden" });
   }
 
-  const updatedUser = await adminUserService.updateAdminUser(id, body);
+  const updatedUser = await updateAdminUser(id, body);
   return c.json(updatedUser);
-};
+});
 
-export const deleteAdminUser = async (c: Context<AdminAuthEnv>) => {
+app.delete("/:id", async (c) => {
   const { id } = c.req.param();
   const { adminUser } = c.var;
 
-  const targetUser = await adminUserService.getAdminUserById(id);
+  const targetUser = await getAdminUserById(id);
   if (!targetUser) {
     throw new HTTPException(404, { message: "Admin user not found" });
   }
@@ -95,6 +85,8 @@ export const deleteAdminUser = async (c: Context<AdminAuthEnv>) => {
     throw new HTTPException(403, { message: "Forbidden" });
   }
 
-  await adminUserService.deleteAdminUser(id);
+  await deleteAdminUser(id);
   return c.body(null, 204);
-};
+});
+
+export default app;

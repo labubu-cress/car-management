@@ -1,13 +1,13 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import adminUsersRoutes from "./features/admin-users/routes";
-import authRoutes from "./features/auth/routes";
-import carCategoriesAdminRoutes from "./features/car-categories/routes";
-import carTrimsAdminRoutes from "./features/car-trims/routes";
-import imgAdminApi from "./features/img/routes";
-import tenantsAdminApi from "./features/tenants/routes";
-import usersAdminApi from "./features/users/routes";
-import vehicleScenariosAdminRoutes from "./features/vehicle-scenarios/routes";
+import adminUsersRoutes from "./features/admin-users";
+import authRoutes from "./features/auth";
+import carCategoriesAdminRoutes from "./features/car-categories";
+import carTrimsAdminRoutes from "./features/car-trims";
+import imgAdminApi from "./features/img";
+import tenantsAdminApi from "./features/tenants";
+import usersAdminApi from "./features/users";
+import vehicleScenariosAdminRoutes from "./features/vehicle-scenarios";
 import type { AdminAuthEnv } from "./middleware/auth";
 import { authMiddleware } from "./middleware/auth";
 
