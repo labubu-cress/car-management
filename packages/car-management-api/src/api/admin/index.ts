@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import adminUsersRoutes from "./features/admin-users/routes";
 import authRoutes from "./features/auth/routes";
-import carsAdminApi from "./features/cars";
+import carsAdminRoutes from "./features/cars/routes";
 import imgAdminApi from "./features/img/routes";
 import tenantsAdminApi from "./features/tenants/routes";
 import usersAdminApi from "./features/users/routes";
@@ -31,7 +31,7 @@ const adminProtected = new Hono<{ Variables: AdminAuthEnv["Variables"] }>();
 adminProtected.use("*", authMiddleware);
 
 // Mount feature APIs
-adminProtected.route("/cars", carsAdminApi);
+adminProtected.route("/", carsAdminRoutes);
 adminProtected.route("/tenants", tenantsAdminApi);
 adminProtected.route("/admin-users", adminUsersRoutes);
 adminProtected.route("/users", usersAdminApi);

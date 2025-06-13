@@ -1,5 +1,7 @@
 import { createTenantPrismaClient } from "@/lib/db";
-import { type CarCategory, type CarTrim, type VehicleScenario, Prisma } from "@prisma/client";
+import type { CarCategory, CarTrim, VehicleScenario } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import type { CreateCarCategoryInput, CreateCarTrimInput, CreateVehicleScenarioInput } from "./schema";
 
 // This service will contain all business logic related to cars,
 // including categories, trims, and scenarios.
@@ -14,14 +16,16 @@ export const getCarCategoryById = async (tenantId: string, id: string): Promise<
   return prisma.carCategory.findUnique({ where: { id } });
 };
 
-export const createCarCategory = async (
-  tenantId: string,
-  data: Omit<Prisma.CarCategoryCreateInput, "tenant" | "vehicleScenarios">,
-): Promise<CarCategory> => {
+export const createCarCategory = async (tenantId: string, data: CreateCarCategoryInput): Promise<CarCategory> => {
   const prisma = createTenantPrismaClient(tenantId);
   return prisma.carCategory.create({
     data: {
       ...data,
+      tags: JSON.stringify(data.tags || []),
+      highlights: JSON.stringify(data.highlights || []),
+      interiorImages: JSON.stringify(data.interiorImages || []),
+      exteriorImages: JSON.stringify(data.exteriorImages || []),
+      offerPictures: JSON.stringify(data.offerPictures || []),
       tenant: {
         connect: {
           id: tenantId,
@@ -37,9 +41,25 @@ export const updateCarCategory = async (
   data: Omit<Prisma.CarCategoryUpdateInput, "tenant" | "vehicleScenarios">,
 ): Promise<CarCategory | null> => {
   const prisma = createTenantPrismaClient(tenantId);
+  const dataForUpdate = { ...data };
+  if (data.tags) {
+    dataForUpdate.tags = JSON.stringify(data.tags);
+  }
+  if (data.highlights) {
+    dataForUpdate.highlights = JSON.stringify(data.highlights);
+  }
+  if (data.interiorImages) {
+    dataForUpdate.interiorImages = JSON.stringify(data.interiorImages);
+  }
+  if (data.exteriorImages) {
+    dataForUpdate.exteriorImages = JSON.stringify(data.exteriorImages);
+  }
+  if (data.offerPictures) {
+    dataForUpdate.offerPictures = JSON.stringify(data.offerPictures);
+  }
   return prisma.carCategory.update({
     where: { id },
-    data,
+    data: dataForUpdate,
   });
 };
 
@@ -58,14 +78,13 @@ export const getCarTrimById = async (tenantId: string, id: string): Promise<CarT
   return prisma.carTrim.findUnique({ where: { id } });
 };
 
-type CarTrimCreateData = Omit<Prisma.CarTrimCreateInput, "tenant" | "category"> & { categoryId: string };
-
-export const createCarTrim = async (tenantId: string, data: CarTrimCreateData): Promise<CarTrim> => {
+export const createCarTrim = async (tenantId: string, data: CreateCarTrimInput): Promise<CarTrim> => {
   const prisma = createTenantPrismaClient(tenantId);
   const { categoryId, ...restData } = data;
   return prisma.carTrim.create({
     data: {
       ...restData,
+      features: JSON.stringify(restData.features || []),
       tenant: {
         connect: {
           id: tenantId,
@@ -86,9 +105,13 @@ export const updateCarTrim = async (
   data: Omit<Prisma.CarTrimUpdateInput, "tenant" | "category">,
 ): Promise<CarTrim | null> => {
   const prisma = createTenantPrismaClient(tenantId);
+  const dataForUpdate = { ...data };
+  if (data.features) {
+    dataForUpdate.features = JSON.stringify(data.features);
+  }
   return prisma.carTrim.update({
     where: { id },
-    data,
+    data: dataForUpdate,
   });
 };
 
@@ -109,7 +132,7 @@ export const getVehicleScenarioById = async (tenantId: string, id: string): Prom
 
 export const createVehicleScenario = async (
   tenantId: string,
-  data: { name: string; description: string; image: string },
+  data: CreateVehicleScenarioInput,
 ): Promise<VehicleScenario> => {
   const prisma = createTenantPrismaClient(tenantId);
   return prisma.vehicleScenario.create({

@@ -9,7 +9,7 @@ import type {
   UpdateCarTrimInput,
   UpdateVehicleScenarioInput,
 } from "./schema";
-import * as carsService from "./service";
+import * as Service from "./service";
 
 type ControllerEnv<T = unknown> = AdminAuthEnv & {
   Variables: {
@@ -26,7 +26,7 @@ export const createVehicleScenario = async (c: Context<ControllerEnv<CreateVehic
     throw new HTTPException(403, { message: "Forbidden: No tenant associated" });
   }
 
-  const newScenario = await carsService.createVehicleScenario(tenantId, validatedData);
+  const newScenario = await Service.createVehicleScenario(tenantId, validatedData);
   return c.json(newScenario, 201);
 };
 
@@ -35,7 +35,7 @@ export const getAllVehicleScenarios = async (c: Context<AdminAuthEnv>) => {
   if (!tenantId) {
     throw new HTTPException(403, { message: "Forbidden: No tenant associated" });
   }
-  const scenarios = await carsService.getAllVehicleScenarios(tenantId);
+  const scenarios = await Service.getAllVehicleScenarios(tenantId);
   return c.json(scenarios);
 };
 
@@ -45,7 +45,7 @@ export const getVehicleScenarioById = async (c: Context<AdminAuthEnv>) => {
     throw new HTTPException(403, { message: "Forbidden: No tenant associated" });
   }
   const { id } = c.req.param();
-  const scenario = await carsService.getVehicleScenarioById(tenantId, id);
+  const scenario = await Service.getVehicleScenarioById(tenantId, id);
   if (scenario) {
     return c.json(scenario);
   }
@@ -59,7 +59,7 @@ export const updateVehicleScenario = async (c: Context<ControllerEnv<UpdateVehic
   }
   const { id } = c.req.param();
 
-  const updatedScenario = await carsService.updateVehicleScenario(tenantId, id, validatedData);
+  const updatedScenario = await Service.updateVehicleScenario(tenantId, id, validatedData);
   if (updatedScenario) {
     return c.json(updatedScenario);
   }
@@ -72,7 +72,7 @@ export const deleteVehicleScenario = async (c: Context<AdminAuthEnv>) => {
     throw new HTTPException(403, { message: "Forbidden: No tenant associated" });
   }
   const { id } = c.req.param();
-  await carsService.deleteVehicleScenario(tenantId, id);
+  await Service.deleteVehicleScenario(tenantId, id);
   return c.body(null, 204);
 };
 
@@ -82,17 +82,7 @@ export const createCarCategory = async (c: Context<ControllerEnv<CreateCarCatego
     throw new HTTPException(403, { message: "Forbidden: No tenant associated" });
   }
 
-  // Ensure JSON fields are not undefined
-  const dataForPrisma = {
-    ...validatedData,
-    tags: validatedData.tags ?? [],
-    highlights: validatedData.highlights ?? [],
-    interiorImages: validatedData.interiorImages ?? [],
-    exteriorImages: validatedData.exteriorImages ?? [],
-    offerPictures: validatedData.offerPictures ?? [],
-  };
-
-  const newCategory = await carsService.createCarCategory(tenantId, dataForPrisma);
+  const newCategory = await Service.createCarCategory(tenantId, validatedData);
   return c.json(newCategory, 201);
 };
 
@@ -101,7 +91,7 @@ export const getAllCarCategories = async (c: Context<AdminAuthEnv>) => {
   if (!tenantId) {
     throw new HTTPException(403, { message: "Forbidden: No tenant associated" });
   }
-  const categories = await carsService.getAllCarCategories(tenantId);
+  const categories = await Service.getAllCarCategories(tenantId);
   return c.json(categories);
 };
 
@@ -111,7 +101,7 @@ export const getCarCategoryById = async (c: Context<AdminAuthEnv>) => {
     throw new HTTPException(403, { message: "Forbidden: No tenant associated" });
   }
   const { id } = c.req.param();
-  const category = await carsService.getCarCategoryById(tenantId, id);
+  const category = await Service.getCarCategoryById(tenantId, id);
   if (category) {
     return c.json(category);
   }
@@ -125,15 +115,7 @@ export const updateCarCategory = async (c: Context<ControllerEnv<UpdateCarCatego
   }
   const { id } = c.req.param();
 
-  const dataForPrisma = { ...validatedData };
-  // Remove undefined json fields to avoid Prisma errors
-  if (dataForPrisma.tags === undefined) delete dataForPrisma.tags;
-  if (dataForPrisma.highlights === undefined) delete dataForPrisma.highlights;
-  if (dataForPrisma.interiorImages === undefined) delete dataForPrisma.interiorImages;
-  if (dataForPrisma.exteriorImages === undefined) delete dataForPrisma.exteriorImages;
-  if (dataForPrisma.offerPictures === undefined) delete dataForPrisma.offerPictures;
-
-  const updatedCategory = await carsService.updateCarCategory(tenantId, id, dataForPrisma);
+  const updatedCategory = await Service.updateCarCategory(tenantId, id, validatedData);
   if (updatedCategory) {
     return c.json(updatedCategory);
   }
@@ -146,7 +128,7 @@ export const deleteCarCategory = async (c: Context<AdminAuthEnv>) => {
     throw new HTTPException(403, { message: "Forbidden: No tenant associated" });
   }
   const { id } = c.req.param();
-  await carsService.deleteCarCategory(tenantId, id);
+  await Service.deleteCarCategory(tenantId, id);
   return c.body(null, 204);
 };
 
@@ -156,12 +138,7 @@ export const createCarTrim = async (c: Context<ControllerEnv<CreateCarTrimInput>
     throw new HTTPException(403, { message: "Forbidden: No tenant associated" });
   }
 
-  const dataForPrisma = {
-    ...validatedData,
-    features: validatedData.features ?? [],
-  };
-
-  const newTrim = await carsService.createCarTrim(tenantId, dataForPrisma);
+  const newTrim = await Service.createCarTrim(tenantId, validatedData);
   return c.json(newTrim, 201);
 };
 
@@ -170,11 +147,11 @@ export const getAllCarTrims = async (c: Context<AdminAuthEnv>) => {
   if (!tenantId) {
     throw new HTTPException(403, { message: "Forbidden: No tenant associated" });
   }
-  const { categoryId } = c.req.query();
+  const { categoryId } = c.req.param();
   if (!categoryId) {
-    return c.json({ message: "categoryId query parameter is required" }, 400);
+    return c.json({ message: "categoryId parameter is required" }, 400);
   }
-  const trims = await carsService.getAllCarTrims(tenantId, categoryId);
+  const trims = await Service.getAllCarTrims(tenantId, categoryId);
   return c.json(trims);
 };
 
@@ -184,7 +161,7 @@ export const getCarTrimById = async (c: Context<AdminAuthEnv>) => {
     throw new HTTPException(403, { message: "Forbidden: No tenant associated" });
   }
   const { id } = c.req.param();
-  const trim = await carsService.getCarTrimById(tenantId, id);
+  const trim = await Service.getCarTrimById(tenantId, id);
   if (trim) {
     return c.json(trim);
   }
@@ -198,10 +175,7 @@ export const updateCarTrim = async (c: Context<ControllerEnv<UpdateCarTrimInput>
   }
   const { id } = c.req.param();
 
-  const dataForPrisma = { ...validatedData };
-  if (dataForPrisma.features === undefined) delete dataForPrisma.features;
-
-  const updatedTrim = await carsService.updateCarTrim(tenantId, id, dataForPrisma);
+  const updatedTrim = await Service.updateCarTrim(tenantId, id, validatedData);
   if (updatedTrim) {
     return c.json(updatedTrim);
   }
@@ -214,6 +188,6 @@ export const deleteCarTrim = async (c: Context<AdminAuthEnv>) => {
     throw new HTTPException(403, { message: "Forbidden: No tenant associated" });
   }
   const { id } = c.req.param();
-  await carsService.deleteCarTrim(tenantId, id);
+  await Service.deleteCarTrim(tenantId, id);
   return c.body(null, 204);
 };
