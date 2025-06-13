@@ -1,5 +1,5 @@
-import { type Tenant, Prisma } from "@prisma/client";
-import { prisma } from "../db/client";
+import { prisma } from "@/lib/db";
+import { Prisma, type Tenant } from "@prisma/client";
 
 export const getAllTenants = async (): Promise<Tenant[]> => {
   return prisma.tenant.findMany();
@@ -9,16 +9,11 @@ export const getTenantById = async (id: string): Promise<Tenant | null> => {
   return prisma.tenant.findUnique({ where: { id } });
 };
 
-export const createTenant = async (
-  data: Prisma.TenantCreateInput
-): Promise<Tenant> => {
+export const createTenant = async (data: Prisma.TenantCreateInput): Promise<Tenant> => {
   return prisma.tenant.create({ data });
 };
 
-export const updateTenant = async (
-  id: string,
-  data: Prisma.TenantUpdateInput
-): Promise<Tenant | null> => {
+export const updateTenant = async (id: string, data: Prisma.TenantUpdateInput): Promise<Tenant | null> => {
   return prisma.tenant.update({ where: { id }, data });
 };
 

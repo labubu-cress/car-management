@@ -1,13 +1,6 @@
 import { getImgUploadToken } from "@/controllers/admin/img.controller";
-import {
-  createTenant,
-  deleteTenant,
-  getAllTenants,
-  getTenantById,
-  updateTenant,
-} from "@/controllers/admin/tenant.controller";
 import { getAllUsers, getUserById } from "@/controllers/admin/user.controller";
-import { superAdminPermission, tenantManipulationPermission } from "@/middleware/admin/permission.middleware";
+import { tenantManipulationPermission } from "@/middleware/admin/permission.middleware";
 import { Router } from "express";
 import {
   createAdminUser,
@@ -28,13 +21,6 @@ router.post("/auth/login", login);
 
 // Apply authentication middleware to all routes below
 router.use(authenticate);
-
-// Tenant Management Routes
-router.post("/tenants", superAdminPermission, createTenant);
-router.get("/tenants", getAllTenants);
-router.get("/tenants/:id", getTenantById);
-router.put("/tenants/:id", superAdminPermission, tenantManipulationPermission, updateTenant);
-router.delete("/tenants/:id", superAdminPermission, tenantManipulationPermission, deleteTenant);
 
 // AdminUser Management Routes
 router.get("/admin-users/current", getCurrentAdminUser);

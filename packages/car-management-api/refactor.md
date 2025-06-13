@@ -11,7 +11,7 @@
 *   **核心需求**:
     1.  将后端框架从 Express 迁移到 Hono。
     2.  引入 Zod 进行所有 API 的请求 schema 验证。
-    3.  对项目进行目录结构重构，采用“功能模块化”的最佳实践。
+    3.  对项目进行目录结构重构，采用"功能模块化"的最佳实践。
     4.  **关键设计要求**: 新的目录结构必须能够让未来的**小程序后端 (`app`)** 和 **管理后台后端 (`admin`)** 轻松拆分成两个独立的应用。
 
 **2. 已分析的文件**
@@ -86,6 +86,58 @@ src/
 我们刚刚完成了规划阶段。您的任务是从 **阶段一：基础建设** 的第一步开始执行。
 
 **您的第一个动作是：** 请开始执行 **阶段一** 的第 1 步：**管理依赖项**。
+
+
+---
+
+### **任务交接点 (Agent Handoff Point)**
+
+**上次任务总结:**
+
+前一个 Agent 已经完成了以下工作：
+
+1.  **基础建设**:
+    *   项目依赖已更新，添加了 `hono`, `@hono/zod-validator`, `@hono/node-server`，并移除了 `express`。
+    *   已根据 `refactor.md` 的规划创建了全新的目录结构 (`src/api`, `src/modules`, `src/lib` 等)。
+    *   `src/index.ts` 已重构为 Hono 应用入口，并配置好了 admin 和 app 的路由挂载。
+    *   数据库 Prisma Client 初始化逻辑已迁移至 `src/lib/db.ts`。
+2.  **模块迁移 - `Cars` 模块**:
+    *   **已完全迁移**。
+    *   所有与汽车相关的业务逻辑 (CarCategory, CarTrim, VehicleScenario) 已整合到 `src/modules/cars/cars.service.ts`。
+    *   `admin` 端 API (增删改查) 已在 `src/api/admin/features/cars/` 目录下完成实现。
+    *   `app` 端 API (查询) 已在 `src/api/app/features/cars/` 目录下完成实现。
+    *   所有相关的旧控制器 (`car-*.controller.ts`) 和路由定义都已从旧的 `controllers` 和 `routes` 目录中清理。
+3.  **模块迁移 - `Tenants` 模块**:
+    *   **已完全迁移** (此模块仅存在于 admin API 中)。
+    *   旧的 `tenant.service.ts` 的业务逻辑已整合到 `src/modules/tenants/tenant.service.ts`。
+    *   `admin` 端的 `Tenants` API (增删改查) 已在 `src/api/admin/features/tenants/` 目录下，使用 Hono、Zod 和新的 Service 完成了实现。
+    *   新的租户路由已挂载到 `src/api/admin/index.ts`。
+    *   所有相关的旧控制器 (`tenant.controller.ts`) 和路由定义都已从旧的 `controllers` 和 `routes` 目录中清理。
+
+**下一步任务 (Next Action):**
+
+下一个 Agent 的任务是从 `refactor.md` 规划的下一个模块开始，继续进行迁移。
+
+**下一个要迁移的模块是：`AdminUser` (管理员用户管理)**
+
+请严格遵循已经建立的模式来迁移 `AdminUser` 模块 (注意：此模块也仅存在于 admin API 中)：
+
+1.  **创建 Service**:
+    *   在 `src/modules/users/` 中创建 `admin-user.service.ts` 文件。
+    *   将旧的 `src/services/admin-user.service.ts` 中的逻辑迁移到新的 service 文件中，并进行必要的调整 (如导入路径)。
+2.  **实现 Admin API**:
+    *   在 `src/api/admin/features/` 下创建 `admin-users` 目录。
+    *   在此目录中创建 `schema.ts`, `controller.ts`, `routes.ts`。
+    *   使用 Zod 在 `schema.ts` 中定义创建和更新 AdminUser 的验证规则 (注意处理密码字段)。
+    *   在 `controller.ts` 中实现 API 逻辑，并调用 `modules/users/admin-user.service.ts`。
+    *   在 `routes.ts` 中定义 Hono 路由。
+3.  **集成路由**:
+    *   将 `features/admin-users/routes.ts` 导出的路由挂载到 `src/api/admin/index.ts` 中。
+4.  **清理旧代码**:
+    *   从 `src/routes/admin.route.ts` 中移除所有与 `admin-users` 相关的路由。
+    *   删除旧的 `src/controllers/admin/admin-user.controller.ts` 文件。
+
+**下一个 Agent 的第一个具体动作是：** 请开始执行 **`AdminUser` 模块** 的迁移工作，首先从分析 `src/controllers/admin/admin-user.controller.ts` 和 `src/services/admin-user.service.ts` 开始，以准备创建新的 `src/modules/users/admin-user.service.ts`。
 
 
 ---
