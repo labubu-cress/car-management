@@ -4,7 +4,7 @@ import type { AdminAuthEnv } from "../../middleware/auth";
 import * as userService from "./service";
 
 export const getAllUsers = async (c: Context<AdminAuthEnv>) => {
-  const adminUser = c.get("adminUser");
+  const { adminUser } = c.var;
   if (!adminUser.tenantId) {
     throw new HTTPException(403, { message: "Forbidden: No tenant associated" });
   }
@@ -14,7 +14,7 @@ export const getAllUsers = async (c: Context<AdminAuthEnv>) => {
 };
 
 export const getUserById = async (c: Context<AdminAuthEnv>) => {
-  const adminUser = c.get("adminUser");
+  const { adminUser } = c.var;
   if (!adminUser.tenantId) {
     throw new HTTPException(403, { message: "Forbidden: No tenant associated" });
   }

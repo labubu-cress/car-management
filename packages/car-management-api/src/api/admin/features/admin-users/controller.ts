@@ -1,7 +1,7 @@
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import type { AdminAuthEnv as BaseAdminAuthEnv } from "../../middleware/auth";
-import type { createAdminUserSchema, updateAdminUserSchema } from "./schema";
+import type { CreateAdminUserInput, UpdateAdminUserInput } from "./schema";
 import * as adminUserService from "./service";
 
 export type AdminAuthEnv = BaseAdminAuthEnv;
@@ -9,13 +9,13 @@ type LoggedInUser = AdminAuthEnv["Variables"]["adminUser"];
 
 type CreateAdminUserEnv = AdminAuthEnv & {
   Variables: {
-    validatedData: typeof createAdminUserSchema._type;
+    validatedData: CreateAdminUserInput;
   };
 };
 
 type UpdateAdminUserEnv = AdminAuthEnv & {
   Variables: {
-    validatedData: typeof updateAdminUserSchema._type;
+    validatedData: UpdateAdminUserInput;
   };
 };
 
@@ -35,7 +35,7 @@ const hasAdminManipulationPermission = (user: LoggedInUser, targetUser: Partial<
 };
 
 export const getAllAdminUsers = async (c: Context<AdminAuthEnv>) => {
-  const adminUser = c.get("adminUser");
+  const { adminUser } = c.var;
   const users = (await adminUserService.getAllAdminUsers()).filter((user) =>
     hasAdminManipulationPermission(adminUser, user),
   );
@@ -43,7 +43,7 @@ export const getAllAdminUsers = async (c: Context<AdminAuthEnv>) => {
 };
 
 export const getAdminUserById = async (c: Context<AdminAuthEnv>) => {
-  const adminUser = c.get("adminUser");
+  const { adminUser } = c.var;
   const { id } = c.req.param();
   const user = await adminUserService.getAdminUserById(id);
   if (!user) {
@@ -56,8 +56,7 @@ export const getAdminUserById = async (c: Context<AdminAuthEnv>) => {
 };
 
 export const createAdminUser = async (c: Context<CreateAdminUserEnv>) => {
-  const adminUser = c.get("adminUser");
-  const body = c.get("validatedData");
+  const { adminUser, validatedData: body } = c.var;
 
   if (!hasAdminManipulationPermission(adminUser, body)) {
     throw new HTTPException(403, { message: "Forbidden" });
@@ -68,8 +67,7 @@ export const createAdminUser = async (c: Context<CreateAdminUserEnv>) => {
 
 export const updateAdminUser = async (c: Context<UpdateAdminUserEnv>) => {
   const { id } = c.req.param();
-  const adminUser = c.get("adminUser");
-  const body = c.get("validatedData");
+  const { adminUser, validatedData: body } = c.var;
 
   const targetUser = await adminUserService.getAdminUserById(id);
   if (!targetUser) {
@@ -86,7 +84,7 @@ export const updateAdminUser = async (c: Context<UpdateAdminUserEnv>) => {
 
 export const deleteAdminUser = async (c: Context<AdminAuthEnv>) => {
   const { id } = c.req.param();
-  const adminUser = c.get("adminUser");
+  const { adminUser } = c.var;
 
   const targetUser = await adminUserService.getAdminUserById(id);
   if (!targetUser) {

@@ -17,3 +17,6 @@ export const updateTenantSchema = z.object({
   status: tenantStatusSchema.optional(),
   config: z.record(z.string(), z.any()).optional(),
 });
+
+export type CreateTenantInput = z.infer<typeof createTenantSchema>;
+export type UpdateTenantInput = z.infer<typeof updateTenantSchema>;

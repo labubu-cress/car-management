@@ -8,11 +8,16 @@ import {
   updateAdminUser,
   type AdminAuthEnv,
 } from "./controller";
-import { createAdminUserSchema, updateAdminUserSchema } from "./schema";
+import {
+  createAdminUserSchema,
+  updateAdminUserSchema,
+  type CreateAdminUserInput,
+  type UpdateAdminUserInput,
+} from "./schema";
 
 type AdminUsersEnv = AdminAuthEnv & {
   Variables: {
-    validatedData: typeof createAdminUserSchema._type | typeof updateAdminUserSchema._type;
+    validatedData: CreateAdminUserInput | UpdateAdminUserInput;
   };
 };
 

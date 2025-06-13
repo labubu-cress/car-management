@@ -4,7 +4,7 @@ import { HTTPException } from "hono/http-exception";
 import type { AdminAuthEnv } from "../../middleware/auth";
 
 export const getUploadToken = async (c: Context<AdminAuthEnv>) => {
-  const adminUser = c.get("adminUser");
+  const { adminUser } = c.var;
   if (!adminUser.tenantId) {
     throw new HTTPException(403, { message: "Forbidden: No tenant associated" });
   }

@@ -1,5 +1,5 @@
 import type { Context } from "hono";
-import type { createTenantSchema, updateTenantSchema } from "./schema";
+import type { CreateTenantInput, UpdateTenantInput } from "./schema";
 import * as tenantService from "./service";
 
 export const getAllTenants = async (c: Context) => {
@@ -19,14 +19,14 @@ export const getTenantById = async (c: Context) => {
 };
 
 export const createTenant = async (c: Context) => {
-  const validatedData = c.get("validatedData") as typeof createTenantSchema._type;
+  const validatedData = c.get("validatedData") as CreateTenantInput;
   const newTenant = await tenantService.createTenant(validatedData);
   return c.json(newTenant, 201);
 };
 
 export const updateTenant = async (c: Context) => {
   const { id } = c.req.param();
-  const validatedData = c.get("validatedData") as typeof updateTenantSchema._type;
+  const validatedData = c.get("validatedData") as UpdateTenantInput;
   const updatedTenant = await tenantService.updateTenant(id, validatedData);
   if (!updatedTenant) {
     return c.json({ message: "Tenant not found" }, 404);

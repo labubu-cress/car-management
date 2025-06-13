@@ -45,3 +45,10 @@ export const createCarTrimSchema = z.object({
 
 // Schema for updating a car trim
 export const updateCarTrimSchema = createCarTrimSchema.partial();
+
+export type CreateVehicleScenarioInput = z.infer<typeof createVehicleScenarioSchema>;
+export type UpdateVehicleScenarioInput = z.infer<typeof updateVehicleScenarioSchema>;
+export type CreateCarCategoryInput = z.infer<typeof createCarCategorySchema>;
+export type UpdateCarCategoryInput = z.infer<typeof updateCarCategorySchema>;
+export type CreateCarTrimInput = z.infer<typeof createCarTrimSchema>;
+export type UpdateCarTrimInput = z.infer<typeof updateCarTrimSchema>;
