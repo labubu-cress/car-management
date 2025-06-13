@@ -1,27 +1,9 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
-import {
-  createAdminUser,
-  deleteAdminUser,
-  getAdminUserById,
-  getAllAdminUsers,
-  updateAdminUser,
-  type AdminAuthEnv,
-} from "./controller";
-import {
-  createAdminUserSchema,
-  updateAdminUserSchema,
-  type CreateAdminUserInput,
-  type UpdateAdminUserInput,
-} from "./schema";
+import { createAdminUser, deleteAdminUser, getAdminUserById, getAllAdminUsers, updateAdminUser } from "./controller";
+import { createAdminUserSchema, updateAdminUserSchema } from "./schema";
 
-type AdminUsersEnv = AdminAuthEnv & {
-  Variables: {
-    validatedData: CreateAdminUserInput | UpdateAdminUserInput;
-  };
-};
-
-const adminUsersRoutes = new Hono<AdminUsersEnv>();
+const adminUsersRoutes = new Hono();
 
 adminUsersRoutes.get("/", getAllAdminUsers);
 adminUsersRoutes.post("/", zValidator("json", createAdminUserSchema), createAdminUser);

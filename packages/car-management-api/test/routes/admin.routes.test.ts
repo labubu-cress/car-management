@@ -1,7 +1,16 @@
+import type { CreateAdminUserInput } from "@/api/admin/features/admin-users/schema";
+import type { AdminUser } from "@/api/admin/features/admin-users/types";
+import type {
+  CreateCarCategoryInput,
+  CreateCarTrimInput,
+  CreateVehicleScenarioInput,
+} from "@/api/admin/features/cars/schema";
+import type { CreateTenantInput } from "@/api/admin/features/tenants/schema";
+import app from "@/index";
+import { prisma } from "@/lib/db";
+import type { CarCategory, CarTrim, Tenant, User, VehicleScenario } from "@prisma/client";
 import { beforeEach, describe, expect, it } from "vitest";
-import app from "../../src/index";
-import { prisma } from "../../src/lib/db";
-import { clearTestDb, createTestTenantAndAdminUsers, TestAdminUserWithToken } from "../helper";
+import { clearTestDb, createTestTenantAndAdminUsers, type TestAdminUserWithToken } from "../helper";
 
 describe("Admin API", () => {
   let superAdminUser: TestAdminUserWithToken;
@@ -32,9 +41,9 @@ describe("Admin API", () => {
   });
 
   // Tenant Management Tests
-  describe.only("/api/v1/admin/tenants", () => {
-    it.only("should create a new tenant", async () => {
-      const newTenant = {
+  describe("/api/v1/admin/tenants", () => {
+    it("should create a new tenant", async () => {
+      const newTenant: CreateTenantInput = {
         name: "New Test Tenant",
         appId: "new-test-app-id",
         appSecret: "a-new-secure-secret",
@@ -62,7 +71,7 @@ describe("Admin API", () => {
         },
       });
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body = (await response.json()) as Tenant[];
       expect(Array.isArray(body)).toBe(true);
       expect(body.length).toBeGreaterThan(0);
     });
@@ -71,7 +80,8 @@ describe("Admin API", () => {
   // AdminUser Management Tests
   describe("/api/v1/admin/admin-users", () => {
     it("should create a new admin user", async () => {
-      const newAdmin = {
+      const newAdmin: CreateAdminUserInput = {
+        name: "new admin",
         username: "newadmin",
         password: "password123",
         role: "admin",
@@ -99,7 +109,7 @@ describe("Admin API", () => {
         },
       });
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body = (await response.json()) as AdminUser[];
       expect(Array.isArray(body)).toBe(true);
       expect(body.length).toBeGreaterThan(0);
     });
@@ -108,14 +118,14 @@ describe("Admin API", () => {
   // CarCategory Management Tests
   describe("/api/v1/admin/car-categories", () => {
     it("should create a new car category", async () => {
-      const newCategory = {
+      const newCategory: CreateCarCategoryInput = {
         name: "New Test Category",
-        image: "new_image.jpg",
-        tags: '["tag1", "tag2"]',
-        highlights: '["highlight1"]',
-        interiorImages: '["interior1.jpg"]',
-        exteriorImages: '["exterior1.jpg"]',
-        offerPictures: '["offer1.jpg"]',
+        image: "https://example.com/new_image.jpg",
+        tags: ["tag1", "tag2"],
+        highlights: [{ title: "highlight1", value: "value1" }],
+        interiorImages: ["https://example.com/interior1.jpg"],
+        exteriorImages: ["https://example.com/exterior1.jpg"],
+        offerPictures: ["https://example.com/offer1.jpg"],
       };
       const response = await app.request("/api/v1/admin/car-categories", {
         method: "POST",
@@ -137,7 +147,7 @@ describe("Admin API", () => {
         },
       });
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body = (await response.json()) as CarCategory[];
       expect(Array.isArray(body)).toBe(true);
       expect(body.length).toBe(1);
       expect(body[0].name).toBe("Test Category");
@@ -147,13 +157,14 @@ describe("Admin API", () => {
   // CarTrim Management Tests
   describe("/api/v1/admin/car-categories/:categoryId/trims", () => {
     it("should create a new car trim for a category", async () => {
-      const newTrim = {
+      const newTrim: CreateCarTrimInput = {
         name: "Test Trim",
         subtitle: "A nice trim",
-        image: "trim.jpg",
+        image: "https://example.com/trim.jpg",
         originalPrice: "50000",
         currentPrice: "48000",
-        features: "[]",
+        features: [{ title: "Feature 1", value: "Value 1" }],
+        categoryId: categoryId,
       };
       const response = await app.request(`/api/v1/admin/car-categories/${categoryId}/trims`, {
         method: "POST",
@@ -187,7 +198,7 @@ describe("Admin API", () => {
         },
       });
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body = (await response.json()) as CarTrim[];
       expect(Array.isArray(body)).toBe(true);
       expect(body.length).toBeGreaterThan(0);
     });
@@ -196,9 +207,9 @@ describe("Admin API", () => {
   // VehicleScenario Management Tests
   describe("/api/v1/admin/vehicle-scenarios", () => {
     it("should create a new vehicle scenario", async () => {
-      const newScenario = {
+      const newScenario: CreateVehicleScenarioInput = {
         name: "Test Drive",
-        image: "test_drive.jpg",
+        image: "https://example.com/test_drive.jpg",
         description: "A test drive scenario",
       };
       const response = await app.request("/api/v1/admin/vehicle-scenarios", {
@@ -229,7 +240,7 @@ describe("Admin API", () => {
         },
       });
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body = (await response.json()) as VehicleScenario[];
       expect(Array.isArray(body)).toBe(true);
       expect(body.length).toBeGreaterThan(0);
       expect(body[0].name).toBe("Existing Scenario");
@@ -275,7 +286,7 @@ describe("Admin API", () => {
       });
 
       expect(response.status).toBe(200);
-      const body = await response.json();
+      const body = (await response.json()) as User[];
       expect(Array.isArray(body)).toBe(true);
       expect(body.length).toBe(1); // Should only get user for its own tenant
       expect(body[0].nickname).toBe("Test User");

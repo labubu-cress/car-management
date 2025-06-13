@@ -1,6 +1,6 @@
+import { login } from "@/api/admin/features/auth/service";
+import { password2hash } from "@/lib/transform";
 import { AdminRole, PrismaClient } from "@prisma/client";
-import { login } from "../src/api/admin/features/auth/service";
-import { password2hash } from "../src/lib/transform";
 
 export const clearTestDb = async (client: PrismaClient) => {
   await client.carTrim.deleteMany();

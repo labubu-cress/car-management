@@ -1,23 +1,21 @@
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
+import type { z } from "zod";
 import type { AdminAuthEnv as BaseAdminAuthEnv } from "../../middleware/auth";
-import type { CreateAdminUserInput, UpdateAdminUserInput } from "./schema";
+import { createAdminUserSchema, updateAdminUserSchema } from "./schema";
 import * as adminUserService from "./service";
 
 export type AdminAuthEnv = BaseAdminAuthEnv;
 type LoggedInUser = AdminAuthEnv["Variables"]["adminUser"];
 
-type CreateAdminUserEnv = AdminAuthEnv & {
-  Variables: {
-    validatedData: CreateAdminUserInput;
-  };
-};
-
-type UpdateAdminUserEnv = AdminAuthEnv & {
-  Variables: {
-    validatedData: UpdateAdminUserInput;
-  };
-};
+type ValidatedContext<T extends z.ZodSchema> = Context<
+  AdminAuthEnv,
+  any,
+  {
+    in: { json: z.infer<T> };
+    out: { json: z.infer<T> };
+  }
+>;
 
 const hasAdminManipulationPermission = (user: LoggedInUser, targetUser: Partial<LoggedInUser>): boolean => {
   switch (user.role) {
@@ -55,8 +53,9 @@ export const getAdminUserById = async (c: Context<AdminAuthEnv>) => {
   return c.json(user);
 };
 
-export const createAdminUser = async (c: Context<CreateAdminUserEnv>) => {
-  const { adminUser, validatedData: body } = c.var;
+export const createAdminUser = async (c: ValidatedContext<typeof createAdminUserSchema>) => {
+  const { adminUser } = c.var;
+  const body = c.req.valid("json");
 
   if (!hasAdminManipulationPermission(adminUser, body)) {
     throw new HTTPException(403, { message: "Forbidden" });
@@ -65,9 +64,10 @@ export const createAdminUser = async (c: Context<CreateAdminUserEnv>) => {
   return c.json(newUser, 201);
 };
 
-export const updateAdminUser = async (c: Context<UpdateAdminUserEnv>) => {
+export const updateAdminUser = async (c: ValidatedContext<typeof updateAdminUserSchema>) => {
   const { id } = c.req.param();
-  const { adminUser, validatedData: body } = c.var;
+  const { adminUser } = c.var;
+  const body = c.req.valid("json");
 
   const targetUser = await adminUserService.getAdminUserById(id);
   if (!targetUser) {
