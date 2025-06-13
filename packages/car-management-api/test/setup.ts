@@ -1,5 +1,5 @@
 import { afterAll, beforeAll } from "vitest";
-import { prisma } from "../src/db/client";
+import { prisma } from "../src/lib/db";
 import { clearTestDb } from "./helper";
 
 beforeAll(async () => {

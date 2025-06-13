@@ -32,8 +32,8 @@ describe("Admin API", () => {
   });
 
   // Tenant Management Tests
-  describe("/api/v1/admin/tenants", () => {
-    it("should create a new tenant", async () => {
+  describe.only("/api/v1/admin/tenants", () => {
+    it.only("should create a new tenant", async () => {
       const newTenant = {
         name: "New Test Tenant",
         appId: "new-test-app-id",

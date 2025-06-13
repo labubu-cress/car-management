@@ -1,6 +1,6 @@
 import { AdminRole, PrismaClient } from "@prisma/client";
-import { login } from "../src/services/admin/auth.service";
-import { password2hash } from "../src/utils/transform";
+import { login } from "../src/api/admin/features/auth/service";
+import { password2hash } from "../src/lib/transform";
 
 export const clearTestDb = async (client: PrismaClient) => {
   await client.carTrim.deleteMany();
@@ -34,8 +34,8 @@ export const createTestAdminUser = async (
       tenantId: role === "super_admin" || role === "admin" ? undefined : tenantId,
     },
   });
-  const token = await login(username, password);
-  return { username, password, role, tenantId, token: token! };
+  const loginResult = await login(username, password);
+  return { username, password, role, tenantId, token: loginResult!.token };
 };
 
 export const createTestTenantAndAdminUsers = async (client: PrismaClient) => {

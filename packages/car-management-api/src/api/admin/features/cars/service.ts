@@ -1,5 +1,5 @@
+import { createTenantPrismaClient } from "@/lib/db";
 import { type CarCategory, type CarTrim, type VehicleScenario, Prisma } from "@prisma/client";
-import { createTenantPrismaClient } from "../../lib/db";
 
 // This service will contain all business logic related to cars,
 // including categories, trims, and scenarios.
