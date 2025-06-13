@@ -2,7 +2,9 @@ import { Hono } from "hono";
 import adminUsersRoutes from "./features/admin-users/routes";
 import authRoutes from "./features/auth/routes";
 import carsAdminApi from "./features/cars";
+import imgAdminApi from "./features/img/routes";
 import tenantsAdminApi from "./features/tenants/routes";
+import usersAdminApi from "./features/users/routes";
 import type { AdminAuthEnv } from "./middleware/auth";
 import { authMiddleware } from "./middleware/auth";
 
@@ -17,6 +19,8 @@ adminProtected.use("*", authMiddleware);
 adminProtected.route("/cars", carsAdminApi);
 adminProtected.route("/tenants", tenantsAdminApi);
 adminProtected.route("/admin-users", adminUsersRoutes);
+adminProtected.route("/users", usersAdminApi);
+adminProtected.route("/img", imgAdminApi);
 
 adminProtected.get("/", (c) => c.json({ message: "Welcome to Authenticated Admin API" }));
 

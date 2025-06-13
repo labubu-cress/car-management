@@ -140,3 +140,58 @@ src/
 
 
 ---
+
+### **任务交接点 (Agent Handoff Point): 最终审查**
+
+**上次任务总结:**
+
+前一个 Agent 已经根据本文件中定义的重构计划，完成了 `User` 和 `Img` 这最后两个模块从旧 Express 架构到新 Hono 架构的迁移工作。
+
+**已完成的工作:**
+
+1.  **`User` 模块迁移 (Admin API):**
+    *   旧的 `user.service.ts` 逻辑已迁移至 `src/modules/users/user.service.ts`。
+    *   在 `src/api/admin/features/users/` 目录下创建了完整的 Hono API (controller, routes, schema)。
+    *   路由已在 `src/api/admin/index.ts` 中正确挂载。
+
+2.  **`Img` 模块迁移 (Admin API):**
+    *   旧的 `qcloudCos.ts` 逻辑已迁移至 `src/modules/cloud/qcloud.service.ts`。
+    *   在 `src/api/admin/features/img/` 目录下创建了 Hono API (controller, routes)。
+    *   路由已在 `src/api/admin/index.ts` 中正确挂载。
+
+3.  **代码清理:**
+    *   删除了所有旧的控制器 (`user.controller.ts`, `img.controller.ts`)。
+    *   删除了所有旧的服务 (`user.service.ts`)。
+    *   删除了旧的路由文件 (`admin.route.ts`)。
+    *   删除了旧的、现已多余的目录 (`/src/routes`, `/src/cloud`, `/src/controllers`, `/src/services`)。
+
+**下一步任务 (Next Action): 最终代码审查**
+
+您的任务是作为一名代码审查员（Code Reviewer），对前一个 Agent 完成的重构工作进行一次全面的、细致的审查。
+
+**您的审查清单应包括但不限于以下几点：**
+
+1.  **结构一致性检查:**
+    *   **目录结构**: 验证最终的项目目录结构是否**严格符合**本文件开头定义的**最终目录结构**。检查 `src/api/admin/features` 和 `src/modules` 下的目录和文件命名是否规范、一致。
+    *   **代码模式**: 检查新创建的 `users` 和 `img` API (`controller.ts`, `routes.ts`) 是否遵循了项目中已有的 `admin-users` 模块的编码风格和模式（例如，错误处理、从上下文获取 `tenantId` 的方式等）。
+
+2.  **代码质量与正确性检查:**
+    *   **`user.service.ts`**: 检查 `src/modules/users/user.service.ts` 的逻辑是否与旧 `services/admin/user.service.ts` 完全一致。
+    *   **`qcloud.service.ts`**: 检查 `src/modules/cloud/qcloud.service.ts` 的逻辑是否与旧 `cloud/qcloudCos.ts` 完全一致。
+    *   **控制器逻辑**: 审查 `users/controller.ts` 和 `img/controller.ts`。逻辑是否清晰？`tenantId` 是否被正确处理？错误处理是否完备？
+    *   **路由定义**: 审查 `users/routes.ts` 和 `img/routes.ts`。Zod 验证是否正确应用？路由是否正确导出？
+
+3.  **依赖与导入检查:**
+    *   检查所有新创建的文件，确保没有错误的相对路径导入 (e.g., `../..`)。
+    *   检查 `package.json`，确认 `express` 已被移除，`hono` 和 `zod` 存在。
+
+4.  **清理工作检查:**
+    *   再次确认所有在计划中应被删除的旧文件/目录都已被彻底删除，没有残留。
+
+5.  **启动测试 (如果可能):**
+    *   请提出一个可以验证项目是否能成功启动的命令 (例如 `npm run dev` 或 `pnpm dev`)。
+
+**您的第一个具体动作是：** 请从**结构一致性检查**的第一点开始，系统地审查整个项目。
+
+
+---
