@@ -2,7 +2,9 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import adminUsersRoutes from "./features/admin-users/routes";
 import authRoutes from "./features/auth/routes";
-import carsAdminRoutes from "./features/cars/routes";
+import carCategoriesAdminRoutes from "./features/cars/car-categories/routes";
+import carTrimsAdminRoutes from "./features/cars/car-trims/routes";
+import vehicleScenariosAdminRoutes from "./features/cars/vehicle-scenarios/routes";
 import imgAdminApi from "./features/img/routes";
 import tenantsAdminApi from "./features/tenants/routes";
 import usersAdminApi from "./features/users/routes";
@@ -31,7 +33,9 @@ const adminProtected = new Hono<{ Variables: AdminAuthEnv["Variables"] }>();
 adminProtected.use("*", authMiddleware);
 
 // Mount feature APIs
-adminProtected.route("/", carsAdminRoutes);
+adminProtected.route("/vehicle-scenarios", vehicleScenariosAdminRoutes);
+adminProtected.route("/car-categories", carCategoriesAdminRoutes);
+adminProtected.route("/car-trims", carTrimsAdminRoutes);
 adminProtected.route("/tenants", tenantsAdminApi);
 adminProtected.route("/admin-users", adminUsersRoutes);
 adminProtected.route("/users", usersAdminApi);
