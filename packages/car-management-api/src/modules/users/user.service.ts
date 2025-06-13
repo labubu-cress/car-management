@@ -1,5 +1,5 @@
-import type { User } from "@prisma/client";
 import { createTenantPrismaClient } from "../../lib/db";
+import type { User } from "./user.types";
 
 export const getAllUsers = async (tenantId: string): Promise<User[]> => {
   const prisma = createTenantPrismaClient(tenantId);

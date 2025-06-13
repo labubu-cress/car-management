@@ -1,6 +1,6 @@
+import type { AdminJwtPayload } from "@/api/admin/middleware/auth";
 import { prisma } from "@/lib/db";
-import type { AdminJwtPayload } from "@/types/interface";
-import { verifyPassword } from "@/utils/transform";
+import { verifyPassword } from "@/lib/transform";
 import type { AdminUser } from "@prisma/client";
 import jwt from "jsonwebtoken";
 

@@ -1,6 +1,5 @@
 import { serve } from "@hono/node-server";
 import { Hono, type Context } from "hono";
-import type { AddressInfo } from "net";
 import adminRoutes from "./api/admin";
 import appRoutes from "./api/app";
 
@@ -17,15 +16,11 @@ app.get("/", (c: Context) => {
 const port = Number(process.env.PORT) || 3000;
 
 if (process.env.NODE_ENV !== "test") {
-  serve(
-    {
-      fetch: app.fetch,
-      port,
-    },
-    (info: AddressInfo) => {
-      console.log(`Server is running on http://localhost:${info.port}`);
-    },
-  );
+  serve({
+    fetch: app.fetch,
+    port,
+  });
+  console.log(`Server is running on http://localhost:${port}`);
 }
 
 export default app;

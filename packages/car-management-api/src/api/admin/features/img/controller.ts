@@ -1,6 +1,6 @@
+import { createQcloudImgUploadToken } from "@/lib/oss-sts";
 import type { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { createQcloudImgUploadToken } from "../../../../modules/cloud/qcloud.service";
 import type { AdminAuthEnv } from "../../middleware/auth";
 
 export const getUploadToken = async (c: Context<AdminAuthEnv>) => {

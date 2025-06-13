@@ -4,6 +4,11 @@ import { type Context, type Next } from "hono";
 import { createMiddleware } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 
+// Define the shape of the JWT payload for admin users
+export interface AdminJwtPayload {
+  id: string;
+}
+
 // Define the shape of the environment for authenticated admin routes
 export type AdminAuthEnv = {
   Variables: {
