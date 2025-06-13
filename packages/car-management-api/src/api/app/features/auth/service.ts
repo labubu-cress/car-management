@@ -18,7 +18,7 @@ export const loginOrRegister = async (
         tenantId,
         openId,
         unionId,
-        nickname: `用户${openId.slice(-4)}`,
+        nickname: `用户${openId.slice(-6)}`,
         avatarUrl: "",
         phoneNumber: "",
       },

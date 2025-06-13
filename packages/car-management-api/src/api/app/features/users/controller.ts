@@ -15,16 +15,10 @@ export const updatePhoneNumber = async (c: Context) => {
   const user = c.get("user") as User;
   const { code } = c.get("validatedData") as UpdatePhoneNumberInput;
 
-  try {
-    const { phoneNumber } = (await wechatClient.getPhoneNumber(code)) ?? {};
-    if (!phoneNumber) {
-      throw new HTTPException(400, { message: "Invalid code from wechat" });
-    }
-    const updatedUser = await appUserService.updatePhoneNumber(user.tenantId, user.openId, phoneNumber);
-    return c.json(updatedUser);
-  } catch (error: any) {
-    console.error("Update phone number error:", error);
-    if (error instanceof HTTPException) throw error;
-    throw new HTTPException(500, { message: "Error updating phone number", cause: error });
+  const { phoneNumber } = (await wechatClient.getPhoneNumber(code)) ?? {};
+  if (!phoneNumber) {
+    throw new HTTPException(400, { message: "Invalid code from wechat" });
   }
+  const updatedUser = await appUserService.updatePhoneNumber(user.tenantId, user.openId, phoneNumber);
+  return c.json(updatedUser);
 };

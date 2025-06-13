@@ -1,9 +1,24 @@
 import { Hono, type Context } from "hono";
+import { HTTPException } from "hono/http-exception";
 import appAuthRoutes from "./features/auth/routes";
 import carsAppApi from "./features/cars";
 import appUserRoutes from "./features/users/routes";
 
 const app = new Hono();
+
+app.onError((err, c) => {
+  console.error(`App API Error: ${err}`);
+  if (err instanceof HTTPException) {
+    return err.getResponse();
+  }
+  return c.json(
+    {
+      message: "An error occurred in the App API.",
+      error: err.message,
+    },
+    500,
+  );
+});
 
 // Mount the app features
 app.route("/auth", appAuthRoutes);

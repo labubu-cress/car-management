@@ -9,11 +9,6 @@ export const getUploadToken = async (c: Context<AdminAuthEnv>) => {
     throw new HTTPException(403, { message: "Forbidden: No tenant associated" });
   }
 
-  try {
-    const configWithToken = await createQcloudImgUploadToken(adminUser.tenantId);
-    return c.json(configWithToken);
-  } catch (e) {
-    console.error(e);
-    throw new HTTPException(500, { message: "Failed to get upload token" });
-  }
+  const configWithToken = await createQcloudImgUploadToken(adminUser.tenantId);
+  return c.json(configWithToken);
 };

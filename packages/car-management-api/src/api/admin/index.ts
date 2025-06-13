@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
 import adminUsersRoutes from "./features/admin-users/routes";
 import authRoutes from "./features/auth/routes";
 import carsAdminApi from "./features/cars";
@@ -9,6 +10,20 @@ import type { AdminAuthEnv } from "./middleware/auth";
 import { authMiddleware } from "./middleware/auth";
 
 const adminApi = new Hono();
+
+adminApi.onError((err, c) => {
+  console.error(`Admin API Error: ${err}`);
+  if (err instanceof HTTPException) {
+    return err.getResponse();
+  }
+  return c.json(
+    {
+      message: "An error occurred in the Admin API.",
+      error: err.message,
+    },
+    500,
+  );
+});
 
 const adminProtected = new Hono<{ Variables: AdminAuthEnv["Variables"] }>();
 
