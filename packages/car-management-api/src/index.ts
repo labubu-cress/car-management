@@ -1,18 +1,31 @@
-import express from "express";
-import adminRoutes from "./routes/admin.route";
-// import appRoutes from './routes/app.route';
+import { serve } from "@hono/node-server";
+import { Hono, type Context } from "hono";
+import type { AddressInfo } from "net";
+import adminRoutes from "./api/admin";
+import appRoutes from "./api/app";
 
-const app = express();
-const port = process.env.PORT || 3000;
+const app = new Hono().basePath("/api/v1");
 
-app.use(express.json());
-app.use("/api/v1/admin", adminRoutes);
-// app.use('/api/v1/app', appRoutes);
+// Mount the admin and app routes
+app.route("/admin", adminRoutes);
+app.route("/app", appRoutes);
 
-export { app };
+app.get("/", (c: Context) => {
+  return c.text("Hello Hono!");
+});
+
+const port = Number(process.env.PORT) || 3000;
 
 if (process.env.NODE_ENV !== "test") {
-  app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-  });
+  serve(
+    {
+      fetch: app.fetch,
+      port,
+    },
+    (info: AddressInfo) => {
+      console.log(`Server is running on http://localhost:${info.port}`);
+    },
+  );
 }
+
+export default app;

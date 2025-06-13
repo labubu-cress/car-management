@@ -1,4 +1,4 @@
-import { createTenantPrismaClient, prisma } from "@/db/client";
+import { createTenantPrismaClient, prisma } from "@/lib/db";
 import type { User } from "@prisma/client";
 
 export const updatePhoneNumber = async (tenantId: string, openId: string, phoneNumber: string) => {
