@@ -1,8 +1,8 @@
 import { type AdminRole, type AdminUser, Prisma } from "@prisma/client";
 
+import { prisma } from "@/lib/db";
 import { type OmitPasswordHash, type ReplacePasswordHash } from "@/types/typeHelper";
-import { prisma } from "../db/client";
-import { password2hash } from "../utils/transform";
+import { password2hash } from "@/utils/transform";
 
 // Helper to remove password hash
 const excludePasswordHash = <T extends AdminUser>(user: T): OmitPasswordHash<T> => {

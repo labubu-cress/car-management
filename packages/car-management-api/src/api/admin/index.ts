@@ -1,15 +1,28 @@
-import { Hono, type Context } from "hono";
+import { Hono } from "hono";
+import adminUsersRoutes from "./features/admin-users/routes";
+import authRoutes from "./features/auth/routes";
 import carsAdminApi from "./features/cars";
 import tenantsAdminApi from "./features/tenants/routes";
+import type { AdminAuthEnv } from "./middleware/auth";
+import { authMiddleware } from "./middleware/auth";
 
-const admin = new Hono();
+const adminApi = new Hono();
 
-// Mount the cars admin API
-admin.route("/cars", carsAdminApi);
-admin.route("/tenants", tenantsAdminApi);
+const adminProtected = new Hono<{ Variables: AdminAuthEnv["Variables"] }>();
 
-// Later, other admin features like auth, users, etc., will be mounted here.
+// All routes under /admin will be protected by the auth middleware
+adminProtected.use("*", authMiddleware);
 
-admin.get("/", (c: Context) => c.json({ message: "Welcome to Admin API" }));
+// Mount feature APIs
+adminProtected.route("/cars", carsAdminApi);
+adminProtected.route("/tenants", tenantsAdminApi);
+adminProtected.route("/admin-users", adminUsersRoutes);
 
-export default admin;
+adminProtected.get("/", (c) => c.json({ message: "Welcome to Authenticated Admin API" }));
+
+// Unprotected auth routes
+adminApi.route("/auth", authRoutes);
+// Protected routes
+adminApi.route("/", adminProtected);
+
+export default adminApi;

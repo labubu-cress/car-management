@@ -96,48 +96,47 @@ src/
 
 前一个 Agent 已经完成了以下工作：
 
-1.  **基础建设**:
-    *   项目依赖已更新，添加了 `hono`, `@hono/zod-validator`, `@hono/node-server`，并移除了 `express`。
-    *   已根据 `refactor.md` 的规划创建了全新的目录结构 (`src/api`, `src/modules`, `src/lib` 等)。
-    *   `src/index.ts` 已重构为 Hono 应用入口，并配置好了 admin 和 app 的路由挂载。
-    *   数据库 Prisma Client 初始化逻辑已迁移至 `src/lib/db.ts`。
-2.  **模块迁移 - `Cars` 模块**:
-    *   **已完全迁移**。
-    *   所有与汽车相关的业务逻辑 (CarCategory, CarTrim, VehicleScenario) 已整合到 `src/modules/cars/cars.service.ts`。
-    *   `admin` 端 API (增删改查) 已在 `src/api/admin/features/cars/` 目录下完成实现。
-    *   `app` 端 API (查询) 已在 `src/api/app/features/cars/` 目录下完成实现。
-    *   所有相关的旧控制器 (`car-*.controller.ts`) 和路由定义都已从旧的 `controllers` 和 `routes` 目录中清理。
-3.  **模块迁移 - `Tenants` 模块**:
+1.  **核心认证流程迁移**:
+    *   之前迁移工作中缺失的**认证层**已经完全建立。
+    *   旧的 `auth.service.ts` 逻辑已迁移至 `src/modules/auth/auth.service.ts`。
+    *   创建了全新的 Hono `authMiddleware` (`src/api/admin/middleware/auth.ts`)，用于保护所有 Admin API。
+    *   在 `src/api/admin/index.ts` 中对路由进行了重构，分离了受保护的路由和不受保护的路由。
+    *   实现了新的、不受保护的登录路由 `/api/v1/admin/auth/login`。
+
+2.  **模块迁移 - `AdminUser` 模块**:
     *   **已完全迁移** (此模块仅存在于 admin API 中)。
-    *   旧的 `tenant.service.ts` 的业务逻辑已整合到 `src/modules/tenants/tenant.service.ts`。
-    *   `admin` 端的 `Tenants` API (增删改查) 已在 `src/api/admin/features/tenants/` 目录下，使用 Hono、Zod 和新的 Service 完成了实现。
-    *   新的租户路由已挂载到 `src/api/admin/index.ts`。
-    *   所有相关的旧控制器 (`tenant.controller.ts`) 和路由定义都已从旧的 `controllers` 和 `routes` 目录中清理。
+    *   `admin-user.service.ts` 的业务逻辑已整合到 `src/modules/users/admin-user.service.ts`。
+    *   `admin` 端的 `AdminUser` API (增删改查) 已在 `src/api/admin/features/admin-users/` 目录下完成实现，并应用了新的认证中间件和权限检查逻辑。
+    *   所有相关的旧控制器、服务和路由定义均已清理。
 
 **下一步任务 (Next Action):**
 
-下一个 Agent 的任务是从 `refactor.md` 规划的下一个模块开始，继续进行迁移。
+重构已接近尾声。通过检查旧的路由文件 `src/routes/admin.route.ts`，我们发现还剩下最后两个功能需要迁移：
 
-**下一个要迁移的模块是：`AdminUser` (管理员用户管理)**
+1.  `User` (普通小程序用户管理)
+2.  `Img` (获取图片上传凭证)
 
-请严格遵循已经建立的模式来迁移 `AdminUser` 模块 (注意：此模块也仅存在于 admin API 中)：
+下一个 Agent 的任务是迁移这两个剩余的模块。
 
-1.  **创建 Service**:
-    *   在 `src/modules/users/` 中创建 `admin-user.service.ts` 文件。
-    *   将旧的 `src/services/admin-user.service.ts` 中的逻辑迁移到新的 service 文件中，并进行必要的调整 (如导入路径)。
+**下一个要迁移的模块是：`User` (普通用户管理)**
+
+请严格遵循已经建立的模式来迁移 `User` 模块：
+
+1.  **分析与创建 Service**:
+    *   分析旧的 `src/controllers/admin/user.controller.ts` 和 `src/services/admin/user.service.ts` 的逻辑。
+    *   在 `src/modules/users/` 中创建 `user.service.ts` 文件，并将旧 service 的逻辑迁移进去。
 2.  **实现 Admin API**:
-    *   在 `src/api/admin/features/` 下创建 `admin-users` 目录。
+    *   在 `src/api/admin/features/` 下创建 `users` 目录。
     *   在此目录中创建 `schema.ts`, `controller.ts`, `routes.ts`。
-    *   使用 Zod 在 `schema.ts` 中定义创建和更新 AdminUser 的验证规则 (注意处理密码字段)。
-    *   在 `controller.ts` 中实现 API 逻辑，并调用 `modules/users/admin-user.service.ts`。
+    *   在 `controller.ts` 中实现 API 逻辑，调用新的 `user.service.ts`。
     *   在 `routes.ts` 中定义 Hono 路由。
 3.  **集成路由**:
-    *   将 `features/admin-users/routes.ts` 导出的路由挂载到 `src/api/admin/index.ts` 中。
+    *   将 `features/users/routes.ts` 导出的路由挂载到 `src/api/admin/index.ts` 的**受保护路由组**中。
 4.  **清理旧代码**:
-    *   从 `src/routes/admin.route.ts` 中移除所有与 `admin-users` 相关的路由。
-    *   删除旧的 `src/controllers/admin/admin-user.controller.ts` 文件。
+    *   从 `src/routes/admin.route.ts` 中移除所有与 `users` 相关的路由。
+    *   删除旧的 `src/controllers/admin/user.controller.ts` 和 `src/services/admin/user.service.ts` 文件。
 
-**下一个 Agent 的第一个具体动作是：** 请开始执行 **`AdminUser` 模块** 的迁移工作，首先从分析 `src/controllers/admin/admin-user.controller.ts` 和 `src/services/admin-user.service.ts` 开始，以准备创建新的 `src/modules/users/admin-user.service.ts`。
+**下一个 Agent 的第一个具体动作是：** 请开始执行 **`User` 模块** 的迁移工作，首先从分析 `src/controllers/admin/user.controller.ts` 和 `src/services/admin/user.service.ts` 开始。
 
 
 ---
