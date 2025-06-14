@@ -1,17 +1,15 @@
 import { Hono, type Context } from "hono";
 import { HTTPException } from "hono/http-exception";
-import type { AppEnv } from "../../types/hono";
+import { authMiddleware } from "../admin/middleware/auth";
 import authRoutes from "./features/auth";
 import carCategoriesAppRoutes from "./features/car-categories";
 import carTrimsAppRoutes from "./features/car-trims";
 import appUserRoutes from "./features/users";
 import vehicleScenariosAppRoutes from "./features/vehicle-scenarios";
-import { tenantMiddleware } from "./middleware/tenant";
+import type { AppAuthEnv } from "./middleware/auth";
+import { tenantMiddleware, type AppTenantEnv } from "./middleware/tenant";
 
-const app = new Hono<AppEnv>();
-
-// Apply tenant middleware to all routes, except for auth
-app.use("*", tenantMiddleware);
+const app = new Hono();
 
 app.onError((err, c) => {
   console.error(`App API Error: ${err}`);
@@ -27,14 +25,30 @@ app.onError((err, c) => {
   );
 });
 
-// Unprotected auth routes
-app.route("/auth", authRoutes);
+// All routes for a specific tenant are grouped here
+const tenantApp = new Hono<AppTenantEnv>();
 
-// Mount the app features
-app.route("/users", appUserRoutes);
-app.route("/vehicle-scenarios", vehicleScenariosAppRoutes);
-app.route("/car-categories", carCategoriesAppRoutes);
-app.route("/car-trims", carTrimsAppRoutes);
+// Apply tenant middleware to all tenant routes
+tenantApp.use("*", tenantMiddleware);
+
+// Auth routes are public within a tenant, but tenant-aware
+tenantApp.route("/auth", authRoutes);
+
+// Publicly accessible routes within a tenant
+tenantApp.route("/vehicle-scenarios", vehicleScenariosAppRoutes);
+tenantApp.route("/car-categories", carCategoriesAppRoutes);
+tenantApp.route("/car-trims", carTrimsAppRoutes);
+
+// Routes that require authentication
+const authedApp = new Hono<AppAuthEnv>();
+authedApp.use("*", authMiddleware);
+authedApp.route("/users", appUserRoutes);
+
+// Register authed routes under the tenant app
+tenantApp.route("/", authedApp);
+
+// Register tenant app with the main app
+app.route("/tenants/:tenantId", tenantApp);
 
 // 后续将在此处聚合所有 app 功能路由
 app.get("/", (c: Context) => c.json({ message: "Welcome to App API" }));

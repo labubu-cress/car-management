@@ -8,8 +8,8 @@ import imgAdminApi from "./features/img";
 import tenantsAdminApi from "./features/tenants";
 import usersAdminApi from "./features/users";
 import vehicleScenariosAdminRoutes from "./features/vehicle-scenarios";
-import type { AdminAuthEnv } from "./middleware/auth";
-import { authMiddleware } from "./middleware/auth";
+import type { AdminAuthEnv, AdminAuthTenantEnv } from "./middleware/auth";
+import { authMiddleware, superAdminMiddleware, tenantAccessMiddleware } from "./middleware/auth";
 
 const adminApi = new Hono();
 
@@ -27,25 +27,30 @@ adminApi.onError((err, c) => {
   );
 });
 
-const adminProtected = new Hono<{ Variables: AdminAuthEnv["Variables"] }>();
+const superAdminProtected = new Hono<AdminAuthEnv>();
+superAdminProtected.use("*", superAdminMiddleware);
 
-// All routes under /admin will be protected by the auth middleware
-adminProtected.use("*", authMiddleware);
+superAdminProtected.route("/tenants", tenantsAdminApi);
 
-// Mount feature APIs
-adminProtected.route("/vehicle-scenarios", vehicleScenariosAdminRoutes);
-adminProtected.route("/car-categories", carCategoriesAdminRoutes);
-adminProtected.route("/car-trims", carTrimsAdminRoutes);
-adminProtected.route("/tenants", tenantsAdminApi);
-adminProtected.route("/admin-users", adminUsersRoutes);
-adminProtected.route("/users", usersAdminApi);
-adminProtected.route("/img", imgAdminApi);
+const authProtected = new Hono<AdminAuthEnv>();
+authProtected.use("*", authMiddleware);
 
-adminProtected.get("/", (c) => c.json({ message: "Welcome to Authenticated Admin API" }));
+authProtected.route("/admin-users", adminUsersRoutes);
+
+const tenantSpecificRoutes = new Hono<AdminAuthTenantEnv>();
+tenantSpecificRoutes.use("/*", tenantAccessMiddleware);
+
+tenantSpecificRoutes.route("/vehicle-scenarios", vehicleScenariosAdminRoutes);
+tenantSpecificRoutes.route("/car-categories", carCategoriesAdminRoutes);
+tenantSpecificRoutes.route("/car-trims", carTrimsAdminRoutes);
+tenantSpecificRoutes.route("/users", usersAdminApi);
+tenantSpecificRoutes.route("/img", imgAdminApi);
 
 // Unprotected auth routes
 adminApi.route("/auth", authRoutes);
 // Protected routes
-adminApi.route("/", adminProtected);
+adminApi.route("/", superAdminProtected);
+adminApi.route("/", authProtected);
+adminApi.route("/tenants/:tenantId", tenantSpecificRoutes);
 
 export default adminApi;

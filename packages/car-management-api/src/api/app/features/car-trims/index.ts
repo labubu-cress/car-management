@@ -1,8 +1,8 @@
-import type { AppEnv } from "@/types/hono";
 import { Hono } from "hono";
+import type { AppTenantEnv } from "../../middleware/tenant";
 import { getAllCarTrims, getCarTrimById } from "./service";
 
-const app = new Hono<{ Variables: AppEnv["Variables"] }>();
+const app = new Hono<AppTenantEnv>();
 
 app.get("/", async (c) => {
   const { tenantId } = c.var;

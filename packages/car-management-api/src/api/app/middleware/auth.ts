@@ -32,9 +32,11 @@ export const appAuthMiddleware = createMiddleware<AppAuthEnv>(async (c: Context<
   if (!user) {
     throw new HTTPException(401, { message: "Invalid token" });
   }
-
+  
+  if (user.tenantId !== c.var.tenantId) {
+    throw new HTTPException(403, { message: "You are not authorized to access this tenant." });
+  }
   c.set("user", user);
-  c.set("tenantId", user.tenantId);
 
   await next();
 });

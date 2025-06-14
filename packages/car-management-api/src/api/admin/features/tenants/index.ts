@@ -4,7 +4,7 @@ import type { AdminAuthEnv } from "../../middleware/auth";
 import { createTenantSchema, updateTenantSchema } from "./schema";
 import { createTenant, deleteTenant, getAllTenants, getTenantById, updateTenant } from "./service";
 
-const app = new Hono<{ Variables: AdminAuthEnv["Variables"] }>();
+const app = new Hono<AdminAuthEnv>();
 
 app.get("/", async (c) => {
   // TODO: Add permission check middleware

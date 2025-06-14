@@ -1,11 +1,11 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import type { AdminAuthEnv } from "../../middleware/auth";
+import type { AdminAuthTenantEnv } from "../../middleware/auth";
 import { createCarTrimSchema, updateCarTrimSchema } from "./schema";
 import { createCarTrim, deleteCarTrim, getAllCarTrims, getCarTrimById, updateCarTrim } from "./service";
 
-const app = new Hono<{ Variables: AdminAuthEnv["Variables"] }>();
+const app = new Hono<AdminAuthTenantEnv>();
 
 // Middleware to check for tenantId
 app.use("*", async (c, next) => {

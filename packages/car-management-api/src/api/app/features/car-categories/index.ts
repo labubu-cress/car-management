@@ -1,8 +1,9 @@
-import type { AppEnv } from "@/types/hono";
+
 import { Hono } from "hono";
+import type { AppTenantEnv } from "../../middleware/tenant";
 import { getAllCarCategories, getCarCategoryById } from "./service";
 
-const app = new Hono<AppEnv>();
+const app = new Hono<AppTenantEnv>();
 
 app.get("/", async (c) => {
   const { tenantId } = c.var;

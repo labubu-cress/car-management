@@ -114,7 +114,7 @@ describe("Admin API", () => {
   });
 
   // CarCategory Management Tests
-  describe.only("/api/v1/admin/car-categories", () => {
+  describe.only("/api/v1/admin/tenants/:tenantId/car-categories", () => {
     it.only("should create a new car category", async () => {
       const newCategory: CreateCarCategoryInput = {
         name: "New Test Category",
@@ -125,7 +125,7 @@ describe("Admin API", () => {
         exteriorImages: ["https://example.com/exterior1.jpg"],
         offerPictures: ["https://example.com/offer1.jpg"],
       };
-      const response = await app.request("/api/v1/admin/car-categories", {
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-categories`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -139,7 +139,7 @@ describe("Admin API", () => {
     });
 
     it("should get all car categories", async () => {
-      const response = await app.request("/api/v1/admin/car-categories", {
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-categories`, {
         headers: {
           Authorization: `Bearer ${tenantViewerUser.token}`,
         },
@@ -153,7 +153,7 @@ describe("Admin API", () => {
   });
 
   // CarTrim Management Tests
-  describe("/api/v1/admin/car-categories/:categoryId/trims", () => {
+  describe("/api/v1/admin/tenants/:tenantId/car-trims", () => {
     it("should create a new car trim for a category", async () => {
       const newTrim: CreateCarTrimInput = {
         name: "Test Trim",
@@ -164,7 +164,7 @@ describe("Admin API", () => {
         features: [{ title: "Feature 1", value: "Value 1" }],
         categoryId: categoryId,
       };
-      const response = await app.request(`/api/v1/admin/car-categories/${categoryId}/trims`, {
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -190,11 +190,14 @@ describe("Admin API", () => {
           tenantId: tenantId,
         },
       });
-      const response = await app.request(`/api/v1/admin/car-categories/${categoryId}/trims`, {
-        headers: {
-          Authorization: `Bearer ${tenantViewerUser.token}`,
+      const response = await app.request(
+        `/api/v1/admin/tenants/${tenantId}/car-trims?categoryId=${categoryId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${tenantViewerUser.token}`,
+          },
         },
-      });
+      );
       expect(response.status).toBe(200);
       const body = (await response.json()) as CarTrim[];
       expect(Array.isArray(body)).toBe(true);
@@ -203,14 +206,14 @@ describe("Admin API", () => {
   });
 
   // VehicleScenario Management Tests
-  describe("/api/v1/admin/vehicle-scenarios", () => {
+  describe("/api/v1/admin/tenants/:tenantId/vehicle-scenarios", () => {
     it("should create a new vehicle scenario", async () => {
       const newScenario: CreateVehicleScenarioInput = {
         name: "Test Drive",
         image: "https://example.com/test_drive.jpg",
         description: "A test drive scenario",
       };
-      const response = await app.request("/api/v1/admin/vehicle-scenarios", {
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/vehicle-scenarios`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -232,7 +235,7 @@ describe("Admin API", () => {
           tenantId: tenantId,
         },
       });
-      const response = await app.request("/api/v1/admin/vehicle-scenarios", {
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/vehicle-scenarios`, {
         headers: {
           Authorization: `Bearer ${tenantViewerUser.token}`,
         },
@@ -246,7 +249,7 @@ describe("Admin API", () => {
   });
 
   // User Management Tests
-  describe("/api/v1/admin/users", () => {
+  describe("/api/v1/admin/tenants/:tenantId/users", () => {
     it("should get all users for the tenant", async () => {
       // Create a user for the tenant
       await prisma.user.create({
@@ -277,7 +280,7 @@ describe("Admin API", () => {
         },
       });
 
-      const response = await app.request("/api/v1/admin/users", {
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/users`, {
         headers: {
           Authorization: `Bearer ${tenantAdminUser.token}`,
         },

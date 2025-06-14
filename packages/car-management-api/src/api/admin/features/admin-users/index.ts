@@ -13,16 +13,12 @@ const hasAdminManipulationPermission = (user: LoggedInUser, targetUser: Partial<
       return true;
     case "admin":
       return targetUser.role !== "super_admin";
-    case "tenant_admin":
-      return targetUser.role !== "super_admin" && targetUser.role !== "admin" && targetUser.tenantId === user.tenantId;
-    case "tenant_viewer":
-      return false;
     default:
       return false;
   }
 };
 
-const app = new Hono<{ Variables: AdminAuthEnv["Variables"] }>();
+const app = new Hono<AdminAuthEnv>();
 
 app.get("/", async (c) => {
   const { adminUser } = c.var;
