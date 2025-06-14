@@ -246,7 +246,7 @@ describe("Admin API", () => {
   });
 
   // User Management Tests
-  describe.only("/api/v1/admin/tenants/:tenantId/users", () => {
+  describe("/api/v1/admin/tenants/:tenantId/users", () => {
     it("should get all users for the tenant", async () => {
       // Create a user for the tenant
       await prisma.user.create({
