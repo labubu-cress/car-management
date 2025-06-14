@@ -1,10 +1,9 @@
 import { z } from "zod";
 
-export const adminRoleSchema = z.enum(["super_admin", "admin", "tenant_admin", "tenant_viewer"]);
+export const adminRoleSchema = z.enum(["super_admin", "admin"]);
 
 export const adminUserSchema = z.object({
   id: z.string(),
-  name: z.string(),
   username: z.string(),
   role: adminRoleSchema,
   tenantId: z.string().nullable(),
@@ -13,7 +12,6 @@ export const adminUserSchema = z.object({
 });
 
 export const createAdminUserSchema = z.object({
-  name: z.string(),
   username: z.string(),
   password: z.string().min(6),
   role: adminRoleSchema,
@@ -21,7 +19,6 @@ export const createAdminUserSchema = z.object({
 });
 
 export const updateAdminUserSchema = z.object({
-  name: z.string().optional(),
   username: z.string().optional(),
   password: z.string().min(6).optional(),
   role: adminRoleSchema.optional(),

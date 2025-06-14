@@ -61,7 +61,7 @@ export const tenantAccessMiddleware = createMiddleware<AdminAuthTenantEnv>(async
     throw new HTTPException(400, { message: "Tenant ID is required in the URL path." });
   }
 
-  if (!adminUser.tenantId || adminUser.tenantId !== tenantId) {
+  if (adminUser.tenantId && adminUser.tenantId !== tenantId) {
     throw new HTTPException(403, { message: "You are not authorized to access this tenant." });
   }
 

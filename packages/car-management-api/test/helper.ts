@@ -53,17 +53,9 @@ export const createTestTenantAndAdminUsers = async (client: PrismaClient) => {
   // create a admin user
   const adminUser = await createTestAdminUser(client, "admin");
 
-  // create a tenant admin user
-  const tenantAdminUser = await createTestAdminUser(client, "tenant_admin", tenantId);
-
-  // create a tenant viewer user
-  const tenantViewerUser = await createTestAdminUser(client, "tenant_viewer", tenantId);
-
   return {
     tenantId,
     superAdminUser,
     adminUser,
-    tenantAdminUser,
-    tenantViewerUser,
   };
 };

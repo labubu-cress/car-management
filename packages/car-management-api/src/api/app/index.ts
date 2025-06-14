@@ -2,10 +2,10 @@ import { Hono, type Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { authMiddleware } from "../admin/middleware/auth";
 import authRoutes from "./features/auth";
-import carCategoriesAppRoutes from "./features/car-categories";
-import carTrimsAppRoutes from "./features/car-trims";
-import appUserRoutes from "./features/users";
-import vehicleScenariosAppRoutes from "./features/vehicle-scenarios";
+import carCategoriesRoutes from "./features/car-categories";
+import carTrimsRoutes from "./features/car-trims";
+import usersRoutes from "./features/users";
+import vehicleScenariosRoutes from "./features/vehicle-scenarios";
 import type { AppAuthEnv } from "./middleware/auth";
 import { tenantMiddleware, type AppTenantEnv } from "./middleware/tenant";
 
@@ -35,14 +35,14 @@ tenantApp.use("*", tenantMiddleware);
 tenantApp.route("/auth", authRoutes);
 
 // Publicly accessible routes within a tenant
-tenantApp.route("/vehicle-scenarios", vehicleScenariosAppRoutes);
-tenantApp.route("/car-categories", carCategoriesAppRoutes);
-tenantApp.route("/car-trims", carTrimsAppRoutes);
+tenantApp.route("/vehicle-scenarios", vehicleScenariosRoutes);
+tenantApp.route("/car-categories", carCategoriesRoutes);
+tenantApp.route("/car-trims", carTrimsRoutes);
 
 // Routes that require authentication
 const authedApp = new Hono<AppAuthEnv>();
 authedApp.use("*", authMiddleware);
-authedApp.route("/users", appUserRoutes);
+authedApp.route("/users", usersRoutes);
 
 // Register authed routes under the tenant app
 tenantApp.route("/", authedApp);

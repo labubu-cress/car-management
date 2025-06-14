@@ -4,10 +4,10 @@ import adminUsersRoutes from "./features/admin-users";
 import authRoutes from "./features/auth";
 import carCategoriesAdminRoutes from "./features/car-categories";
 import carTrimsAdminRoutes from "./features/car-trims";
-import imgAdminApi from "./features/img";
-import tenantsAdminApi from "./features/tenants";
-import usersAdminApi from "./features/users";
-import vehicleScenariosAdminRoutes from "./features/vehicle-scenarios";
+import imgRoutes from "./features/img";
+import tenantsRoutes from "./features/tenants";
+import usersRoutes from "./features/users";
+import vehicleScenariosRoutes from "./features/vehicle-scenarios";
 import type { AdminAuthEnv, AdminAuthTenantEnv } from "./middleware/auth";
 import { authMiddleware, superAdminMiddleware, tenantAccessMiddleware } from "./middleware/auth";
 
@@ -30,7 +30,7 @@ adminApi.onError((err, c) => {
 const superAdminProtected = new Hono<AdminAuthEnv>();
 superAdminProtected.use("*", superAdminMiddleware);
 
-superAdminProtected.route("/tenants", tenantsAdminApi);
+superAdminProtected.route("/tenants", tenantsRoutes);
 
 const authProtected = new Hono<AdminAuthEnv>();
 authProtected.use("*", authMiddleware);
@@ -40,17 +40,18 @@ authProtected.route("/admin-users", adminUsersRoutes);
 const tenantSpecificRoutes = new Hono<AdminAuthTenantEnv>();
 tenantSpecificRoutes.use("/*", tenantAccessMiddleware);
 
-tenantSpecificRoutes.route("/vehicle-scenarios", vehicleScenariosAdminRoutes);
+tenantSpecificRoutes.route("/vehicle-scenarios", vehicleScenariosRoutes);
 tenantSpecificRoutes.route("/car-categories", carCategoriesAdminRoutes);
 tenantSpecificRoutes.route("/car-trims", carTrimsAdminRoutes);
-tenantSpecificRoutes.route("/users", usersAdminApi);
-tenantSpecificRoutes.route("/img", imgAdminApi);
+tenantSpecificRoutes.route("/users", usersRoutes);
+tenantSpecificRoutes.route("/img", imgRoutes);
 
 // Unprotected auth routes
 adminApi.route("/auth", authRoutes);
 // Protected routes
-adminApi.route("/", superAdminProtected);
-adminApi.route("/", authProtected);
 adminApi.route("/tenants/:tenantId", tenantSpecificRoutes);
+adminApi.route("/", authProtected);
+adminApi.route("/", superAdminProtected);
+
 
 export default adminApi;
