@@ -25,7 +25,7 @@ describe("Admin API", () => {
       data: {
         name: "Test Category",
         tenantId: tenantId,
-        image: "image.jpg",
+        image: "https://example.com/image.jpg",
         tags: [],
         highlights: [],
         interiorImages: [],
@@ -290,7 +290,7 @@ describe("Admin API", () => {
         data: {
           name: "Test Trim for Get",
           subtitle: "A nice trim",
-          image: "trim.jpg",
+          image: "https://example.com/trim.jpg",
           originalPrice: "50000",
           currentPrice: "48000",
           features: [],

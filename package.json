@@ -6,6 +6,7 @@
     "packages/*"
   ],
   "scripts": {
+    "test": "npm test --workspaces --if-present",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
