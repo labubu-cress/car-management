@@ -3,6 +3,8 @@ import { LoginForm } from '@/components/LoginForm';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { AdminUsers } from '@/pages/AdminUsers';
 import { CarCategories } from '@/pages/CarCategories';
+import { CarCategoryForm } from '@/pages/CarCategoryForm';
+import { CarTrimForm } from '@/pages/CarTrimForm';
 import { CarTrims } from '@/pages/CarTrims';
 import { Dashboard } from '@/pages/Dashboard';
 import { FirstTenantSetup } from '@/pages/FirstTenantSetup';
@@ -58,7 +60,11 @@ const AppRoutes: React.FC = () => {
                 <Route path="/admin-users" element={<AdminUsers />} />
                 <Route path="/vehicle-scenarios" element={<VehicleScenarios />} />
                 <Route path="/car-categories" element={<CarCategories />} />
+                <Route path="/car-categories/new" element={<CarCategoryForm />} />
+                <Route path="/car-categories/:id/edit" element={<CarCategoryForm />} />
                 <Route path="/car-trims" element={<CarTrims />} />
+                <Route path="/car-trims/new" element={<CarTrimForm />} />
+                <Route path="/car-trims/:id/edit" element={<CarTrimForm />} />
                 <Route path="/users" element={<Users />} />
               </Routes>
             </Layout>
