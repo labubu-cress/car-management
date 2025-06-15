@@ -1,0 +1,189 @@
+// 基于 OpenAPI 规范的类型定义
+
+export interface LoginInput {
+  username: string;
+  password: string;
+}
+
+export interface AdminUser {
+  id: string;
+  username: string;
+  role: 'super_admin' | 'admin';
+  tenantId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LoginResponse {
+  token: string;
+  user: AdminUser;
+}
+
+export interface Tenant {
+  id: string;
+  name: string;
+  appId: string;
+  appSecret: string;
+  status: 'active' | 'inactive';
+  config?: Record<string, any>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateTenantInput {
+  name: string;
+  appId: string;
+  appSecret: string;
+  status?: 'active' | 'inactive';
+  config?: Record<string, any>;
+}
+
+export interface UpdateTenantInput {
+  name?: string;
+  appId?: string;
+  appSecret?: string;
+  status?: 'active' | 'inactive';
+  config?: Record<string, any>;
+}
+
+export interface VehicleScenario {
+  id: string;
+  tenantId: string;
+  name: string;
+  description: string;
+  image: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateVehicleScenarioInput {
+  name: string;
+  description: string;
+  image: string;
+}
+
+export interface UpdateVehicleScenarioInput {
+  name?: string;
+  description?: string;
+  image?: string;
+}
+
+export interface Highlight {
+  title: string;
+  value: string;
+}
+
+export interface CarCategory {
+  id: string;
+  tenantId: string;
+  name: string;
+  image: string;
+  badge?: string;
+  tags?: string[];
+  highlights?: Highlight[];
+  interiorImages?: string[];
+  exteriorImages?: string[];
+  offerPictures?: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateCarCategoryInput {
+  name: string;
+  image: string;
+  badge?: string;
+  tags?: string[];
+  highlights?: Highlight[];
+  interiorImages?: string[];
+  exteriorImages?: string[];
+  offerPictures?: string[];
+}
+
+export interface UpdateCarCategoryInput {
+  name?: string;
+  image?: string;
+  badge?: string;
+  tags?: string[];
+  highlights?: Highlight[];
+  interiorImages?: string[];
+  exteriorImages?: string[];
+  offerPictures?: string[];
+}
+
+export interface Feature {
+  title: string;
+  value: string;
+}
+
+export interface CarTrim {
+  id: string;
+  tenantId: string;
+  name: string;
+  subtitle: string;
+  image: string;
+  originalPrice: string;
+  currentPrice: string;
+  badge?: string;
+  features?: Feature[];
+  categoryId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateCarTrimInput {
+  name: string;
+  subtitle: string;
+  image: string;
+  originalPrice: string;
+  currentPrice: string;
+  badge?: string;
+  features?: Feature[];
+  categoryId: string;
+}
+
+export interface UpdateCarTrimInput {
+  name?: string;
+  subtitle?: string;
+  image?: string;
+  originalPrice?: string;
+  currentPrice?: string;
+  badge?: string;
+  features?: Feature[];
+  categoryId?: string;
+}
+
+export interface User {
+  id: string;
+  tenantId: string;
+  nickname: string;
+  avatarUrl: string;
+  phoneNumber: string;
+  openId: string;
+  unionId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateAdminUserInput {
+  username: string;
+  password: string;
+  role: 'super_admin' | 'admin';
+  tenantId?: string;
+}
+
+export interface UpdateAdminUserInput {
+  username?: string;
+  password?: string;
+  role?: 'super_admin' | 'admin';
+  tenantId?: string;
+}
+
+export interface UploadToken {
+  secretId: string;
+  secretKey: string;
+  sessionToken: string;
+  region: string;
+  bucket: string;
+  expiredTime: number;
+  startTime: number;
+} 

@@ -1,0 +1,63 @@
+import { useAuth } from '@/contexts/AuthContext';
+import { faBuilding, faCar, faLayerGroup, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+import * as styles from './Dashboard.css';
+
+export const Dashboard: React.FC = () => {
+  const { currentTenant } = useAuth();
+
+  const stats = [
+    { title: '当前租户', value: currentTenant?.name || '-', icon: faBuilding, color: '#1890ff' },
+    { title: '用户总数', value: '0', icon: faUsers, color: '#52c41a' },
+    { title: '车辆分类', value: '0', icon: faLayerGroup, color: '#faad14' },
+    { title: '车型配置', value: '0', icon: faCar, color: '#722ed1' },
+  ];
+
+  return (
+    <div className={styles.dashboard}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>仪表盘</h1>
+        <p className={styles.subtitle}>欢迎使用汽车管理后台</p>
+      </div>
+
+      <div className={styles.statsGrid}>
+        {stats.map((stat, index) => (
+          <div key={index} className={styles.statCard}>
+            <div className={styles.statIcon} style={{ backgroundColor: `${stat.color}20` }}>
+              <FontAwesomeIcon icon={stat.icon} style={{ color: stat.color }} />
+            </div>
+            <div className={styles.statContent}>
+              <div className={styles.statValue}>{stat.value}</div>
+              <div className={styles.statTitle}>{stat.title}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className={styles.content}>
+        <div className={styles.card}>
+          <h2 className={styles.cardTitle}>快速开始</h2>
+          <div className={styles.quickActions}>
+            <div className={styles.quickAction}>
+              <h3>1. 管理租户</h3>
+              <p>创建和管理不同的租户，每个租户都有独立的数据空间</p>
+            </div>
+            <div className={styles.quickAction}>
+              <h3>2. 配置车辆场景</h3>
+              <p>设置不同的车辆使用场景，如商务、家用、越野等</p>
+            </div>
+            <div className={styles.quickAction}>
+              <h3>3. 添加车辆分类</h3>
+              <p>创建车辆分类，包括图片、标签和亮点信息</p>
+            </div>
+            <div className={styles.quickAction}>
+              <h3>4. 配置车型</h3>
+              <p>为每个分类添加具体的车型配置和价格信息</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}; 
