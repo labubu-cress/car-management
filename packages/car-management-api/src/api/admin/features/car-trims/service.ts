@@ -10,7 +10,7 @@ export const getAllCarTrims = async (tenantId: string, categoryId: string): Prom
 
 export const getCarTrimById = async (tenantId: string, id: string): Promise<CarTrim | null> => {
   const prisma = createTenantPrismaClient(tenantId);
-  const trim = await prisma.carTrim.findUnique({ where: { id } });
+  const trim = await prisma.carTrim.findFirst({ where: { id, tenantId } });
   if (!trim) {
     return null;
   }
@@ -44,6 +44,10 @@ export const updateCarTrim = async (
   data: UpdateCarTrimInput,
 ): Promise<CarTrim | null> => {
   const prisma = createTenantPrismaClient(tenantId);
+  const existingTrim = await prisma.carTrim.findFirst({ where: { id, tenantId } });
+  if (!existingTrim) {
+    return null;
+  }
   const updatedTrim = await prisma.carTrim.update({
     where: { id },
     data: data,
@@ -53,5 +57,9 @@ export const updateCarTrim = async (
 
 export const deleteCarTrim = async (tenantId: string, id: string): Promise<void> => {
   const prisma = createTenantPrismaClient(tenantId);
+  const existingTrim = await prisma.carTrim.findFirst({ where: { id, tenantId } });
+  if (!existingTrim) {
+    throw new Error("Car trim not found or access denied.");
+  }
   await prisma.carTrim.delete({ where: { id } });
 };

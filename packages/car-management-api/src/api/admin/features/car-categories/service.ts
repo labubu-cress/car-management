@@ -10,7 +10,7 @@ export const getAllCarCategories = async (tenantId: string): Promise<CarCategory
 
 export const getCarCategoryById = async (tenantId: string, id: string): Promise<CarCategory | null> => {
   const prisma = createTenantPrismaClient(tenantId);
-  const category = await prisma.carCategory.findUnique({ where: { id } });
+  const category = await prisma.carCategory.findFirst({ where: { id, tenantId } });
   if (!category) {
     return null;
   }
@@ -38,6 +38,10 @@ export const updateCarCategory = async (
   data: UpdateCarCategoryInput,
 ): Promise<CarCategory | null> => {
   const prisma = createTenantPrismaClient(tenantId);
+  const existingCategory = await prisma.carCategory.findFirst({ where: { id, tenantId } });
+  if (!existingCategory) {
+    return null;
+  }
   const updatedCategory = await prisma.carCategory.update({
     where: { id },
     data: data,
@@ -47,5 +51,9 @@ export const updateCarCategory = async (
 
 export const deleteCarCategory = async (tenantId: string, id: string): Promise<void> => {
   const prisma = createTenantPrismaClient(tenantId);
+  const existingCategory = await prisma.carCategory.findFirst({ where: { id, tenantId } });
+  if (!existingCategory) {
+    throw new Error("Car category not found or access denied.");
+  }
   await prisma.carCategory.delete({ where: { id } });
 };

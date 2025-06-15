@@ -10,7 +10,7 @@ export const getAllVehicleScenarios = async (tenantId: string): Promise<VehicleS
 
 export const getVehicleScenarioById = async (tenantId: string, id: string): Promise<VehicleScenario | null> => {
   const prisma = createTenantPrismaClient(tenantId);
-  return prisma.vehicleScenario.findUnique({ where: { id } });
+  return prisma.vehicleScenario.findFirst({ where: { id, tenantId } });
 };
 
 export const createVehicleScenario = async (
@@ -36,6 +36,10 @@ export const updateVehicleScenario = async (
   data: Prisma.VehicleScenarioUpdateInput,
 ): Promise<VehicleScenario | null> => {
   const prisma = createTenantPrismaClient(tenantId);
+  const existingScenario = await prisma.vehicleScenario.findFirst({ where: { id, tenantId } });
+  if (!existingScenario) {
+    return null; // Or throw an error
+  }
   return prisma.vehicleScenario.update({
     where: { id },
     data,
@@ -44,5 +48,9 @@ export const updateVehicleScenario = async (
 
 export const deleteVehicleScenario = async (tenantId: string, id: string): Promise<void> => {
   const prisma = createTenantPrismaClient(tenantId);
+  const existingScenario = await prisma.vehicleScenario.findFirst({ where: { id, tenantId } });
+  if (!existingScenario) {
+    throw new Error("Vehicle scenario not found or access denied.");
+  }
   await prisma.vehicleScenario.delete({ where: { id } });
 };

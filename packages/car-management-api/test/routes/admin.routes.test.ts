@@ -72,6 +72,17 @@ describe("Admin API", () => {
       expect(Array.isArray(body)).toBe(true);
       expect(body.length).toBeGreaterThan(0);
     });
+
+    it("should get a tenant by id", async () => {
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}`, {
+        headers: {
+          Authorization: `Bearer ${superAdminUser.token}`,
+        },
+      });
+      expect(response.status).toBe(200);
+      const body = (await response.json()) as Tenant;
+      expect(body.id).toBe(tenantId);
+    });
   });
 
   // AdminUser Management Tests
@@ -108,6 +119,17 @@ describe("Admin API", () => {
       const body = (await response.json()) as AdminUser[];
       expect(Array.isArray(body)).toBe(true);
       expect(body.length).toBeGreaterThan(0);
+    });
+
+    it("should get an admin user by id", async () => {
+      const response = await app.request(`/api/v1/admin/admin-users/${adminUser.id}`, {
+        headers: {
+          Authorization: `Bearer ${adminUser.token}`,
+        },
+      });
+      expect(response.status).toBe(200);
+      const body = (await response.json()) as AdminUser;
+      expect(body.id).toBe(adminUser.id);
     });
   });
 
@@ -207,6 +229,18 @@ describe("Admin API", () => {
       expect(Array.isArray(body)).toBe(true);
       expect(body.length).toBe(1);
       expect(body[0].name).toBe("Test Category");
+    });
+
+    it("should get a car category by id", async () => {
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-categories/${categoryId}`, {
+        headers: {
+          Authorization: `Bearer ${adminUser.token}`,
+        },
+      });
+      expect(response.status).toBe(200);
+      const body = (await response.json()) as CarCategory;
+      expect(body.id).toBe(categoryId);
+      expect(body.name).toBe("Test Category");
     });
   });
 
@@ -311,6 +345,33 @@ describe("Admin API", () => {
       expect(Array.isArray(body)).toBe(true);
       expect(body.length).toBeGreaterThan(0);
     });
+
+    it("should get a car trim by id", async () => {
+      const trim = await prisma.carTrim.create({
+        data: {
+          name: "Test Trim for Get",
+          subtitle: "A nice trim",
+          image: "https://example.com/trim.jpg",
+          originalPrice: "50000",
+          currentPrice: "48000",
+          features: [],
+          categoryId: categoryId,
+          tenantId: tenantId,
+        },
+      });
+      const response = await app.request(
+        `/api/v1/admin/tenants/${tenantId}/car-trims/${trim.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${adminUser.token}`,
+          },
+        },
+      );
+      expect(response.status).toBe(200);
+      const body = (await response.json()) as CarTrim;
+      expect(body.id).toBe(trim.id);
+      expect(body.name).toBe("Test Trim for Get");
+    });
   });
 
   // VehicleScenario Management Tests
@@ -353,6 +414,26 @@ describe("Admin API", () => {
       expect(Array.isArray(body)).toBe(true);
       expect(body.length).toBeGreaterThan(0);
       expect(body[0].name).toBe("Existing Scenario");
+    });
+
+    it("should get a vehicle scenario by id", async () => {
+      const scenario = await prisma.vehicleScenario.create({
+        data: {
+          name: "Existing Scenario",
+          image: "existing.jpg",
+          description: "An existing scenario",
+          tenantId: tenantId,
+        },
+      });
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/vehicle-scenarios/${scenario.id}`, {
+        headers: {
+          Authorization: `Bearer ${adminUser.token}`,
+        },
+      });
+      expect(response.status).toBe(200);
+      const body = (await response.json()) as VehicleScenario;
+      expect(body.id).toBe(scenario.id);
+      expect(body.name).toBe("Existing Scenario");
     });
   });
 
@@ -399,6 +480,30 @@ describe("Admin API", () => {
       expect(Array.isArray(body)).toBe(true);
       expect(body.length).toBe(1); // Should only get user for its own tenant
       expect(body[0].nickname).toBe("Test User");
+    });
+
+    it("should get a user by id", async () => {
+      const user = await prisma.user.create({
+        data: {
+          openId: "test-user-openid-for-get-by-id",
+          nickname: "Test User for Get By Id",
+          avatarUrl: "avatar.jpg",
+          phoneNumber: "12345678902",
+          tenantId: tenantId,
+        },
+      });
+
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/users/${user.id}`, {
+        headers: {
+          Authorization: `Bearer ${adminUser.token}`,
+        },
+      });
+
+      expect(response.status).toBe(200);
+      const body = (await response.json()) as User;
+      expect(Array.isArray(body)).toBe(false);
+      expect(body.id).toBe(user.id);
+      expect(body.nickname).toBe("Test User for Get By Id");
     });
   });
 });

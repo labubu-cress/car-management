@@ -12,10 +12,11 @@ export const clearTestDb = async (client: PrismaClient) => {
 };
 
 export type TestAdminUserWithToken = {
+  id: string;
   username: string;
   password: string;
   role: AdminRole;
-  tenantId?: string;
+  tenantId?: string | null;
   token: string;
 };
 export const createTestAdminUser = async (
@@ -35,7 +36,15 @@ export const createTestAdminUser = async (
     },
   });
   const loginResult = await login(username, password);
-  return { username, password, role, tenantId, token: loginResult!.token };
+  const { user, token } = loginResult!;
+  return {
+    id: user.id,
+    username: user.username,
+    password,
+    role: user.role,
+    tenantId: user.tenantId,
+    token,
+  };
 };
 
 export const createTestTenantAndAdminUsers = async (client: PrismaClient) => {
