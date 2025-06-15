@@ -1,12 +1,12 @@
 import type { CreateAdminUserInput } from "@/api/admin/features/admin-users/schema";
 import type { AdminUser } from "@/api/admin/features/admin-users/types";
-import type { CreateCarCategoryInput } from "@/api/admin/features/car-categories/schema";
-import type { CreateCarTrimInput } from "@/api/admin/features/car-trims/schema";
-import type { CreateTenantInput } from "@/api/admin/features/tenants/schema";
+import type { CarCategory, CreateCarCategoryInput } from "@/api/admin/features/car-categories/schema";
+import type { CarTrim, CreateCarTrimInput } from "@/api/admin/features/car-trims/schema";
+import type { CreateTenantInput, Tenant } from "@/api/admin/features/tenants/schema";
 import type { CreateVehicleScenarioInput } from "@/api/admin/features/vehicle-scenarios/schema";
 import app from "@/index";
 import { prisma } from "@/lib/db";
-import type { CarCategory, CarTrim, Tenant, User, VehicleScenario } from "@prisma/client";
+import type { User, VehicleScenario } from "@prisma/client";
 import { beforeEach, describe, expect, it } from "vitest";
 import { clearTestDb, createTestTenantAndAdminUsers, type TestAdminUserWithToken } from "../helper";
 
@@ -26,11 +26,11 @@ describe("Admin API", () => {
         name: "Test Category",
         tenantId: tenantId,
         image: "image.jpg",
-        tags: "[]",
-        highlights: "[]",
-        interiorImages: "[]",
-        exteriorImages: "[]",
-        offerPictures: "[]",
+        tags: [],
+        highlights: [],
+        interiorImages: [],
+        exteriorImages: [],
+        offerPictures: [],
       },
     });
     categoryId = category.id;
@@ -43,6 +43,7 @@ describe("Admin API", () => {
         name: "New Test Tenant",
         appId: "new-test-app-id",
         appSecret: "a-new-secure-secret",
+        config: {},
       };
       const response = await app.request("/api/v1/admin/tenants", {
         method: "POST",
@@ -156,43 +157,38 @@ describe("Admin API", () => {
       
       // 验证 tags 数组
       expect(body.tags).toBeDefined();
-      const parsedTags = JSON.parse(body.tags as string);
-      expect(Array.isArray(parsedTags)).toBe(true);
-      expect(parsedTags).toEqual(newCategory.tags);
-      expect(parsedTags.length).toBe(3);
-      expect(parsedTags).toContain("豪华");
-      expect(parsedTags).toContain("舒适");
-      expect(parsedTags).toContain("智能驾驶");
+      expect(Array.isArray(body.tags)).toBe(true);
+      expect(body.tags).toEqual(newCategory.tags);
+      expect(body.tags.length).toBe(3);
+      expect(body.tags).toContain("豪华");
+      expect(body.tags).toContain("舒适");
+      expect(body.tags).toContain("智能驾驶");
       
       // 验证 highlights 数组
       expect(body.highlights).toBeDefined();
-      const parsedHighlights = JSON.parse(body.highlights as string);
-      expect(Array.isArray(parsedHighlights)).toBe(true);
-      expect(parsedHighlights.length).toBe(3);
-      expect(parsedHighlights[0]).toMatchObject({ title: "动力系统", value: "2.0T涡轮增压" });
-      expect(parsedHighlights[1]).toMatchObject({ title: "燃油经济性", value: "7.5L/100km" });
-      expect(parsedHighlights[2]).toMatchObject({ title: "最大功率", value: "245马力" });
+      expect(Array.isArray(body.highlights)).toBe(true);
+      expect(body.highlights.length).toBe(3);
+      expect(body.highlights[0]).toMatchObject({ title: "动力系统", value: "2.0T涡轮增压" });
+      expect(body.highlights[1]).toMatchObject({ title: "燃油经济性", value: "7.5L/100km" });
+      expect(body.highlights[2]).toMatchObject({ title: "最大功率", value: "245马力" });
       
       // 验证 interiorImages 数组
       expect(body.interiorImages).toBeDefined();
-      const parsedInteriorImages = JSON.parse(body.interiorImages as string);
-      expect(Array.isArray(parsedInteriorImages)).toBe(true);
-      expect(parsedInteriorImages.length).toBe(3);
-      expect(parsedInteriorImages).toEqual(newCategory.interiorImages);
+      expect(Array.isArray(body.interiorImages)).toBe(true);
+      expect(body.interiorImages.length).toBe(3);
+      expect(body.interiorImages).toEqual(newCategory.interiorImages);
       
       // 验证 exteriorImages 数组
       expect(body.exteriorImages).toBeDefined();
-      const parsedExteriorImages = JSON.parse(body.exteriorImages as string);
-      expect(Array.isArray(parsedExteriorImages)).toBe(true);
-      expect(parsedExteriorImages.length).toBe(2);
-      expect(parsedExteriorImages).toEqual(newCategory.exteriorImages);
+      expect(Array.isArray(body.exteriorImages)).toBe(true);
+      expect(body.exteriorImages.length).toBe(2);
+      expect(body.exteriorImages).toEqual(newCategory.exteriorImages);
       
       // 验证 offerPictures 数组
       expect(body.offerPictures).toBeDefined();
-      const parsedOfferPictures = JSON.parse(body.offerPictures as string);
-      expect(Array.isArray(parsedOfferPictures)).toBe(true);
-      expect(parsedOfferPictures.length).toBe(2);
-      expect(parsedOfferPictures).toEqual(newCategory.offerPictures);
+      expect(Array.isArray(body.offerPictures)).toBe(true);
+      expect(body.offerPictures.length).toBe(2);
+      expect(body.offerPictures).toEqual(newCategory.offerPictures);
       
       // 验证自动生成的字段
       expect(body.id).toBeDefined();
@@ -261,14 +257,13 @@ describe("Admin API", () => {
       
       // 验证 features 数组
       expect(body.features).toBeDefined();
-      const parsedFeatures = JSON.parse(body.features as string);
-      expect(Array.isArray(parsedFeatures)).toBe(true);
-      expect(parsedFeatures.length).toBe(5);
-      expect(parsedFeatures[0]).toMatchObject({ title: "座椅配置", value: "真皮座椅，前排座椅加热/通风" });
-      expect(parsedFeatures[1]).toMatchObject({ title: "科技配置", value: "12.3英寸中控屏，无线充电" });
-      expect(parsedFeatures[2]).toMatchObject({ title: "安全配置", value: "主动刹车，车道偏离预警" });
-      expect(parsedFeatures[3]).toMatchObject({ title: "动力系统", value: "2.0T发动机+8AT变速箱" });
-      expect(parsedFeatures[4]).toMatchObject({ title: "悬挂系统", value: "前麦弗逊后多连杆独立悬挂" });
+      expect(Array.isArray(body.features)).toBe(true);
+      expect(body.features.length).toBe(5);
+      expect(body.features[0]).toMatchObject({ title: "座椅配置", value: "真皮座椅，前排座椅加热/通风" });
+      expect(body.features[1]).toMatchObject({ title: "科技配置", value: "12.3英寸中控屏，无线充电" });
+      expect(body.features[2]).toMatchObject({ title: "安全配置", value: "主动刹车，车道偏离预警" });
+      expect(body.features[3]).toMatchObject({ title: "动力系统", value: "2.0T发动机+8AT变速箱" });
+      expect(body.features[4]).toMatchObject({ title: "悬挂系统", value: "前麦弗逊后多连杆独立悬挂" });
       
       // 验证关联关系
       expect(body.categoryId).toBe(categoryId);
@@ -285,7 +280,7 @@ describe("Admin API", () => {
       expect(typeof body.image).toBe("string");
       expect(typeof body.originalPrice).toBe("string");
       expect(typeof body.currentPrice).toBe("string");
-      expect(typeof body.features).toBe("string");
+      expect(Array.isArray(body.features)).toBe(true);
       expect(typeof body.categoryId).toBe("string");
       expect(typeof body.tenantId).toBe("string");
     });
@@ -298,7 +293,7 @@ describe("Admin API", () => {
           image: "trim.jpg",
           originalPrice: "50000",
           currentPrice: "48000",
-          features: "[]",
+          features: [],
           categoryId: categoryId,
           tenantId: tenantId,
         },

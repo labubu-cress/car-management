@@ -1,25 +1,28 @@
 import { createTenantPrismaClient } from "@/lib/db";
-import type { CarTrim } from "@prisma/client";
-import { Prisma } from "@prisma/client";
-import type { CreateCarTrimInput } from "./schema";
+import { z } from "zod";
+import { carTrimSchema, type CarTrim, type CreateCarTrimInput, type UpdateCarTrimInput } from "./schema";
 
 export const getAllCarTrims = async (tenantId: string, categoryId: string): Promise<CarTrim[]> => {
   const prisma = createTenantPrismaClient(tenantId);
-  return prisma.carTrim.findMany({ where: { categoryId } });
+  const trims = await prisma.carTrim.findMany({ where: { categoryId } });
+  return z.array(carTrimSchema).parse(trims);
 };
 
 export const getCarTrimById = async (tenantId: string, id: string): Promise<CarTrim | null> => {
   const prisma = createTenantPrismaClient(tenantId);
-  return prisma.carTrim.findUnique({ where: { id } });
+  const trim = await prisma.carTrim.findUnique({ where: { id } });
+  if (!trim) {
+    return null;
+  }
+  return carTrimSchema.parse(trim);
 };
 
 export const createCarTrim = async (tenantId: string, data: CreateCarTrimInput): Promise<CarTrim> => {
   const prisma = createTenantPrismaClient(tenantId);
   const { categoryId, ...restData } = data;
-  return prisma.carTrim.create({
+  const newTrim = await prisma.carTrim.create({
     data: {
       ...restData,
-      features: JSON.stringify(restData.features || []),
       tenant: {
         connect: {
           id: tenantId,
@@ -32,22 +35,20 @@ export const createCarTrim = async (tenantId: string, data: CreateCarTrimInput):
       },
     },
   });
+  return carTrimSchema.parse(newTrim);
 };
 
 export const updateCarTrim = async (
   tenantId: string,
   id: string,
-  data: Omit<Prisma.CarTrimUpdateInput, "tenant" | "category">,
+  data: UpdateCarTrimInput,
 ): Promise<CarTrim | null> => {
   const prisma = createTenantPrismaClient(tenantId);
-  const dataForUpdate = { ...data };
-  if (data.features) {
-    dataForUpdate.features = JSON.stringify(data.features);
-  }
-  return prisma.carTrim.update({
+  const updatedTrim = await prisma.carTrim.update({
     where: { id },
-    data: dataForUpdate,
+    data: data,
   });
+  return carTrimSchema.parse(updatedTrim);
 };
 
 export const deleteCarTrim = async (tenantId: string, id: string): Promise<void> => {

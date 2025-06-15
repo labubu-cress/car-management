@@ -1,28 +1,27 @@
 import { createTenantPrismaClient } from "@/lib/db";
-import type { CarCategory } from "@prisma/client";
-import { Prisma } from "@prisma/client";
-import type { CreateCarCategoryInput } from "./schema";
+import { z } from "zod";
+import { carCategorySchema, type CarCategory, type CreateCarCategoryInput, type UpdateCarCategoryInput } from "./schema";
 
 export const getAllCarCategories = async (tenantId: string): Promise<CarCategory[]> => {
   const prisma = createTenantPrismaClient(tenantId);
-  return prisma.carCategory.findMany();
+  const categories = await prisma.carCategory.findMany();
+  return z.array(carCategorySchema).parse(categories);
 };
 
 export const getCarCategoryById = async (tenantId: string, id: string): Promise<CarCategory | null> => {
   const prisma = createTenantPrismaClient(tenantId);
-  return prisma.carCategory.findUnique({ where: { id } });
+  const category = await prisma.carCategory.findUnique({ where: { id } });
+  if (!category) {
+    return null;
+  }
+  return carCategorySchema.parse(category);
 };
 
 export const createCarCategory = async (tenantId: string, data: CreateCarCategoryInput): Promise<CarCategory> => {
   const prisma = createTenantPrismaClient(tenantId);
-  return prisma.carCategory.create({
+  const newCategory = await prisma.carCategory.create({
     data: {
       ...data,
-      tags: JSON.stringify(data.tags || []),
-      highlights: JSON.stringify(data.highlights || []),
-      interiorImages: JSON.stringify(data.interiorImages || []),
-      exteriorImages: JSON.stringify(data.exteriorImages || []),
-      offerPictures: JSON.stringify(data.offerPictures || []),
       tenant: {
         connect: {
           id: tenantId,
@@ -30,34 +29,20 @@ export const createCarCategory = async (tenantId: string, data: CreateCarCategor
       },
     },
   });
+  return carCategorySchema.parse(newCategory);
 };
 
 export const updateCarCategory = async (
   tenantId: string,
   id: string,
-  data: Omit<Prisma.CarCategoryUpdateInput, "tenant" | "vehicleScenarios">,
+  data: UpdateCarCategoryInput,
 ): Promise<CarCategory | null> => {
   const prisma = createTenantPrismaClient(tenantId);
-  const dataForUpdate = { ...data };
-  if (data.tags) {
-    dataForUpdate.tags = JSON.stringify(data.tags);
-  }
-  if (data.highlights) {
-    dataForUpdate.highlights = JSON.stringify(data.highlights);
-  }
-  if (data.interiorImages) {
-    dataForUpdate.interiorImages = JSON.stringify(data.interiorImages);
-  }
-  if (data.exteriorImages) {
-    dataForUpdate.exteriorImages = JSON.stringify(data.exteriorImages);
-  }
-  if (data.offerPictures) {
-    dataForUpdate.offerPictures = JSON.stringify(data.offerPictures);
-  }
-  return prisma.carCategory.update({
+  const updatedCategory = await prisma.carCategory.update({
     where: { id },
-    data: dataForUpdate,
+    data: data,
   });
+  return carCategorySchema.parse(updatedCategory);
 };
 
 export const deleteCarCategory = async (tenantId: string, id: string): Promise<void> => {

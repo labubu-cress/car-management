@@ -1,4 +1,22 @@
 import { z } from "zod";
+import { carFeatureSchema } from "../shared/schema";
+
+export const carTrimSchema = z.object({
+  id: z.string(),
+  tenantId: z.string(),
+  name: z.string(),
+  subtitle: z.string(),
+  image: z.string().url(),
+  badge: z.string().nullable(),
+  originalPrice: z.string(),
+  currentPrice: z.string(),
+  features: z.array(carFeatureSchema),
+  categoryId: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type CarTrim = z.infer<typeof carTrimSchema>;
 
 // Schema for creating a car trim
 export const createCarTrimSchema = z.object({
@@ -8,7 +26,7 @@ export const createCarTrimSchema = z.object({
   originalPrice: z.string(),
   currentPrice: z.string(),
   badge: z.string().optional(),
-  features: z.array(z.object({ title: z.string(), value: z.string() })).optional(),
+  features: z.array(carFeatureSchema).optional().default([]),
   categoryId: z.string().cuid(),
 });
 
