@@ -29,19 +29,14 @@ export function createTenantPrismaClient(tenantId: string) {
 
           if (
             [
-              "findUnique",
-              "findUniqueOrThrow",
               "findFirst",
               "findFirstOrThrow",
               "findMany",
-              "update",
               "updateMany",
-              "delete",
               "deleteMany",
               "count",
               "aggregate",
               "groupBy",
-              "upsert",
             ].includes(operation)
           ) {
             if (newArgs.where) {

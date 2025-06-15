@@ -83,6 +83,36 @@ describe("Admin API", () => {
       const body = (await response.json()) as Tenant;
       expect(body.id).toBe(tenantId);
     });
+
+    it("should delete a tenant", async () => {
+      const tenantToDelete = await prisma.tenant.create({
+        data: {
+          name: "Tenant to Delete",
+          appId: "to-delete-app-id",
+          appSecret: "a-secure-secret-to-delete",
+        },
+      });
+      const response = await app.request(
+        `/api/v1/admin/tenants/${tenantToDelete.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${superAdminUser.token}`,
+          },
+        },
+      );
+      expect(response.status).toBe(204);
+
+      const findResponse = await app.request(
+        `/api/v1/admin/tenants/${tenantToDelete.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${superAdminUser.token}`,
+          },
+        },
+      );
+      expect(findResponse.status).toBe(404);
+    });
   });
 
   // AdminUser Management Tests
@@ -130,6 +160,45 @@ describe("Admin API", () => {
       expect(response.status).toBe(200);
       const body = (await response.json()) as AdminUser;
       expect(body.id).toBe(adminUser.id);
+    });
+
+    it("should delete an admin user", async () => {
+      const newAdmin: CreateAdminUserInput = {
+        username: "deletable-admin",
+        password: "password123",
+        role: "admin",
+      };
+      const createResponse = await app.request("/api/v1/admin/admin-users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${superAdminUser.token}`,
+        },
+        body: JSON.stringify(newAdmin),
+      });
+      expect(createResponse.status).toBe(201);
+      const adminToDelete = (await createResponse.json()) as AdminUser;
+
+      const response = await app.request(
+        `/api/v1/admin/admin-users/${adminToDelete.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${superAdminUser.token}`,
+          },
+        },
+      );
+      expect(response.status).toBe(204);
+
+      const findResponse = await app.request(
+        `/api/v1/admin/admin-users/${adminToDelete.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${adminUser.token}`,
+          },
+        },
+      );
+      expect(findResponse.status).toBe(404);
     });
   });
 
@@ -241,6 +310,41 @@ describe("Admin API", () => {
       const body = (await response.json()) as CarCategory;
       expect(body.id).toBe(categoryId);
       expect(body.name).toBe("Test Category");
+    });
+
+    it("should delete a car category", async () => {
+      const categoryToDelete = await prisma.carCategory.create({
+        data: {
+          name: "Category to Delete",
+          tenantId: tenantId,
+          image: "delete.jpg",
+          tags: [],
+          highlights: [],
+          interiorImages: [],
+          exteriorImages: [],
+          offerPictures: [],
+        },
+      });
+      const response = await app.request(
+        `/api/v1/admin/tenants/${tenantId}/car-categories/${categoryToDelete.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${adminUser.token}`,
+          },
+        },
+      );
+      expect(response.status).toBe(204);
+
+      const findResponse = await app.request(
+        `/api/v1/admin/tenants/${tenantId}/car-categories/${categoryToDelete.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${adminUser.token}`,
+          },
+        },
+      );
+      expect(findResponse.status).toBe(404);
     });
   });
 
@@ -372,6 +476,41 @@ describe("Admin API", () => {
       expect(body.id).toBe(trim.id);
       expect(body.name).toBe("Test Trim for Get");
     });
+
+    it("should delete a car trim", async () => {
+      const trimToDelete = await prisma.carTrim.create({
+        data: {
+          name: "Trim to Delete",
+          subtitle: "A trim to be deleted",
+          image: "https://example.com/trim-delete.jpg",
+          originalPrice: "600000",
+          currentPrice: "560000",
+          features: [],
+          categoryId: categoryId,
+          tenantId: tenantId,
+        },
+      });
+      const response = await app.request(
+        `/api/v1/admin/tenants/${tenantId}/car-trims/${trimToDelete.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${adminUser.token}`,
+          },
+        },
+      );
+      expect(response.status).toBe(204);
+
+      const findResponse = await app.request(
+        `/api/v1/admin/tenants/${tenantId}/car-trims/${trimToDelete.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${adminUser.token}`,
+          },
+        },
+      );
+      expect(findResponse.status).toBe(404);
+    });
   });
 
   // VehicleScenario Management Tests
@@ -434,6 +573,37 @@ describe("Admin API", () => {
       const body = (await response.json()) as VehicleScenario;
       expect(body.id).toBe(scenario.id);
       expect(body.name).toBe("Existing Scenario");
+    });
+
+    it("should delete a vehicle scenario", async () => {
+      const scenarioToDelete = await prisma.vehicleScenario.create({
+        data: {
+          name: "Scenario to Delete",
+          image: "delete.jpg",
+          description: "A scenario to be deleted",
+          tenantId: tenantId,
+        },
+      });
+      const response = await app.request(
+        `/api/v1/admin/tenants/${tenantId}/vehicle-scenarios/${scenarioToDelete.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${adminUser.token}`,
+          },
+        },
+      );
+      expect(response.status).toBe(204);
+
+      const findResponse = await app.request(
+        `/api/v1/admin/tenants/${tenantId}/vehicle-scenarios/${scenarioToDelete.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${adminUser.token}`,
+          },
+        },
+      );
+      expect(findResponse.status).toBe(404);
     });
   });
 
