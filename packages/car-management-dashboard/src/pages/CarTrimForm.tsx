@@ -245,8 +245,9 @@ export const CarTrimForm: React.FC = () => {
               value={formData.categoryId}
               onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
               className={formFieldStyles.select}
+              disabled={categories.length <= 1}
             >
-              <option value="">请选择分类</option>
+              {categories.length > 1 && <option value="">请选择分类</option>}
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}

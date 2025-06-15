@@ -146,8 +146,9 @@ export const CarTrims: React.FC = () => {
             minWidth: '200px',
             outline: 'none',
           }}
+          disabled={categories.length <= 1}
         >
-          <option value="">请选择分类</option>
+          {categories.length > 1 && <option value="">请选择分类</option>}
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
               {category.name}

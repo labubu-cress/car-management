@@ -23,6 +23,7 @@ export const Header: React.FC = () => {
             value={currentTenant?.id || ''}
             onChange={handleTenantChange}
             className={styles.tenantSelect}
+            disabled={tenants.length <= 1}
           >
             {tenants.map(tenant => (
               <option key={tenant.id} value={tenant.id}>
@@ -30,7 +31,7 @@ export const Header: React.FC = () => {
               </option>
             ))}
           </select>
-          <FontAwesomeIcon icon={faChevronDown} className={styles.chevronIcon} />
+          {tenants.length > 1 && <FontAwesomeIcon icon={faChevronDown} className={styles.chevronIcon} />}
         </div>
       </div>
 
