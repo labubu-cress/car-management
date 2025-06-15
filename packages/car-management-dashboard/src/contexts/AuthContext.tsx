@@ -7,9 +7,11 @@ interface AuthContextType {
   currentTenant: Tenant | null;
   tenants: Tenant[];
   isLoading: boolean;
+  needsFirstTenant: boolean;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   selectTenant: (tenant: Tenant) => void;
+  refreshTenants: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,37 +33,54 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [currentTenant, setCurrentTenant] = useState<Tenant | null>(null);
   const [tenants, setTenants] = useState<Tenant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [needsFirstTenant, setNeedsFirstTenant] = useState(false);
+
+  const refreshTenants = async () => {
+    try {
+      const tenantsData = await tenantsApi.getAll();
+      setTenants(tenantsData);
+      
+      // 检查是否需要创建第一个租户
+      if (tenantsData.length === 0) {
+        setNeedsFirstTenant(true);
+        setCurrentTenant(null);
+        localStorage.removeItem('current_tenant');
+        return;
+      }
+      
+      setNeedsFirstTenant(false);
+      
+      // 恢复或选择当前租户
+      const savedTenant = localStorage.getItem('current_tenant');
+      if (savedTenant) {
+        const tenant = JSON.parse(savedTenant);
+        const validTenant = tenantsData.find(t => t.id === tenant.id);
+        if (validTenant) {
+          setCurrentTenant(validTenant);
+          return;
+        }
+      }
+
+      // 如果没有选择租户，自动选择第一个活跃的租户
+      const activeTenant = tenantsData.find(t => t.status === 'active') || tenantsData[0];
+      setCurrentTenant(activeTenant);
+      localStorage.setItem('current_tenant', JSON.stringify(activeTenant));
+    } catch (error) {
+      console.error('Failed to load tenants:', error);
+      throw error;
+    }
+  };
 
   // 初始化认证状态
   useEffect(() => {
     const initAuth = async () => {
       const token = localStorage.getItem('admin_token');
       const savedUser = localStorage.getItem('admin_user');
-      const savedTenant = localStorage.getItem('current_tenant');
 
       if (token && savedUser) {
         try {
           setUser(JSON.parse(savedUser));
-          
-          // 加载租户列表
-          const tenantsData = await tenantsApi.getAll();
-          setTenants(tenantsData);
-
-          // 恢复当前租户
-          if (savedTenant) {
-            const tenant = JSON.parse(savedTenant);
-            const validTenant = tenantsData.find(t => t.id === tenant.id);
-            if (validTenant) {
-              setCurrentTenant(validTenant);
-            }
-          }
-
-          // 如果没有选择租户，自动选择第一个活跃的租户
-          if (!savedTenant && tenantsData.length > 0) {
-            const activeTenant = tenantsData.find(t => t.status === 'active') || tenantsData[0];
-            setCurrentTenant(activeTenant);
-            localStorage.setItem('current_tenant', JSON.stringify(activeTenant));
-          }
+          await refreshTenants();
         } catch (error) {
           console.error('Failed to initialize auth:', error);
           logout();
@@ -81,16 +100,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem('admin_user', JSON.stringify(response.user));
       setUser(response.user);
 
-      // 加载租户列表
-      const tenantsData = await tenantsApi.getAll();
-      setTenants(tenantsData);
-
-      // 自动选择第一个活跃的租户
-      if (tenantsData.length > 0) {
-        const activeTenant = tenantsData.find(t => t.status === 'active') || tenantsData[0];
-        setCurrentTenant(activeTenant);
-        localStorage.setItem('current_tenant', JSON.stringify(activeTenant));
-      }
+      // 加载租户列表并检查是否需要创建第一个租户
+      await refreshTenants();
     } catch (error) {
       throw error;
     }
@@ -103,6 +114,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
     setCurrentTenant(null);
     setTenants([]);
+    setNeedsFirstTenant(false);
   };
 
   const selectTenant = (tenant: Tenant) => {
@@ -115,10 +127,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     currentTenant,
     tenants,
     isLoading,
+    needsFirstTenant,
     login,
     logout,
     selectTenant,
+    refreshTenants,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }; 

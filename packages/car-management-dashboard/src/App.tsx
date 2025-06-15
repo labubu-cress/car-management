@@ -5,6 +5,7 @@ import { AdminUsers } from '@/pages/AdminUsers';
 import { CarCategories } from '@/pages/CarCategories';
 import { CarTrims } from '@/pages/CarTrims';
 import { Dashboard } from '@/pages/Dashboard';
+import { FirstTenantSetup } from '@/pages/FirstTenantSetup';
 import { Tenants } from '@/pages/Tenants';
 import { Users } from '@/pages/Users';
 import { VehicleScenarios } from '@/pages/VehicleScenarios';
@@ -24,7 +25,7 @@ const queryClient = new QueryClient({
 });
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, needsFirstTenant } = useAuth();
 
   if (isLoading) {
     return <div>加载中...</div>;
@@ -32,6 +33,10 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
   if (!user) {
     return <LoginForm />;
+  }
+
+  if (needsFirstTenant) {
+    return <FirstTenantSetup />;
   }
 
   return <>{children}</>;
