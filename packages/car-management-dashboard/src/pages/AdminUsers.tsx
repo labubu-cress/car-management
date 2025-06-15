@@ -119,7 +119,7 @@ export const AdminUsers: React.FC = () => {
     setFormData({
       username: '',
       password: '',
-      role: 'admin',
+      role: 'admin', // 默认只能创建普通管理员
       tenantId: '',
     });
     setIsModalOpen(true);
@@ -155,7 +155,7 @@ export const AdminUsers: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.username) {
+    if (!formData.username.trim()) {
       toast.error('请输入用户名');
       return;
     }
@@ -165,10 +165,16 @@ export const AdminUsers: React.FC = () => {
       return;
     }
 
+    if (formData.password && formData.password.length < 6) {
+      toast.error('密码至少需要6个字符');
+      return;
+    }
+
     const submitData: CreateAdminUserInput | UpdateAdminUserInput = {
-      username: formData.username,
+      username: formData.username.trim(),
       role: formData.role,
-      tenantId: formData.tenantId || undefined,
+      // 根据新的需求，管理员不分配到特定租户，所以 tenantId 始终为 undefined
+      tenantId: undefined,
     };
 
     if (formData.password) {
@@ -264,39 +270,59 @@ export const AdminUsers: React.FC = () => {
               value={formData.password}
               onChange={(e) => handleInputChange('password', e.target.value)}
               className={styles.input}
-              placeholder={editingUser ? '留空则不修改密码' : '请输入密码'}
+              placeholder={editingUser ? '留空则不修改密码' : '请输入密码（至少6个字符）'}
               disabled={isSubmitting}
+              minLength={6}
             />
+            {!editingUser && (
+              <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                密码至少需要6个字符
+              </small>
+            )}
           </div>
 
-          <div className={styles.formGroup}>
-            <label className={styles.label}>角色</label>
-            <select
-              value={formData.role}
-              onChange={(e) => handleInputChange('role', e.target.value as 'super_admin' | 'admin')}
-              className={styles.select}
-              disabled={isSubmitting}
-            >
-              <option value="admin">管理员</option>
-              <option value="super_admin">超级管理员</option>
-            </select>
-          </div>
+          {/* 根据新需求，创建管理员时不需要选择角色和租户 */}
+          {!editingUser ? (
+            <div className={styles.formGroup}>
+              <label className={styles.label}>角色</label>
+              <input
+                type="text"
+                value="管理员"
+                className={styles.input}
+                disabled
+                style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
+              />
+              <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                新创建的用户默认为管理员角色
+              </small>
+            </div>
+          ) : (
+            <div className={styles.formGroup}>
+              <label className={styles.label}>角色</label>
+              <select
+                value={formData.role}
+                onChange={(e) => handleInputChange('role', e.target.value as 'super_admin' | 'admin')}
+                className={styles.select}
+                disabled={isSubmitting}
+              >
+                <option value="admin">管理员</option>
+                <option value="super_admin">超级管理员</option>
+              </select>
+            </div>
+          )}
 
           <div className={styles.formGroup}>
             <label className={styles.label}>所属租户</label>
-            <select
-              value={formData.tenantId}
-              onChange={(e) => handleInputChange('tenantId', e.target.value)}
-              className={styles.select}
-              disabled={isSubmitting}
-            >
-              <option value="">全局（所有租户）</option>
-              {tenants.map(tenant => (
-                <option key={tenant.id} value={tenant.id}>
-                  {tenant.name}
-                </option>
-              ))}
-            </select>
+            <input
+              type="text"
+              value="全局（所有租户）"
+              className={styles.input}
+              disabled
+              style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
+            />
+            <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+              管理员用户不分配到特定租户，可以管理所有租户
+            </small>
           </div>
         </form>
       </Modal>

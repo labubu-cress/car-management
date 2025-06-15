@@ -153,18 +153,35 @@ export const Tenants: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.appId || !formData.appSecret) {
-      toast.error('请填写所有必填字段');
+    if (!formData.name.trim()) {
+      toast.error('请输入租户名称');
       return;
     }
+
+    if (!formData.appId.trim()) {
+      toast.error('请输入应用ID');
+      return;
+    }
+
+    if (!formData.appSecret.trim()) {
+      toast.error('请输入应用密钥');
+      return;
+    }
+
+    const submitData = {
+      name: formData.name.trim(),
+      appId: formData.appId.trim(),
+      appSecret: formData.appSecret.trim(),
+      status: formData.status,
+    };
 
     if (editingTenant) {
       updateMutation.mutate({
         id: editingTenant.id,
-        data: formData,
+        data: submitData,
       });
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate(submitData);
     }
   };
 

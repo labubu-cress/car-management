@@ -150,18 +150,34 @@ export const VehicleScenarios: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.description || !formData.image) {
-      toast.error('请填写所有必填字段');
+    if (!formData.name.trim()) {
+      toast.error('请输入场景名称');
       return;
     }
+
+    if (!formData.description.trim()) {
+      toast.error('请输入场景描述');
+      return;
+    }
+
+    if (!formData.image.trim()) {
+      toast.error('请输入图片URL');
+      return;
+    }
+
+    const submitData = {
+      name: formData.name.trim(),
+      description: formData.description.trim(),
+      image: formData.image.trim(),
+    };
 
     if (editingScenario) {
       updateMutation.mutate({
         id: editingScenario.id,
-        data: formData,
+        data: submitData,
       });
     } else {
-      createMutation.mutate(formData);
+      createMutation.mutate(submitData);
     }
   };
 
