@@ -6,8 +6,9 @@ import type { CreateTenantInput, Tenant } from "@/api/admin/features/tenants/sch
 import type { CreateVehicleScenarioInput } from "@/api/admin/features/vehicle-scenarios/schema";
 import app from "@/index";
 import { prisma } from "@/lib/db";
+import * as ossSts from "@/lib/oss-sts";
 import type { User, VehicleScenario } from "@prisma/client";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { clearTestDb, createTestTenantAndAdminUsers, type TestAdminUserWithToken } from "../helper";
 
 describe("Admin API", () => {
@@ -18,8 +19,7 @@ describe("Admin API", () => {
 
   beforeEach(async () => {
     await clearTestDb(prisma);
-    ({ tenantId, superAdminUser, adminUser } =
-      await createTestTenantAndAdminUsers(prisma));
+    ({ tenantId, superAdminUser, adminUser } = await createTestTenantAndAdminUsers(prisma));
     // Create a car category for car trim tests
     const category = await prisma.carCategory.create({
       data: {
@@ -92,25 +92,19 @@ describe("Admin API", () => {
           appSecret: "a-secure-secret-to-delete",
         },
       });
-      const response = await app.request(
-        `/api/v1/admin/tenants/${tenantToDelete.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${superAdminUser.token}`,
-          },
+      const response = await app.request(`/api/v1/admin/tenants/${tenantToDelete.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${superAdminUser.token}`,
         },
-      );
+      });
       expect(response.status).toBe(204);
 
-      const findResponse = await app.request(
-        `/api/v1/admin/tenants/${tenantToDelete.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${superAdminUser.token}`,
-          },
+      const findResponse = await app.request(`/api/v1/admin/tenants/${tenantToDelete.id}`, {
+        headers: {
+          Authorization: `Bearer ${superAdminUser.token}`,
         },
-      );
+      });
       expect(findResponse.status).toBe(404);
     });
   });
@@ -179,25 +173,19 @@ describe("Admin API", () => {
       expect(createResponse.status).toBe(201);
       const adminToDelete = (await createResponse.json()) as AdminUser;
 
-      const response = await app.request(
-        `/api/v1/admin/admin-users/${adminToDelete.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${superAdminUser.token}`,
-          },
+      const response = await app.request(`/api/v1/admin/admin-users/${adminToDelete.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${superAdminUser.token}`,
         },
-      );
+      });
       expect(response.status).toBe(204);
 
-      const findResponse = await app.request(
-        `/api/v1/admin/admin-users/${adminToDelete.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${adminUser.token}`,
-          },
+      const findResponse = await app.request(`/api/v1/admin/admin-users/${adminToDelete.id}`, {
+        headers: {
+          Authorization: `Bearer ${adminUser.token}`,
         },
-      );
+      });
       expect(findResponse.status).toBe(404);
     });
   });
@@ -212,21 +200,15 @@ describe("Admin API", () => {
         highlights: [
           { title: "动力系统", value: "2.0T涡轮增压" },
           { title: "燃油经济性", value: "7.5L/100km" },
-          { title: "最大功率", value: "245马力" }
+          { title: "最大功率", value: "245马力" },
         ],
         interiorImages: [
           "https://example.com/interior1.jpg",
           "https://example.com/interior2.jpg",
-          "https://example.com/interior3.jpg"
+          "https://example.com/interior3.jpg",
         ],
-        exteriorImages: [
-          "https://example.com/exterior1.jpg",
-          "https://example.com/exterior2.jpg"
-        ],
-        offerPictures: [
-          "https://example.com/offer1.jpg",
-          "https://example.com/offer2.jpg"
-        ],
+        exteriorImages: ["https://example.com/exterior1.jpg", "https://example.com/exterior2.jpg"],
+        offerPictures: ["https://example.com/offer1.jpg", "https://example.com/offer2.jpg"],
       };
       const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-categories`, {
         method: "POST",
@@ -238,14 +220,14 @@ describe("Admin API", () => {
       });
       expect(response.status).toBe(201);
       const body = (await response.json()) as CarCategory;
-      
+
       // 验证基本信息
-      expect(body).toMatchObject({ 
+      expect(body).toMatchObject({
         name: newCategory.name,
         image: newCategory.image,
-        tenantId: tenantId
+        tenantId: tenantId,
       });
-      
+
       // 验证 tags 数组
       expect(body.tags).toBeDefined();
       expect(Array.isArray(body.tags)).toBe(true);
@@ -254,7 +236,7 @@ describe("Admin API", () => {
       expect(body.tags).toContain("豪华");
       expect(body.tags).toContain("舒适");
       expect(body.tags).toContain("智能驾驶");
-      
+
       // 验证 highlights 数组
       expect(body.highlights).toBeDefined();
       expect(Array.isArray(body.highlights)).toBe(true);
@@ -262,25 +244,25 @@ describe("Admin API", () => {
       expect(body.highlights[0]).toMatchObject({ title: "动力系统", value: "2.0T涡轮增压" });
       expect(body.highlights[1]).toMatchObject({ title: "燃油经济性", value: "7.5L/100km" });
       expect(body.highlights[2]).toMatchObject({ title: "最大功率", value: "245马力" });
-      
+
       // 验证 interiorImages 数组
       expect(body.interiorImages).toBeDefined();
       expect(Array.isArray(body.interiorImages)).toBe(true);
       expect(body.interiorImages.length).toBe(3);
       expect(body.interiorImages).toEqual(newCategory.interiorImages);
-      
+
       // 验证 exteriorImages 数组
       expect(body.exteriorImages).toBeDefined();
       expect(Array.isArray(body.exteriorImages)).toBe(true);
       expect(body.exteriorImages.length).toBe(2);
       expect(body.exteriorImages).toEqual(newCategory.exteriorImages);
-      
+
       // 验证 offerPictures 数组
       expect(body.offerPictures).toBeDefined();
       expect(Array.isArray(body.offerPictures)).toBe(true);
       expect(body.offerPictures.length).toBe(2);
       expect(body.offerPictures).toEqual(newCategory.offerPictures);
-      
+
       // 验证自动生成的字段
       expect(body.id).toBeDefined();
       expect(body.createdAt).toBeDefined();
@@ -325,15 +307,12 @@ describe("Admin API", () => {
           offerPictures: [],
         },
       });
-      const response = await app.request(
-        `/api/v1/admin/tenants/${tenantId}/car-categories/${categoryToDelete.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${adminUser.token}`,
-          },
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-categories/${categoryToDelete.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${adminUser.token}`,
         },
-      );
+      });
       expect(response.status).toBe(204);
 
       const findResponse = await app.request(
@@ -362,7 +341,7 @@ describe("Admin API", () => {
           { title: "科技配置", value: "12.3英寸中控屏，无线充电" },
           { title: "安全配置", value: "主动刹车，车道偏离预警" },
           { title: "动力系统", value: "2.0T发动机+8AT变速箱" },
-          { title: "悬挂系统", value: "前麦弗逊后多连杆独立悬挂" }
+          { title: "悬挂系统", value: "前麦弗逊后多连杆独立悬挂" },
         ],
         categoryId: categoryId,
       };
@@ -376,7 +355,7 @@ describe("Admin API", () => {
       });
       expect(response.status).toBe(201);
       const body = (await response.json()) as CarTrim;
-      
+
       // 验证基本信息
       expect(body).toMatchObject({
         name: newTrim.name,
@@ -385,14 +364,14 @@ describe("Admin API", () => {
         originalPrice: newTrim.originalPrice,
         currentPrice: newTrim.currentPrice,
         categoryId: categoryId,
-        tenantId: tenantId
+        tenantId: tenantId,
       });
-      
+
       // 验证价格字段
       expect(body.originalPrice).toBe("580000");
       expect(body.currentPrice).toBe("548000");
       expect(Number(body.originalPrice)).toBeGreaterThan(Number(body.currentPrice));
-      
+
       // 验证 features 数组
       expect(body.features).toBeDefined();
       expect(Array.isArray(body.features)).toBe(true);
@@ -402,16 +381,16 @@ describe("Admin API", () => {
       expect(body.features[2]).toMatchObject({ title: "安全配置", value: "主动刹车，车道偏离预警" });
       expect(body.features[3]).toMatchObject({ title: "动力系统", value: "2.0T发动机+8AT变速箱" });
       expect(body.features[4]).toMatchObject({ title: "悬挂系统", value: "前麦弗逊后多连杆独立悬挂" });
-      
+
       // 验证关联关系
       expect(body.categoryId).toBe(categoryId);
       expect(body.tenantId).toBe(tenantId);
-      
+
       // 验证自动生成的字段
       expect(body.id).toBeDefined();
       expect(body.createdAt).toBeDefined();
       expect(body.updatedAt).toBeDefined();
-      
+
       // 验证字段类型
       expect(typeof body.name).toBe("string");
       expect(typeof body.subtitle).toBe("string");
@@ -436,14 +415,11 @@ describe("Admin API", () => {
           tenantId: tenantId,
         },
       });
-      const response = await app.request(
-        `/api/v1/admin/tenants/${tenantId}/car-trims?categoryId=${categoryId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${adminUser.token}`,
-          },
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims?categoryId=${categoryId}`, {
+        headers: {
+          Authorization: `Bearer ${adminUser.token}`,
         },
-      );
+      });
       expect(response.status).toBe(200);
       const body = (await response.json()) as CarTrim[];
       expect(Array.isArray(body)).toBe(true);
@@ -463,14 +439,11 @@ describe("Admin API", () => {
           tenantId: tenantId,
         },
       });
-      const response = await app.request(
-        `/api/v1/admin/tenants/${tenantId}/car-trims/${trim.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${adminUser.token}`,
-          },
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims/${trim.id}`, {
+        headers: {
+          Authorization: `Bearer ${adminUser.token}`,
         },
-      );
+      });
       expect(response.status).toBe(200);
       const body = (await response.json()) as CarTrim;
       expect(body.id).toBe(trim.id);
@@ -490,26 +463,54 @@ describe("Admin API", () => {
           tenantId: tenantId,
         },
       });
-      const response = await app.request(
-        `/api/v1/admin/tenants/${tenantId}/car-trims/${trimToDelete.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${adminUser.token}`,
-          },
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims/${trimToDelete.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${adminUser.token}`,
         },
-      );
+      });
       expect(response.status).toBe(204);
 
-      const findResponse = await app.request(
-        `/api/v1/admin/tenants/${tenantId}/car-trims/${trimToDelete.id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${adminUser.token}`,
-          },
+      const findResponse = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims/${trimToDelete.id}`, {
+        headers: {
+          Authorization: `Bearer ${adminUser.token}`,
         },
-      );
+      });
       expect(findResponse.status).toBe(404);
+    });
+  });
+
+  // Img Management Tests
+  describe("/api/v1/admin/tenants/:tenantId/img", () => {
+    const mockToken = {
+      secretId: "mock-secret-id",
+      secretKey: "mock-secret-key",
+      sessionToken: "mock-session-token",
+      region: "mock-region",
+      bucket: "mock-bucket",
+      expiredTime: 1678886400,
+      startTime: 1678882800,
+    };
+
+    beforeEach(() => {
+      vi.spyOn(ossSts, "createQcloudImgUploadToken").mockResolvedValue(mockToken);
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it("should get an upload token", async () => {
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/img/upload-token`, {
+        headers: {
+          Authorization: `Bearer ${adminUser.token}`,
+        },
+      });
+
+      expect(response.status).toBe(200);
+      const body = await response.json();
+      expect(body).toEqual(mockToken);
+      expect(ossSts.createQcloudImgUploadToken).toHaveBeenCalledWith(tenantId);
     });
   });
 
@@ -584,15 +585,12 @@ describe("Admin API", () => {
           tenantId: tenantId,
         },
       });
-      const response = await app.request(
-        `/api/v1/admin/tenants/${tenantId}/vehicle-scenarios/${scenarioToDelete.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${adminUser.token}`,
-          },
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/vehicle-scenarios/${scenarioToDelete.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${adminUser.token}`,
         },
-      );
+      });
       expect(response.status).toBe(204);
 
       const findResponse = await app.request(
