@@ -1,7 +1,6 @@
 import COS from 'cos-js-sdk-v5';
 import React, { useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { v4 as uuidv4 } from 'uuid';
 import { imageApi } from '../lib/api';
 import { uploadStyles } from './ImageUpload.css';
 
@@ -9,6 +8,14 @@ interface ImageUploadProps {
   value: string | null;
   onChange: (url: string) => void;
   tenantId: string; // To construct the upload path
+}
+
+async function calculateSHA256(file: File): Promise<string> {
+  const buffer = await file.arrayBuffer();
+  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+  return hashHex;
 }
 
 export const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, tenantId }) => {
@@ -30,6 +37,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, tenan
     setProgress(0);
     
     try {
+      const fileHash = await calculateSHA256(file);
       const tokenData = await imageApi.getUploadToken(tenantId);
       const cos = new COS({
         getAuthorization: (_options, callback) => {
@@ -44,7 +52,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, tenan
       });
 
       const fileExtension = file.name.split('.').pop() || '';
-      const fileName = `${uuidv4()}.${fileExtension}`;
+      const fileName = `${fileHash}.${fileExtension}`;
       const uploadPath = `tenants/${tenantId}/uploads/${fileName}`;
 
       cos.putObject(
@@ -71,7 +79,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, tenan
       );
     } catch (error) {
       setIsUploading(false);
-      toast.error('获取上传凭证失败');
+      toast.error('获取上传凭证或处理文件失败');
       console.error('Get upload token error:', error);
     }
   };
