@@ -1,6 +1,7 @@
 import { FormField } from '@/components/FormField';
 import { formFieldStyles } from '@/components/FormField.css';
 import { Highlight, HighlightInput } from '@/components/HighlightInput';
+import { ImageUpload } from '@/components/ImageUpload';
 import { useAuth } from '@/contexts/AuthContext';
 import { carCategoriesApi, carTrimsApi } from '@/lib/api';
 import { CreateCarTrimInput, UpdateCarTrimInput } from '@/types/api';
@@ -45,7 +46,7 @@ export const CarTrimForm: React.FC = () => {
   );
 
   // 获取车型详情（编辑模式）
-  const { data: trim, isLoading } = useQuery(
+  const { isLoading } = useQuery(
     ['car-trim', currentTenant?.id, id],
     () => currentTenant && id ? carTrimsApi.getById(currentTenant.id, id) : null,
     {
@@ -114,7 +115,7 @@ export const CarTrimForm: React.FC = () => {
     }
     
     if (!formData.image.trim()) {
-      newErrors.image = '请输入车型图片地址';
+      newErrors.image = '请上传车型图片';
     }
     
     if (!formData.originalPrice.trim()) {
@@ -170,6 +171,10 @@ export const CarTrimForm: React.FC = () => {
   const handleBack = () => {
     navigate('/car-trims');
   };
+
+  if (!currentTenant) {
+    return <div>加载租户信息...</div>;
+  }
 
   // 如果没有分类，显示引导
   if (categories.length === 0) {
@@ -231,12 +236,10 @@ export const CarTrimForm: React.FC = () => {
           </FormField>
 
           <FormField label="车型图片" required error={errors.image}>
-            <input
-              type="url"
+            <ImageUpload
               value={formData.image}
-              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-              className={formFieldStyles.input}
-              placeholder="请输入图片URL地址"
+              onChange={(url) => setFormData({ ...formData, image: url })}
+              tenantId={currentTenant.id}
             />
           </FormField>
 

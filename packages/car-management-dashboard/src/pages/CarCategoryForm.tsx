@@ -1,6 +1,8 @@
 import { FormField } from '@/components/FormField';
 import { formFieldStyles } from '@/components/FormField.css';
 import { Highlight, HighlightInput } from '@/components/HighlightInput';
+import { ImageUpload } from '@/components/ImageUpload';
+import { MultiImageUpload } from '@/components/MultiImageUpload';
 import { TagInput } from '@/components/TagInput';
 import { useAuth } from '@/contexts/AuthContext';
 import { carCategoriesApi } from '@/lib/api';
@@ -32,7 +34,7 @@ export const CarCategoryForm: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // 获取分类详情（编辑模式）
-  const { data: category, isLoading } = useQuery(
+  const { isLoading } = useQuery(
     ['car-category', currentTenant?.id, id],
     () => currentTenant && id ? carCategoriesApi.getById(currentTenant.id, id) : null,
     {
@@ -97,7 +99,7 @@ export const CarCategoryForm: React.FC = () => {
     }
     
     if (!formData.image.trim()) {
-      newErrors.image = '请输入分类图片地址';
+      newErrors.image = '请上传分类图片';
     }
 
     setErrors(newErrors);
@@ -148,6 +150,10 @@ export const CarCategoryForm: React.FC = () => {
 
   const isSubmitting = createMutation.isLoading || updateMutation.isLoading;
 
+  if (!currentTenant) {
+    return <div>加载租户信息...</div>;
+  }
+
   return (
     <div className={carCategoryFormStyles.container}>
       <div className={carCategoryFormStyles.header}>
@@ -174,12 +180,10 @@ export const CarCategoryForm: React.FC = () => {
           </FormField>
 
           <FormField label="分类图片" required error={errors.image}>
-            <input
-              type="url"
+            <ImageUpload
               value={formData.image}
-              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-              className={formFieldStyles.input}
-              placeholder="请输入图片URL地址"
+              onChange={(url) => setFormData({ ...formData, image: url })}
+              tenantId={currentTenant.id}
             />
           </FormField>
 
@@ -220,26 +224,26 @@ export const CarCategoryForm: React.FC = () => {
           <h2 className={carCategoryFormStyles.sectionTitle}>图片资源</h2>
           
           <FormField label="内饰图片">
-            <TagInput
-              value={formData.interiorImages}
-              onChange={(interiorImages) => setFormData({ ...formData, interiorImages })}
-              placeholder="输入图片URL后按回车添加"
+            <MultiImageUpload
+              values={formData.interiorImages}
+              onChange={(urls) => setFormData({ ...formData, interiorImages: urls })}
+              tenantId={currentTenant.id}
             />
           </FormField>
 
           <FormField label="外观图片">
-            <TagInput
-              value={formData.exteriorImages}
-              onChange={(exteriorImages) => setFormData({ ...formData, exteriorImages })}
-              placeholder="输入图片URL后按回车添加"
+            <MultiImageUpload
+              values={formData.exteriorImages}
+              onChange={(urls) => setFormData({ ...formData, exteriorImages: urls })}
+              tenantId={currentTenant.id}
             />
           </FormField>
 
           <FormField label="优惠图片">
-            <TagInput
-              value={formData.offerPictures}
-              onChange={(offerPictures) => setFormData({ ...formData, offerPictures })}
-              placeholder="输入图片URL后按回车添加"
+            <MultiImageUpload
+              values={formData.offerPictures}
+              onChange={(urls) => setFormData({ ...formData, offerPictures: urls })}
+              tenantId={currentTenant.id}
             />
           </FormField>
         </div>

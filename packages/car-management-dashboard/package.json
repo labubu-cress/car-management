@@ -10,21 +10,24 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.1",
-    "@vanilla-extract/css": "^1.14.0",
-    "@vanilla-extract/vite-plugin": "^4.0.5",
     "@fortawesome/fontawesome-svg-core": "^6.5.1",
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
-    "axios": "^1.6.2",
-    "react-hook-form": "^7.48.2",
     "@hookform/resolvers": "^3.3.2",
-    "zod": "^3.22.4",
-    "react-query": "^3.39.3",
+    "@types/uuid": "^10.0.0",
+    "@vanilla-extract/css": "^1.14.0",
+    "@vanilla-extract/vite-plugin": "^4.0.5",
+    "axios": "^1.6.2",
+    "clsx": "^2.0.0",
+    "cos-js-sdk-v5": "^1.10.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.48.2",
     "react-hot-toast": "^2.4.1",
-    "clsx": "^2.0.0"
+    "react-query": "^3.39.3",
+    "react-router-dom": "^6.20.1",
+    "uuid": "^11.1.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",
@@ -38,4 +41,4 @@
     "typescript": "^5.2.2",
     "vite": "^5.0.8"
   }
-} 
+}
