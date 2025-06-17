@@ -1,7 +1,7 @@
 import OSS from "ali-oss";
 import STS from "qcloud-cos-sts";
 
-export const createQcloudImgUploadToken = async (tenantId: string) => {
+export const createQcloudImgUploadToken = async (tenantId: string, action: string[] = ["cos:PutObject"]) => {
   const config = {
     // 腾讯云 SecretId, 用于访问腾讯云 API
     secretId: process.env.QCLOUD_SECRET_ID!,
@@ -23,7 +23,7 @@ export const createQcloudImgUploadToken = async (tenantId: string) => {
     version: "2.0",
     statement: [
       {
-        action: ["name/cos:PutObject"],
+        action,
         effect: "allow",
         resource: [`qcs::cos:${config.region}:uid/${config.appId}:${config.bucket}/${config.uploadDir}/*`],
       },
