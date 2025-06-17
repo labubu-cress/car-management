@@ -1,4 +1,5 @@
 import { Column, DataTable } from '@/components/DataTable';
+import { ImageUpload } from '@/components/ImageUpload';
 import { Modal } from '@/components/Modal';
 import { useAuth } from '@/contexts/AuthContext';
 import { vehicleScenariosApi } from '@/lib/api';
@@ -161,7 +162,7 @@ export const VehicleScenarios: React.FC = () => {
     }
 
     if (!formData.image.trim()) {
-      toast.error('请输入图片URL');
+      toast.error('请上传场景图片');
       return;
     }
 
@@ -263,20 +264,12 @@ export const VehicleScenarios: React.FC = () => {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>图片URL *</label>
-            <input
-              type="url"
+            <label className={styles.label}>场景图片 *</label>
+            <ImageUpload
               value={formData.image}
-              onChange={(e) => handleInputChange('image', e.target.value)}
-              className={styles.input}
-              placeholder="请输入图片URL"
-              disabled={isSubmitting}
+              onChange={(url) => handleInputChange('image', url)}
+              tenantId={currentTenant.id}
             />
-            {formData.image && (
-              <div className={styles.imagePreview}>
-                <img src={formData.image} alt="预览" className={styles.previewImage} />
-              </div>
-            )}
           </div>
         </form>
       </Modal>

@@ -30,7 +30,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, tenan
     setProgress(0);
     
     try {
-      const tokenData = await imageApi.getUploadToken();
+      const tokenData = await imageApi.getUploadToken(tenantId);
       const cos = new COS({
         getAuthorization: (_options, callback) => {
           callback({

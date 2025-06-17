@@ -1,1855 +1,1754 @@
 {
-    "openapi": "3.0.0",
-    "info": {
-      "title": "Cars Management Admin API",
-      "version": "1.0.0",
-      "description": "API for managing tenants, cars, and users."
-    },
-    "servers": [
-      {
-        "url": "/api/admin"
-      }
-    ],
-    "paths": {
-      "/auth/login": {
-        "post": {
-          "tags": [
-            "Auth"
-          ],
-          "summary": "Admin user login",
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/LoginInput"
-                }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "Successful login",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "object",
-                    "properties": {
-                      "token": {
-                        "type": "string"
-                      },
-                      "user": {
-                        "$ref": "#/components/schemas/AdminUser"
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "401": {
-              "description": "Invalid credentials"
-            }
-          }
-        }
-      },
-      "/tenants": {
-        "get": {
-          "tags": [
-            "Tenants"
-          ],
-          "summary": "Get all tenants",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "A list of tenants",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/Tenant"
-                    }
-                  }
-                }
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Cars Management Admin API",
+    "version": "1.0.0",
+    "description": "API for managing tenants, cars, and users."
+  },
+  "servers": [
+    {
+      "url": "/api/v1/admin"
+    }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Admin user login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInput"
               }
             }
           }
         },
-        "post": {
-          "tags": [
-            "Tenants"
-          ],
-          "summary": "Create a new tenant",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "requestBody": {
-            "required": true,
+        "responses": {
+          "200": {
+            "description": "Successful login",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateTenantInput"
-                }
-              }
-            }
-          },
-          "responses": {
-            "201": {
-              "description": "Tenant created successfully",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Tenant"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/tenants/{id}": {
-        "get": {
-          "tags": [
-            "Tenants"
-          ],
-          "summary": "Get a tenant by ID",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Tenant details",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Tenant"
-                  }
-                }
-              }
-            },
-            "404": {
-              "description": "Tenant not found"
-            }
-          }
-        },
-        "put": {
-          "tags": [
-            "Tenants"
-          ],
-          "summary": "Update a tenant",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UpdateTenantInput"
-                }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "Tenant updated successfully",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Tenant"
-                  }
-                }
-              }
-            },
-            "404": {
-              "description": "Tenant not found"
-            }
-          }
-        },
-        "delete": {
-          "tags": [
-            "Tenants"
-          ],
-          "summary": "Delete a tenant",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "204": {
-              "description": "Tenant deleted successfully"
-            }
-          }
-        }
-      },
-      "/admin-users": {
-        "get": {
-          "tags": [
-            "AdminUsers"
-          ],
-          "summary": "Get all admin users",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "A list of admin users",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    },
+                    "user": {
                       "$ref": "#/components/schemas/AdminUser"
                     }
                   }
                 }
               }
             }
+          },
+          "401": {
+            "description": "Invalid credentials"
           }
-        },
-        "post": {
-          "tags": [
-            "AdminUsers"
-          ],
-          "summary": "Create a new admin user",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "requestBody": {
-            "required": true,
+        }
+      }
+    },
+    "/tenants": {
+      "get": {
+        "tags": ["Tenants"],
+        "summary": "Get all tenants",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of tenants",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateAdminUserInput"
-                }
-              }
-            }
-          },
-          "responses": {
-            "201": {
-              "description": "Admin user created successfully",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/AdminUser"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Tenant"
                   }
                 }
               }
-            },
-            "403": {
-              "description": "Forbidden"
             }
           }
         }
       },
-      "/admin-users/{id}": {
-        "get": {
-          "tags": [
-            "AdminUsers"
-          ],
-          "summary": "Get an admin user by ID",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
+      "post": {
+        "tags": ["Tenants"],
+        "summary": "Create a new tenant",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
               "schema": {
-                "type": "string"
+                "$ref": "#/components/schemas/CreateTenantInput"
               }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Admin user details",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/AdminUser"
-                  }
-                }
-              }
-            },
-            "403": {
-              "description": "Forbidden"
-            },
-            "404": {
-              "description": "Admin user not found"
             }
           }
         },
-        "put": {
-          "tags": [
-            "AdminUsers"
-          ],
-          "summary": "Update an admin user",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "requestBody": {
-            "required": true,
+        "responses": {
+          "201": {
+            "description": "Tenant created successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UpdateAdminUserInput"
+                  "$ref": "#/components/schemas/Tenant"
                 }
               }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "Admin user updated successfully",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/AdminUser"
-                  }
-                }
-              }
-            },
-            "403": {
-              "description": "Forbidden"
-            },
-            "404": {
-              "description": "Admin user not found"
-            }
-          }
-        },
-        "delete": {
-          "tags": [
-            "AdminUsers"
-          ],
-          "summary": "Delete an admin user",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "204": {
-              "description": "Admin user deleted successfully"
-            },
-            "403": {
-              "description": "Forbidden"
-            },
-            "404": {
-              "description": "Admin user not found"
-            }
-          }
-        }
-      },
-      "/tenants/{tenantId}/vehicle-scenarios": {
-        "post": {
-          "tags": [
-            "VehicleScenarios"
-          ],
-          "summary": "Create a vehicle scenario",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "tenantId",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreateVehicleScenarioInput"
-                }
-              }
-            }
-          },
-          "responses": {
-            "201": {
-              "description": "Vehicle scenario created",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/VehicleScenario"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "get": {
-          "tags": [
-            "VehicleScenarios"
-          ],
-          "summary": "Get all vehicle scenarios for a tenant",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "tenantId",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "A list of vehicle scenarios",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/VehicleScenario"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/tenants/{tenantId}/vehicle-scenarios/{id}": {
-        "get": {
-          "tags": [
-            "VehicleScenarios"
-          ],
-          "summary": "Get a vehicle scenario by ID",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "tenantId",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Vehicle scenario details",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/VehicleScenario"
-                  }
-                }
-              }
-            },
-            "404": {
-              "description": "Vehicle scenario not found"
-            }
-          }
-        },
-        "put": {
-          "tags": [
-            "VehicleScenarios"
-          ],
-          "summary": "Update a vehicle scenario",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "tenantId",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UpdateVehicleScenarioInput"
-                }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "Vehicle scenario updated",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/VehicleScenario"
-                  }
-                }
-              }
-            },
-            "404": {
-              "description": "Vehicle scenario not found"
-            }
-          }
-        },
-        "delete": {
-          "tags": [
-            "VehicleScenarios"
-          ],
-          "summary": "Delete a vehicle scenario",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "tenantId",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "204": {
-              "description": "Vehicle scenario deleted"
-            }
-          }
-        }
-      },
-      "/tenants/{tenantId}/car-categories": {
-        "post": {
-          "tags": [
-            "CarCategories"
-          ],
-          "summary": "Create a car category",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "tenantId",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreateCarCategoryInput"
-                }
-              }
-            }
-          },
-          "responses": {
-            "201": {
-              "description": "Car category created",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/CarCategory"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "get": {
-          "tags": [
-            "CarCategories"
-          ],
-          "summary": "Get all car categories for a tenant",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "tenantId",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "A list of car categories",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/CarCategory"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/tenants/{tenantId}/car-categories/{id}": {
-        "get": {
-          "tags": [
-            "CarCategories"
-          ],
-          "summary": "Get a car category by ID",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "tenantId",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Car category details",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/CarCategory"
-                  }
-                }
-              }
-            },
-            "404": {
-              "description": "Car category not found"
-            }
-          }
-        },
-        "put": {
-          "tags": [
-            "CarCategories"
-          ],
-          "summary": "Update a car category",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "tenantId",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UpdateCarCategoryInput"
-                }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "Car category updated",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/CarCategory"
-                  }
-                }
-              }
-            },
-            "404": {
-              "description": "Car category not found"
-            }
-          }
-        },
-        "delete": {
-          "tags": [
-            "CarCategories"
-          ],
-          "summary": "Delete a car category",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "tenantId",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "204": {
-              "description": "Car category deleted"
-            }
-          }
-        }
-      },
-      "/tenants/{tenantId}/car-trims": {
-        "post": {
-          "tags": [
-            "CarTrims"
-          ],
-          "summary": "Create a car trim",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "tenantId",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreateCarTrimInput"
-                }
-              }
-            }
-          },
-          "responses": {
-            "201": {
-              "description": "Car trim created",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/CarTrim"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "get": {
-          "tags": [
-            "CarTrims"
-          ],
-          "summary": "Get all car trims for a category",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "tenantId",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "categoryId",
-              "in": "query",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "A list of car trims",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/CarTrim"
-                    }
-                  }
-                }
-              }
-            },
-            "400": {
-              "description": "categoryId is required"
-            }
-          }
-        }
-      },
-      "/tenants/{tenantId}/car-trims/{id}": {
-        "get": {
-          "tags": [
-            "CarTrims"
-          ],
-          "summary": "Get a car trim by ID",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "tenantId",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Car trim details",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/CarTrim"
-                  }
-                }
-              }
-            },
-            "404": {
-              "description": "Car trim not found"
-            }
-          }
-        },
-        "put": {
-          "tags": [
-            "CarTrims"
-          ],
-          "summary": "Update a car trim",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "tenantId",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UpdateCarTrimInput"
-                }
-              }
-            }
-          },
-          "responses": {
-            "200": {
-              "description": "Car trim updated",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/CarTrim"
-                  }
-                }
-              }
-            },
-            "404": {
-              "description": "Car trim not found"
-            }
-          }
-        },
-        "delete": {
-          "tags": [
-            "CarTrims"
-          ],
-          "summary": "Delete a car trim",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "tenantId",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "204": {
-              "description": "Car trim deleted"
-            }
-          }
-        }
-      },
-      "/tenants/{tenantId}/users": {
-        "get": {
-          "tags": [
-            "Users"
-          ],
-          "summary": "Get all users for a tenant",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "tenantId",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "A list of users",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/User"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/tenants/{tenantId}/users/{id}": {
-        "get": {
-          "tags": [
-            "Users"
-          ],
-          "summary": "Get a user by ID",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "tenantId",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            },
-            {
-              "name": "id",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "User details",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/User"
-                  }
-                }
-              }
-            },
-            "404": {
-              "description": "User not found"
-            }
-          }
-        }
-      },
-      "/tenants/{tenantId}/img/upload-token": {
-        "get": {
-          "tags": [
-            "Image"
-          ],
-          "summary": "Get an upload token for QCloud COS",
-          "security": [
-            {
-              "bearerAuth": []
-            }
-          ],
-          "parameters": [
-            {
-              "name": "tenantId",
-              "in": "path",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ],
-          "responses": {
-            "200": {
-              "description": "Upload token configuration",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/UploadToken"
-                  }
-                }
-              }
-            },
-            "403": {
-              "description": "Forbidden"
             }
           }
         }
       }
     },
-    "components": {
-      "schemas": {
-        "LoginInput": {
-          "type": "object",
-          "required": [
-            "username",
-            "password"
-          ],
-          "properties": {
-            "username": {
-              "type": "string"
-            },
-            "password": {
+    "/tenants/{id}": {
+      "get": {
+        "tags": ["Tenants"],
+        "summary": "Get a tenant by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
               "type": "string"
             }
           }
-        },
-        "AdminUser": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "cuid"
-            },
-            "username": {
-              "type": "string"
-            },
-            "role": {
-              "type": "string",
-              "enum": [
-                "super_admin",
-                "admin"
-              ]
-            },
-            "tenantId": {
-              "type": "string",
-              "nullable": true
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updatedAt": {
-              "type": "string",
-              "format": "date-time"
-            }
-          }
-        },
-        "CreateAdminUserInput": {
-          "type": "object",
-          "required": [
-            "username",
-            "password",
-            "role"
-          ],
-          "properties": {
-            "username": {
-              "type": "string"
-            },
-            "password": {
-              "type": "string",
-              "format": "password",
-              "minLength": 6
-            },
-            "role": {
-              "type": "string",
-              "enum": [
-                "super_admin",
-                "admin"
-              ]
-            },
-            "tenantId": {
-              "type": "string"
-            }
-          }
-        },
-        "UpdateAdminUserInput": {
-          "type": "object",
-          "properties": {
-            "username": {
-              "type": "string"
-            },
-            "password": {
-              "type": "string",
-              "format": "password",
-              "minLength": 6
-            },
-            "role": {
-              "type": "string",
-              "enum": [
-                "super_admin",
-                "admin"
-              ]
-            },
-            "tenantId": {
-              "type": "string"
-            }
-          }
-        },
-        "Tenant": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "cuid"
-            },
-            "name": {
-              "type": "string"
-            },
-            "appId": {
-              "type": "string"
-            },
-            "appSecret": {
-              "type": "string"
-            },
-            "status": {
-              "type": "string",
-              "enum": [
-                "active",
-                "inactive"
-              ]
-            },
-            "config": {
-              "type": "object",
-              "additionalProperties": true
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updatedAt": {
-              "type": "string",
-              "format": "date-time"
-            }
-          }
-        },
-        "CreateTenantInput": {
-          "type": "object",
-          "required": [
-            "name",
-            "appId",
-            "appSecret"
-          ],
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "appId": {
-              "type": "string"
-            },
-            "appSecret": {
-              "type": "string"
-            },
-            "status": {
-              "type": "string",
-              "enum": [
-                "active",
-                "inactive"
-              ]
-            },
-            "config": {
-              "type": "object",
-              "additionalProperties": true
-            }
-          }
-        },
-        "UpdateTenantInput": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "appId": {
-              "type": "string"
-            },
-            "appSecret": {
-              "type": "string"
-            },
-            "status": {
-              "type": "string",
-              "enum": [
-                "active",
-                "inactive"
-              ]
-            },
-            "config": {
-              "type": "object",
-              "additionalProperties": true
-            }
-          }
-        },
-        "VehicleScenario": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "cuid"
-            },
-            "tenantId": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "image": {
-              "type": "string",
-              "format": "uri"
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updatedAt": {
-              "type": "string",
-              "format": "date-time"
-            }
-          }
-        },
-        "CreateVehicleScenarioInput": {
-          "type": "object",
-          "required": [
-            "name",
-            "description",
-            "image"
-          ],
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "image": {
-              "type": "string",
-              "format": "uri"
-            }
-          }
-        },
-        "UpdateVehicleScenarioInput": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "description": {
-              "type": "string"
-            },
-            "image": {
-              "type": "string",
-              "format": "uri"
-            }
-          }
-        },
-        "CarCategory": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "cuid"
-            },
-            "tenantId": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "image": {
-              "type": "string",
-              "format": "uri"
-            },
-            "badge": {
-              "type": "string"
-            },
-            "tags": {
-              "type": "array",
-              "items": {
-                "type": "string"
+        ],
+        "responses": {
+          "200": {
+            "description": "Tenant details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tenant"
+                }
               }
-            },
-            "highlights": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "title": {
-                    "type": "string"
-                  },
-                  "value": {
-                    "type": "string"
+            }
+          },
+          "404": {
+            "description": "Tenant not found"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Tenants"],
+        "summary": "Update a tenant",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTenantInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tenant updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Tenant"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Tenants"],
+        "summary": "Delete a tenant",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Tenant deleted successfully"
+          }
+        }
+      }
+    },
+    "/admin-users": {
+      "get": {
+        "tags": ["AdminUsers"],
+        "summary": "Get all admin users",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of admin users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminUser"
                   }
                 }
               }
-            },
-            "interiorImages": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uri"
-              }
-            },
-            "exteriorImages": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uri"
-              }
-            },
-            "offerPictures": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uri"
-              }
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updatedAt": {
-              "type": "string",
-              "format": "date-time"
-            }
-          }
-        },
-        "CreateCarCategoryInput": {
-          "type": "object",
-          "required": [
-            "name",
-            "image"
-          ],
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "image": {
-              "type": "string",
-              "format": "uri"
-            },
-            "badge": {
-              "type": "string"
-            },
-            "tags": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "highlights": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "title": {
-                    "type": "string"
-                  },
-                  "value": {
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "interiorImages": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uri"
-              }
-            },
-            "exteriorImages": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uri"
-              }
-            },
-            "offerPictures": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uri"
-              }
-            }
-          }
-        },
-        "UpdateCarCategoryInput": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "image": {
-              "type": "string",
-              "format": "uri"
-            },
-            "badge": {
-              "type": "string"
-            },
-            "tags": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "highlights": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "title": {
-                    "type": "string"
-                  },
-                  "value": {
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "interiorImages": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uri"
-              }
-            },
-            "exteriorImages": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uri"
-              }
-            },
-            "offerPictures": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "format": "uri"
-              }
-            }
-          }
-        },
-        "CarTrim": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "cuid"
-            },
-            "tenantId": {
-              "type": "string"
-            },
-            "name": {
-              "type": "string"
-            },
-            "subtitle": {
-              "type": "string"
-            },
-            "image": {
-              "type": "string",
-              "format": "uri"
-            },
-            "originalPrice": {
-              "type": "string"
-            },
-            "currentPrice": {
-              "type": "string"
-            },
-            "badge": {
-              "type": "string"
-            },
-            "features": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "title": {
-                    "type": "string"
-                  },
-                  "value": {
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "categoryId": {
-              "type": "string",
-              "format": "cuid"
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updatedAt": {
-              "type": "string",
-              "format": "date-time"
-            }
-          }
-        },
-        "CreateCarTrimInput": {
-          "type": "object",
-          "required": [
-            "name",
-            "subtitle",
-            "image",
-            "originalPrice",
-            "currentPrice",
-            "categoryId"
-          ],
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "subtitle": {
-              "type": "string"
-            },
-            "image": {
-              "type": "string",
-              "format": "uri"
-            },
-            "originalPrice": {
-              "type": "string"
-            },
-            "currentPrice": {
-              "type": "string"
-            },
-            "badge": {
-              "type": "string"
-            },
-            "features": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "title": {
-                    "type": "string"
-                  },
-                  "value": {
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "categoryId": {
-              "type": "string",
-              "format": "cuid"
-            }
-          }
-        },
-        "UpdateCarTrimInput": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "subtitle": {
-              "type": "string"
-            },
-            "image": {
-              "type": "string",
-              "format": "uri"
-            },
-            "originalPrice": {
-              "type": "string"
-            },
-            "currentPrice": {
-              "type": "string"
-            },
-            "badge": {
-              "type": "string"
-            },
-            "features": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "title": {
-                    "type": "string"
-                  },
-                  "value": {
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "categoryId": {
-              "type": "string",
-              "format": "cuid"
-            }
-          }
-        },
-        "User": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "string",
-              "format": "cuid"
-            },
-            "tenantId": {
-              "type": "string"
-            },
-            "nickname": {
-              "type": "string"
-            },
-            "avatarUrl": {
-              "type": "string",
-              "format": "uri"
-            },
-            "phoneNumber": {
-              "type": "string"
-            },
-            "openId": {
-              "type": "string"
-            },
-            "unionId": {
-              "type": "string",
-              "nullable": true
-            },
-            "createdAt": {
-              "type": "string",
-              "format": "date-time"
-            },
-            "updatedAt": {
-              "type": "string",
-              "format": "date-time"
-            }
-          }
-        },
-        "UploadToken": {
-          "type": "object",
-          "properties": {
-            "secretId": {
-              "type": "string"
-            },
-            "secretKey": {
-              "type": "string"
-            },
-            "sessionToken": {
-              "type": "string"
-            },
-            "region": {
-              "type": "string"
-            },
-            "bucket": {
-              "type": "string"
-            },
-            "expiredTime": {
-              "type": "number"
-            },
-            "startTime": {
-              "type": "number"
             }
           }
         }
       },
-      "securitySchemes": {
-        "bearerAuth": {
-          "type": "http",
-          "scheme": "bearer",
-          "bearerFormat": "JWT"
+      "post": {
+        "tags": ["AdminUsers"],
+        "summary": "Create a new admin user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAdminUserInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Admin user created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUser"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          }
+        }
+      }
+    },
+    "/admin-users/{id}": {
+      "get": {
+        "tags": ["AdminUsers"],
+        "summary": "Get an admin user by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Admin user details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUser"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Admin user not found"
+          }
+        }
+      },
+      "put": {
+        "tags": ["AdminUsers"],
+        "summary": "Update an admin user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAdminUserInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Admin user updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUser"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Admin user not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["AdminUsers"],
+        "summary": "Delete an admin user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Admin user deleted successfully"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Admin user not found"
+          }
+        }
+      }
+    },
+    "/tenants/{tenantId}/vehicle-scenarios": {
+      "post": {
+        "tags": ["VehicleScenarios"],
+        "summary": "Create a vehicle scenario",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateVehicleScenarioInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Vehicle scenario created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleScenario"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["VehicleScenarios"],
+        "summary": "Get all vehicle scenarios for a tenant",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of vehicle scenarios",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VehicleScenario"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenants/{tenantId}/vehicle-scenarios/{id}": {
+      "get": {
+        "tags": ["VehicleScenarios"],
+        "summary": "Get a vehicle scenario by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle scenario details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleScenario"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle scenario not found"
+          }
+        }
+      },
+      "put": {
+        "tags": ["VehicleScenarios"],
+        "summary": "Update a vehicle scenario",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateVehicleScenarioInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Vehicle scenario updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleScenario"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle scenario not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["VehicleScenarios"],
+        "summary": "Delete a vehicle scenario",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Vehicle scenario deleted"
+          }
+        }
+      }
+    },
+    "/tenants/{tenantId}/car-categories": {
+      "post": {
+        "tags": ["CarCategories"],
+        "summary": "Create a car category",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCarCategoryInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Car category created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarCategory"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["CarCategories"],
+        "summary": "Get all car categories for a tenant",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of car categories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CarCategory"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenants/{tenantId}/car-categories/{id}": {
+      "get": {
+        "tags": ["CarCategories"],
+        "summary": "Get a car category by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Car category details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarCategory"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Car category not found"
+          }
+        }
+      },
+      "put": {
+        "tags": ["CarCategories"],
+        "summary": "Update a car category",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCarCategoryInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Car category updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarCategory"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Car category not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["CarCategories"],
+        "summary": "Delete a car category",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Car category deleted"
+          }
+        }
+      }
+    },
+    "/tenants/{tenantId}/car-trims": {
+      "post": {
+        "tags": ["CarTrims"],
+        "summary": "Create a car trim",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCarTrimInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Car trim created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarTrim"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["CarTrims"],
+        "summary": "Get all car trims for a category",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "categoryId",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of car trims",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CarTrim"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "categoryId is required"
+          }
+        }
+      }
+    },
+    "/tenants/{tenantId}/car-trims/{id}": {
+      "get": {
+        "tags": ["CarTrims"],
+        "summary": "Get a car trim by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Car trim details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarTrim"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Car trim not found"
+          }
+        }
+      },
+      "put": {
+        "tags": ["CarTrims"],
+        "summary": "Update a car trim",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCarTrimInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Car trim updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CarTrim"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Car trim not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["CarTrims"],
+        "summary": "Delete a car trim",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Car trim deleted"
+          }
+        }
+      }
+    },
+    "/tenants/{tenantId}/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get all users for a tenant",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenants/{tenantId}/users/{id}": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get a user by ID",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/tenants/{tenantId}/img/upload-token": {
+      "get": {
+        "tags": ["Image"],
+        "summary": "Get an upload token for QCloud COS",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Upload token configuration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadToken"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden"
+          }
         }
       }
     }
+  },
+  "components": {
+    "schemas": {
+      "LoginInput": {
+        "type": "object",
+        "required": ["username", "password"],
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "AdminUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "cuid"
+          },
+          "username": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": ["super_admin", "admin"]
+          },
+          "tenantId": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateAdminUserInput": {
+        "type": "object",
+        "required": ["username", "password", "role"],
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 6
+          },
+          "role": {
+            "type": "string",
+            "enum": ["super_admin", "admin"]
+          },
+          "tenantId": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdateAdminUserInput": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 6
+          },
+          "role": {
+            "type": "string",
+            "enum": ["super_admin", "admin"]
+          },
+          "tenantId": {
+            "type": "string"
+          }
+        }
+      },
+      "Tenant": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "cuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "appId": {
+            "type": "string"
+          },
+          "appSecret": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "inactive"]
+          },
+          "config": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateTenantInput": {
+        "type": "object",
+        "required": ["name", "appId", "appSecret"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "appId": {
+            "type": "string"
+          },
+          "appSecret": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "inactive"]
+          },
+          "config": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "UpdateTenantInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "appId": {
+            "type": "string"
+          },
+          "appSecret": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "inactive"]
+          },
+          "config": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "VehicleScenario": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "cuid"
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string",
+            "format": "uri"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateVehicleScenarioInput": {
+        "type": "object",
+        "required": ["name", "description", "image"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "UpdateVehicleScenarioInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      },
+      "CarCategory": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "cuid"
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string",
+            "format": "uri"
+          },
+          "badge": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "highlights": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "interiorImages": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "exteriorImages": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "offerPictures": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateCarCategoryInput": {
+        "type": "object",
+        "required": ["name", "image"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string",
+            "format": "uri"
+          },
+          "badge": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "highlights": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "interiorImages": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "exteriorImages": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "offerPictures": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      },
+      "UpdateCarCategoryInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string",
+            "format": "uri"
+          },
+          "badge": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "highlights": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "interiorImages": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "exteriorImages": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
+          },
+          "offerPictures": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uri"
+            }
+          }
+        }
+      },
+      "CarTrim": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "cuid"
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string",
+            "format": "uri"
+          },
+          "originalPrice": {
+            "type": "string"
+          },
+          "currentPrice": {
+            "type": "string"
+          },
+          "badge": {
+            "type": "string"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "categoryId": {
+            "type": "string",
+            "format": "cuid"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateCarTrimInput": {
+        "type": "object",
+        "required": ["name", "subtitle", "image", "originalPrice", "currentPrice", "categoryId"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string",
+            "format": "uri"
+          },
+          "originalPrice": {
+            "type": "string"
+          },
+          "currentPrice": {
+            "type": "string"
+          },
+          "badge": {
+            "type": "string"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "categoryId": {
+            "type": "string",
+            "format": "cuid"
+          }
+        }
+      },
+      "UpdateCarTrimInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "subtitle": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string",
+            "format": "uri"
+          },
+          "originalPrice": {
+            "type": "string"
+          },
+          "currentPrice": {
+            "type": "string"
+          },
+          "badge": {
+            "type": "string"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "categoryId": {
+            "type": "string",
+            "format": "cuid"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "cuid"
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "openId": {
+            "type": "string"
+          },
+          "unionId": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UploadToken": {
+        "type": "object",
+        "properties": {
+          "secretId": {
+            "type": "string"
+          },
+          "secretKey": {
+            "type": "string"
+          },
+          "sessionToken": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          },
+          "bucket": {
+            "type": "string"
+          },
+          "expiredTime": {
+            "type": "number"
+          },
+          "startTime": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
   }
+}

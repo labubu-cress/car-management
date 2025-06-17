@@ -145,7 +145,8 @@ export const usersApi = {
 
 // 图片上传
 export const imageApi = {
-  getUploadToken: (): Promise<UploadToken> => api.get(`/img/upload-token`).then((res) => res.data),
+  getUploadToken: (tenantId: string): Promise<UploadToken> =>
+    api.get(`/tenants/${tenantId}/img/upload-token`).then((res) => res.data),
 };
 
 export default api;
