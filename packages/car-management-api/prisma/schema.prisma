@@ -108,8 +108,8 @@ model CarTrim {
   subtitle      String
   image         String
   badge         String?
-  originalPrice String
-  currentPrice  String
+  originalPrice Decimal
+  currentPrice  Decimal
   features      Json // CarFeature[]
   categoryId    String
   category      CarCategory @relation(fields: [categoryId], references: [id])
