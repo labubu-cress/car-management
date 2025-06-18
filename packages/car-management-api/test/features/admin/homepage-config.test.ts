@@ -4,7 +4,7 @@ import type { HomepageConfig } from "@prisma/client";
 import { beforeEach, describe, expect, it } from "vitest";
 import { clearTestDb, createTestTenantAndAdminUsers, type TestAdminUserWithToken } from "../../helper";
 
-describe("Admin API: /api/v1/admin/homepage-config", () => {
+describe("Admin API: /api/v1/admin/tenants/:tenantId/homepage-config", () => {
   let adminUser: TestAdminUserWithToken;
   let tenantId: string;
 

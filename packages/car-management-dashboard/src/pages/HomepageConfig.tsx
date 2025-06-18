@@ -23,7 +23,7 @@ const HomepageConfigPage = () => {
     if (currentTenant) {
       setLoading(true);
       homepageConfigApi
-        .get()
+        .get(currentTenant.id)
         .then((data) => {
           if (data) {
             reset(data);
@@ -48,7 +48,10 @@ const HomepageConfigPage = () => {
 
   const onSubmit = async (data: UpdateHomepageConfigInput) => {
     try {
-      await homepageConfigApi.update(data);
+      if (!currentTenant) {
+        throw new Error("No tenant selected");
+      }
+      await homepageConfigApi.update(currentTenant.id, data);
       alert('小程序首页配置已更新!');
       setIsNewConfig(false);
     } catch (error) {

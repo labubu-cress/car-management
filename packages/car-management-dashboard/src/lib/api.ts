@@ -158,9 +158,10 @@ export const dashboardApi = {
 };
 
 export const homepageConfigApi = {
-  get: (): Promise<HomepageConfig> => api.get("/homepage-config").then((res) => res.data),
-  update: (data: UpdateHomepageConfigInput): Promise<HomepageConfig> =>
-    api.put("/homepage-config", data).then((res) => res.data),
+  get: (tenantId: string): Promise<HomepageConfig> =>
+    api.get(`/tenants/${tenantId}/homepage-config`).then((res) => res.data),
+  update: (tenantId: string, data: UpdateHomepageConfigInput): Promise<HomepageConfig> =>
+    api.put(`/tenants/${tenantId}/homepage-config`, data).then((res) => res.data),
 };
 
 export default api;
