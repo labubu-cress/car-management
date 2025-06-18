@@ -53,4 +53,18 @@ export const homepageConfigStyles = {
       cursor: "not-allowed",
     },
   }),
+
+  cancelButton: style({
+    padding: "10px 20px",
+    backgroundColor: "#e5e7eb",
+    color: "#374151",
+    border: "none",
+    borderRadius: "6px",
+    fontSize: "14px",
+    fontWeight: "500",
+    cursor: "pointer",
+    ":hover": {
+      backgroundColor: "#d1d5db",
+    },
+  }),
 };

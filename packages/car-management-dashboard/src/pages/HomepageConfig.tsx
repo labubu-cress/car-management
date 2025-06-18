@@ -1,7 +1,13 @@
+import { EmptyState } from '@/components/EmptyState';
 import { homepageConfigApi } from '@/lib/api';
 import { type UpdateHomepageConfigInput } from '@/types/api';
+import { faFileAlt } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useNavigate } from 'react-router-dom';
 import { FormField } from '../components/FormField';
 import { ImageUpload } from '../components/ImageUpload';
 import { useAuth } from '../contexts/AuthContext';
@@ -9,8 +15,22 @@ import { homepageConfigStyles } from './HomepageConfig.css';
 
 const HomepageConfigPage = () => {
   const { currentTenant } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [isNewConfig, setIsNewConfig] = useState(false);
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const [isCreating, setIsCreating] = useState(false);
+
+  const {
+    data: config,
+    isLoading,
+    error,
+  } = useQuery(
+    ['homepage-config', currentTenant?.id],
+    () => (currentTenant ? homepageConfigApi.get(currentTenant.id) : null),
+    {
+      enabled: !!currentTenant,
+    }
+  );
+
   const {
     register,
     handleSubmit,
@@ -20,73 +40,71 @@ const HomepageConfigPage = () => {
   } = useForm<UpdateHomepageConfigInput>();
 
   useEffect(() => {
-    if (currentTenant) {
-      setLoading(true);
-      homepageConfigApi
-        .get(currentTenant.id)
-        .then((data) => {
-          if (data) {
-            reset(data);
-            setIsNewConfig(false);
-          } else {
-            setIsNewConfig(true);
-            reset({
-              welcomeTitle: "",
-              welcomeDescription: "",
-              bannerImage: "",
-              benefitsImage: "",
-            });
-          }
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error("Failed to fetch homepage config", error);
-          setLoading(false);
-        });
+    if (config) {
+      reset(config);
+    } else {
+      reset({
+        welcomeTitle: '',
+        welcomeDescription: '',
+        bannerImage: '',
+        benefitsImage: '',
+      });
     }
-  }, [reset, currentTenant]);
+  }, [config, reset]);
 
-  const onSubmit = async (data: UpdateHomepageConfigInput) => {
-    try {
-      if (!currentTenant) {
-        throw new Error("No tenant selected");
-      }
-      await homepageConfigApi.update(currentTenant.id, data);
-      alert('小程序首页配置已更新!');
-      setIsNewConfig(false);
-    } catch (error) {
-      console.error(error);
-      alert('更新失败，请稍后再试');
+  const updateMutation = useMutation(
+    (data: UpdateHomepageConfigInput) =>
+      homepageConfigApi.update(currentTenant!.id, data),
+    {
+      onSuccess: () => {
+        toast.success('小程序首页配置已更新!');
+        queryClient.invalidateQueries(['homepage-config', currentTenant?.id]);
+        setIsCreating(false);
+      },
+      onError: (error: any) => {
+        toast.error(error.response?.data?.message || '更新失败，请稍后再试');
+      },
     }
+  );
+
+  const onSubmit = (data: UpdateHomepageConfigInput) => {
+    if (!currentTenant) {
+      toast.error('No tenant selected');
+      return;
+    }
+    updateMutation.mutate(data);
   };
 
-  if (loading || !currentTenant) {
+  if (isLoading || !currentTenant) {
     return <div>加载中...</div>;
+  }
+
+  if (error) {
+    return <div>加载配置失败，请稍后重试</div>;
+  }
+
+  if (!config && !isCreating) {
+    return (
+      <EmptyState
+        title="尚未创建小程序首页配置"
+        description="请填写以下信息来完成首页配置。"
+        actionLabel="开始创建"
+        onAction={() => setIsCreating(true)}
+        icon={<FontAwesomeIcon icon={faFileAlt} />}
+      />
+    );
   }
 
   return (
     <div className={homepageConfigStyles.container}>
       <header className={homepageConfigStyles.header}>
         <h1 className={homepageConfigStyles.title}>小程序首页配置</h1>
+        {isCreating && (
+          <button onClick={() => setIsCreating(false)} className={homepageConfigStyles.cancelButton}>
+            取消创建
+          </button>
+        )}
       </header>
-      {isNewConfig && (
-        <div
-          style={{
-            marginBottom: "1rem",
-            padding: "1rem",
-            border: "1px solid #e2e8f0",
-            borderRadius: "0.375rem",
-            backgroundColor: "#f8f9fa",
-          }}
-        >
-          <h2 style={{ fontSize: "1.125rem", fontWeight: "600" }}>
-            尚未创建小程序首页配置
-          </h2>
-          <p style={{ marginTop: "0.5rem" }}>
-            请填写以下信息来完成首页配置。
-          </p>
-        </div>
-      )}
       <form
         onSubmit={handleSubmit(onSubmit)}
         className={homepageConfigStyles.form}
