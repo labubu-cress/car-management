@@ -115,6 +115,7 @@ model CarTrim {
   features      Json // CarFeature[]
   categoryId    String
   category      CarCategory @relation(fields: [categoryId], references: [id])
+  displayOrder  Int         @default(0)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 

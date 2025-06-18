@@ -97,6 +97,7 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
 
     // 验证自动生成的字段
     expect(body.id).toBeDefined();
+    expect(body.displayOrder).toBe(0);
     expect(body.createdAt).toBeDefined();
     expect(body.updatedAt).toBeDefined();
 
@@ -111,10 +112,10 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
     expect(typeof body.tenantId).toBe("string");
   });
 
-  it("should get all car trims for a category", async () => {
+  it("should get all car trims for a category, sorted by displayOrder", async () => {
     await prisma.carTrim.create({
       data: {
-        name: "Test Trim for Get",
+        name: "Trim 2",
         subtitle: "A nice trim",
         image: "https://example.com/trim.jpg",
         originalPrice: 50000,
@@ -122,8 +123,23 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
         features: [],
         categoryId: categoryId,
         tenantId: tenantId,
+        displayOrder: 1,
       },
     });
+    await prisma.carTrim.create({
+      data: {
+        name: "Trim 1",
+        subtitle: "A nice trim",
+        image: "https://example.com/trim.jpg",
+        originalPrice: 50000,
+        currentPrice: 48000,
+        features: [],
+        categoryId: categoryId,
+        tenantId: tenantId,
+        displayOrder: 0,
+      },
+    });
+
     const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims?categoryId=${categoryId}`, {
       headers: {
         Authorization: `Bearer ${adminUser.token}`,
@@ -132,7 +148,62 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
     expect(response.status).toBe(200);
     const body = (await response.json()) as CarTrim[];
     expect(Array.isArray(body)).toBe(true);
-    expect(body.length).toBeGreaterThan(0);
+    expect(body.length).toBe(2);
+    expect(body[0].name).toBe("Trim 1");
+    expect(body[1].name).toBe("Trim 2");
+  });
+
+  it("should reorder car trims", async () => {
+    const trim1 = await prisma.carTrim.create({
+      data: {
+        name: "Trim 1",
+        subtitle: "A nice trim",
+        image: "https://example.com/trim.jpg",
+        originalPrice: 50000,
+        currentPrice: 48000,
+        features: [],
+        categoryId: categoryId,
+        tenantId: tenantId,
+        displayOrder: 0,
+      },
+    });
+    const trim2 = await prisma.carTrim.create({
+      data: {
+        name: "Trim 2",
+        subtitle: "A nice trim",
+        image: "https://example.com/trim.jpg",
+        originalPrice: 50000,
+        currentPrice: 48000,
+        features: [],
+        categoryId: categoryId,
+        tenantId: tenantId,
+        displayOrder: 1,
+      },
+    });
+
+    const newOrderIds = [trim2.id, trim1.id];
+    const reorderResponse = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims/reorder`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${adminUser.token}`,
+      },
+      body: JSON.stringify({ categoryId: categoryId, trimIds: newOrderIds }),
+    });
+    expect(reorderResponse.status).toBe(204);
+
+    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims?categoryId=${categoryId}`, {
+      headers: {
+        Authorization: `Bearer ${adminUser.token}`,
+      },
+    });
+
+    const body = (await response.json()) as CarTrim[];
+    expect(body.length).toBe(2);
+    expect(body[0].id).toBe(trim2.id);
+    expect(body[1].id).toBe(trim1.id);
+    expect(body[0].displayOrder).toBe(0);
+    expect(body[1].displayOrder).toBe(1);
   });
 
   it("should get a car trim by id", async () => {

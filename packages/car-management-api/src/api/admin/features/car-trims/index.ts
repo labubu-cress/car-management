@@ -2,8 +2,15 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import type { AdminAuthTenantEnv } from "../../middleware/auth";
-import { createCarTrimSchema, updateCarTrimSchema } from "./schema";
-import { createCarTrim, deleteCarTrim, getAllCarTrims, getCarTrimById, updateCarTrim } from "./service";
+import { createCarTrimSchema, reorderCarTrimsSchema, updateCarTrimSchema } from "./schema";
+import {
+  createCarTrim,
+  deleteCarTrim,
+  getAllCarTrims,
+  getCarTrimById,
+  reorderCarTrims,
+  updateCarTrim,
+} from "./service";
 
 const app = new Hono<AdminAuthTenantEnv>();
 
@@ -30,6 +37,13 @@ app.get("/", async (c) => {
   }
   const trims = await getAllCarTrims(tenantId as string, categoryId);
   return c.json(trims);
+});
+
+app.put("/reorder", zValidator("json", reorderCarTrimsSchema), async (c) => {
+  const { tenantId } = c.var;
+  const { categoryId, trimIds } = c.req.valid("json");
+  await reorderCarTrims(tenantId as string, categoryId, trimIds);
+  return c.body(null, 204);
 });
 
 app.get("/:id", async (c) => {

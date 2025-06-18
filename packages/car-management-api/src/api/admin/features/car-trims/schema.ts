@@ -13,6 +13,7 @@ export const carTrimSchema = z.object({
   currentPrice: z.instanceof(Prisma.Decimal).transform((val) => val.toString()),
   features: z.array(carFeatureSchema),
   categoryId: z.string(),
+  displayOrder: z.number(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
@@ -33,6 +34,11 @@ export const createCarTrimSchema = z.object({
 
 // Schema for updating a car trim
 export const updateCarTrimSchema = createCarTrimSchema.partial();
+
+export const reorderCarTrimsSchema = z.object({
+  categoryId: z.string().cuid(),
+  trimIds: z.array(z.string().cuid()),
+});
 
 export type CreateCarTrimInput = z.infer<typeof createCarTrimSchema>;
 export type UpdateCarTrimInput = z.infer<typeof updateCarTrimSchema>;

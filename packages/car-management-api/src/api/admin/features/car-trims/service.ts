@@ -4,7 +4,12 @@ import { carTrimSchema, type CarTrim, type CreateCarTrimInput, type UpdateCarTri
 
 export const getAllCarTrims = async (tenantId: string, categoryId: string): Promise<CarTrim[]> => {
   const prisma = createTenantPrismaClient(tenantId);
-  const trims = await prisma.carTrim.findMany({ where: { categoryId } });
+  const trims = await prisma.carTrim.findMany({
+    where: { categoryId },
+    orderBy: {
+      displayOrder: "asc",
+    },
+  });
   return z.array(carTrimSchema).parse(trims);
 };
 
@@ -20,9 +25,17 @@ export const getCarTrimById = async (tenantId: string, id: string): Promise<CarT
 export const createCarTrim = async (tenantId: string, data: CreateCarTrimInput): Promise<CarTrim> => {
   const prisma = createTenantPrismaClient(tenantId);
   const { categoryId, ...restData } = data;
+
+  const maxOrderTrim = await prisma.carTrim.findFirst({
+    where: { categoryId },
+    orderBy: { displayOrder: "desc" },
+  });
+  const nextOrder = maxOrderTrim ? maxOrderTrim.displayOrder + 1 : 0;
+
   const newTrim = await prisma.carTrim.create({
     data: {
       ...restData,
+      displayOrder: nextOrder,
       tenant: {
         connect: {
           id: tenantId,
@@ -62,4 +75,30 @@ export const deleteCarTrim = async (tenantId: string, id: string): Promise<void>
     throw new Error("Car trim not found or access denied.");
   }
   await prisma.carTrim.delete({ where: { id } });
+};
+
+export const reorderCarTrims = async (tenantId: string, categoryId: string, trimIds: string[]): Promise<void> => {
+  const prisma = createTenantPrismaClient(tenantId);
+
+  const trims = await prisma.carTrim.findMany({
+    where: {
+      id: { in: trimIds },
+      categoryId,
+      tenantId,
+    },
+    select: { id: true },
+  });
+
+  if (trims.length !== trimIds.length) {
+    throw new Error("Some car trims not found in this category or access denied.");
+  }
+
+  const updates = trimIds.map((id, index) =>
+    prisma.carTrim.update({
+      where: { id },
+      data: { displayOrder: index },
+    }),
+  );
+
+  await prisma.$transaction(updates);
 };
