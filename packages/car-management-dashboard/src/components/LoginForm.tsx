@@ -2,6 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { faLock, faSignInAlt, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as styles from './LoginForm.css';
 
 export const LoginForm: React.FC = () => {
@@ -9,7 +10,7 @@ export const LoginForm: React.FC = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  
+  const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,6 +25,7 @@ export const LoginForm: React.FC = () => {
 
     try {
       await login(username, password);
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.message || '登录失败，请检查用户名和密码');
     } finally {

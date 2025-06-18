@@ -30,6 +30,7 @@ export const CarCategories: React.FC = () => {
       onSuccess: () => {
         toast.success('车辆分类删除成功');
         queryClient.invalidateQueries(['car-categories', currentTenant?.id]);
+        queryClient.invalidateQueries(['dashboard-stats', currentTenant?.id]);
       },
       onError: (error: any) => {
         toast.error(error.response?.data?.message || '删除车辆分类失败');

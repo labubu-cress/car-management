@@ -4,6 +4,7 @@ import adminUsersRoutes from "./features/admin-users";
 import authRoutes from "./features/auth";
 import carCategoriesAdminRoutes from "./features/car-categories";
 import carTrimsAdminRoutes from "./features/car-trims";
+import dashboardRoutes from "./features/dashboard";
 import imgRoutes from "./features/img";
 import tenantsRoutes from "./features/tenants";
 import usersRoutes from "./features/users";
@@ -45,6 +46,7 @@ tenantSpecificRoutes.route("/car-categories", carCategoriesAdminRoutes);
 tenantSpecificRoutes.route("/car-trims", carTrimsAdminRoutes);
 tenantSpecificRoutes.route("/users", usersRoutes);
 tenantSpecificRoutes.route("/img", imgRoutes);
+tenantSpecificRoutes.route("/dashboard", dashboardRoutes);
 
 // Unprotected auth routes
 adminApi.route("/auth", authRoutes);
@@ -52,6 +54,5 @@ adminApi.route("/auth", authRoutes);
 adminApi.route("/tenants/:tenantId", tenantSpecificRoutes);
 adminApi.route("/", authProtected);
 adminApi.route("/", superAdminProtected);
-
 
 export default adminApi;

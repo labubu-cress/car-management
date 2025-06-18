@@ -1,17 +1,27 @@
 import { useAuth } from '@/contexts/AuthContext';
+import { dashboardApi } from '@/lib/api';
 import { faBuilding, faCar, faLayerGroup, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
+import { useQuery } from 'react-query';
 import * as styles from './Dashboard.css';
 
 export const Dashboard: React.FC = () => {
   const { currentTenant } = useAuth();
 
+  const { data: statsData, isLoading } = useQuery(
+    ['dashboard-stats', currentTenant?.id],
+    () => (currentTenant ? dashboardApi.getStats(currentTenant.id) : null),
+    {
+      enabled: !!currentTenant,
+    }
+  );
+
   const stats = [
     { title: '当前租户', value: currentTenant?.name || '-', icon: faBuilding, color: '#1890ff' },
-    { title: '用户总数', value: '0', icon: faUsers, color: '#52c41a' },
-    { title: '车辆分类', value: '0', icon: faLayerGroup, color: '#faad14' },
-    { title: '车型配置', value: '0', icon: faCar, color: '#722ed1' },
+    { title: '用户总数', value: statsData?.usersCount ?? '0', icon: faUsers, color: '#52c41a' },
+    { title: '车辆分类', value: statsData?.carCategoriesCount ?? '0', icon: faLayerGroup, color: '#faad14' },
+    { title: '车型配置', value: statsData?.carTrimsCount ?? '0', icon: faCar, color: '#722ed1' },
   ];
 
   return (
@@ -28,7 +38,7 @@ export const Dashboard: React.FC = () => {
               <FontAwesomeIcon icon={stat.icon} style={{ color: stat.color }} />
             </div>
             <div className={styles.statContent}>
-              <div className={styles.statValue}>{stat.value}</div>
+              <div className={styles.statValue}>{isLoading && stat.title !== '当前租户' ? '加载中...' : stat.value}</div>
               <div className={styles.statTitle}>{stat.title}</div>
             </div>
           </div>

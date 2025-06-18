@@ -189,3 +189,9 @@ export interface UploadToken {
   expiredTime: number;
   startTime: number;
 }
+
+export interface DashboardStats {
+  usersCount: number;
+  carCategoriesCount: number;
+  carTrimsCount: number;
+}

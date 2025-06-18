@@ -7,6 +7,7 @@ import type {
   CreateCarTrimInput,
   CreateTenantInput,
   CreateVehicleScenarioInput,
+  DashboardStats,
   LoginInput,
   LoginResponse,
   Tenant,
@@ -147,6 +148,11 @@ export const usersApi = {
 export const imageApi = {
   getUploadToken: (tenantId: string): Promise<UploadToken> =>
     api.get(`/tenants/${tenantId}/img/upload-token`).then((res) => res.data),
+};
+
+export const dashboardApi = {
+  getStats: (tenantId: string): Promise<DashboardStats> =>
+    api.get(`/tenants/${tenantId}/dashboard/stats`).then((res) => res.data),
 };
 
 export default api;

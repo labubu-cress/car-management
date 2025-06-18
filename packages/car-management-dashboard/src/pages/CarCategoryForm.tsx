@@ -83,6 +83,7 @@ export const CarCategoryForm: React.FC = () => {
       onSuccess: () => {
         toast.success('车辆分类创建成功');
         queryClient.invalidateQueries(['car-categories', currentTenant?.id]);
+        queryClient.invalidateQueries(['dashboard-stats', currentTenant?.id]);
         navigate('/car-categories');
       },
       onError: (error: any) => {
@@ -99,6 +100,7 @@ export const CarCategoryForm: React.FC = () => {
       onSuccess: () => {
         toast.success('车辆分类更新成功');
         queryClient.invalidateQueries(['car-categories', currentTenant?.id]);
+        queryClient.invalidateQueries(['dashboard-stats', currentTenant?.id]);
         navigate('/car-categories');
       },
       onError: (error: any) => {

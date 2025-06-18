@@ -79,6 +79,7 @@ export const CarTrimForm: React.FC = () => {
       onSuccess: () => {
         toast.success('车型配置创建成功');
         queryClient.invalidateQueries(['car-trims']);
+        queryClient.invalidateQueries(['dashboard-stats', currentTenant?.id]);
         navigate('/car-trims');
       },
       onError: (error: any) => {
@@ -95,6 +96,7 @@ export const CarTrimForm: React.FC = () => {
       onSuccess: () => {
         toast.success('车型配置更新成功');
         queryClient.invalidateQueries(['car-trims']);
+        queryClient.invalidateQueries(['dashboard-stats', currentTenant?.id]);
         navigate('/car-trims');
       },
       onError: (error: any) => {

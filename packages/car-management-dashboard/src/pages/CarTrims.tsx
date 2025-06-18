@@ -49,6 +49,7 @@ export const CarTrims: React.FC = () => {
       onSuccess: () => {
         toast.success('车型配置删除成功');
         queryClient.invalidateQueries(['car-trims', currentTenant?.id, selectedCategoryId]);
+        queryClient.invalidateQueries(['dashboard-stats', currentTenant?.id]);
       },
       onError: (error: any) => {
         toast.error(error.response?.data?.message || '删除车型配置失败');
@@ -139,7 +140,7 @@ export const CarTrims: React.FC = () => {
           value={selectedCategoryId}
           onChange={(e) => setSelectedCategoryId(e.target.value)}
           style={{
-            padding: '8px 12px',
+            padding: '8px 32px 8px 12px',
             border: '1px solid #d1d5db',
             borderRadius: '6px',
             fontSize: '14px',
