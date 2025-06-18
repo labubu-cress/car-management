@@ -33,6 +33,8 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, tenan
     const file = event.target.files?.[0];
     if (!file) return;
 
+    const inputElement = event.target;
+
     setIsUploading(true);
     setProgress(0);
     
@@ -75,10 +77,14 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, tenan
             onChange(imageUrl);
             toast.success('上传成功');
           }
+          // Clear the input value so the same file can be selected again
+          inputElement.value = '';
         }
       );
     } catch (error) {
       setIsUploading(false);
+      // Clear the input value so the same file can be selected again
+      inputElement.value = '';
       toast.error('获取上传凭证或处理文件失败');
       console.error('Get upload token error:', error);
     }
