@@ -196,3 +196,21 @@ export interface DashboardStats {
   carTrimsCount: number;
   vehicleScenariosCount: number;
 }
+
+export interface HomepageConfig {
+  id: string;
+  tenantId: string;
+  welcomeTitle?: string;
+  welcomeDescription?: string;
+  bannerImage: string;
+  benefitsImage: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateHomepageConfigInput {
+  welcomeTitle?: string;
+  welcomeDescription?: string;
+  bannerImage: string;
+  benefitsImage: string;
+}

@@ -4,6 +4,7 @@ import { authMiddleware } from "../admin/middleware/auth";
 import authRoutes from "./features/auth";
 import carCategoriesRoutes from "./features/car-categories";
 import carTrimsRoutes from "./features/car-trims";
+import homepageConfigRoutes from "./features/homepage-config";
 import usersRoutes from "./features/users";
 import vehicleScenariosRoutes from "./features/vehicle-scenarios";
 import type { AppAuthEnv } from "./middleware/auth";
@@ -38,6 +39,7 @@ tenantApp.route("/auth", authRoutes);
 tenantApp.route("/vehicle-scenarios", vehicleScenariosRoutes);
 tenantApp.route("/car-categories", carCategoriesRoutes);
 tenantApp.route("/car-trims", carTrimsRoutes);
+tenantApp.route("/homepage-config", homepageConfigRoutes);
 
 // Routes that require authentication
 const authedApp = new Hono<AppAuthEnv>();

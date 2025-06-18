@@ -8,6 +8,7 @@ import { CarTrimForm } from '@/pages/CarTrimForm';
 import { CarTrims } from '@/pages/CarTrims';
 import { Dashboard } from '@/pages/Dashboard';
 import { FirstTenantSetup } from '@/pages/FirstTenantSetup';
+import HomepageConfigPage from '@/pages/HomepageConfig';
 import { Tenants } from '@/pages/Tenants';
 import { Users } from '@/pages/Users';
 import { VehicleScenarios } from '@/pages/VehicleScenarios';
@@ -66,6 +67,7 @@ const AppRoutes: React.FC = () => {
                 <Route path="/car-trims/new" element={<CarTrimForm />} />
                 <Route path="/car-trims/:id/edit" element={<CarTrimForm />} />
                 <Route path="/users" element={<Users />} />
+                <Route path="/homepage-config" element={<HomepageConfigPage />} />
               </Routes>
             </Layout>
           </ProtectedRoute>

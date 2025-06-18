@@ -3,6 +3,7 @@ import { password2hash } from "@/lib/transform";
 import { AdminRole, PrismaClient } from "@prisma/client";
 
 export const clearTestDb = async (client: PrismaClient) => {
+  await client.homepageConfig.deleteMany();
   await client.carTrim.deleteMany();
   await client.carCategory.deleteMany();
   await client.vehicleScenario.deleteMany();

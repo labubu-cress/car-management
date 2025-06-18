@@ -7,6 +7,7 @@ import {
     faTachometerAlt,
     faUsers,
     faUserShield,
+    faWrench,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
@@ -27,6 +28,7 @@ const menuItems: MenuItem[] = [
   { path: '/car-categories', label: '车辆分类', icon: faLayerGroup },
   { path: '/car-trims', label: '车型配置', icon: faCogs },
   { path: '/users', label: '用户管理', icon: faUsers },
+  { path: '/homepage-config', label: '首页配置', icon: faWrench },
 ];
 
 export const Sidebar: React.FC = () => {

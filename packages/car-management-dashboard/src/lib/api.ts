@@ -8,12 +8,14 @@ import type {
   CreateTenantInput,
   CreateVehicleScenarioInput,
   DashboardStats,
+  HomepageConfig,
   LoginInput,
   LoginResponse,
   Tenant,
   UpdateAdminUserInput,
   UpdateCarCategoryInput,
   UpdateCarTrimInput,
+  UpdateHomepageConfigInput,
   UpdateTenantInput,
   UpdateVehicleScenarioInput,
   UploadToken,
@@ -153,6 +155,12 @@ export const imageApi = {
 export const dashboardApi = {
   getStats: (tenantId: string): Promise<DashboardStats> =>
     api.get(`/tenants/${tenantId}/dashboard/stats`).then((res) => res.data),
+};
+
+export const homepageConfigApi = {
+  get: (): Promise<HomepageConfig> => api.get("/homepage-config").then((res) => res.data),
+  update: (data: UpdateHomepageConfigInput): Promise<HomepageConfig> =>
+    api.put("/homepage-config", data).then((res) => res.data),
 };
 
 export default api;
