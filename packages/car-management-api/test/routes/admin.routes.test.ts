@@ -16,10 +16,22 @@ describe("Admin API", () => {
   let adminUser: TestAdminUserWithToken;
   let tenantId: string;
   let categoryId: string;
+  let vehicleScenarioId: string;
 
   beforeEach(async () => {
     await clearTestDb(prisma);
     ({ tenantId, superAdminUser, adminUser } = await createTestTenantAndAdminUsers(prisma));
+
+    const scenario = await prisma.vehicleScenario.create({
+      data: {
+        name: "Test Scenario",
+        description: "Test Scenario Description",
+        image: "https://example.com/scenario.jpg",
+        tenantId: tenantId,
+      },
+    });
+    vehicleScenarioId = scenario.id;
+
     // Create a car category for car trim tests
     const category = await prisma.carCategory.create({
       data: {
@@ -31,6 +43,7 @@ describe("Admin API", () => {
         interiorImages: [],
         exteriorImages: [],
         offerPictures: [],
+        vehicleScenarioId: vehicleScenarioId,
       },
     });
     categoryId = category.id;
@@ -209,6 +222,7 @@ describe("Admin API", () => {
         ],
         exteriorImages: ["https://example.com/exterior1.jpg", "https://example.com/exterior2.jpg"],
         offerPictures: ["https://example.com/offer1.jpg", "https://example.com/offer2.jpg"],
+        vehicleScenarioId: vehicleScenarioId,
       };
       const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-categories`, {
         method: "POST",
@@ -244,6 +258,13 @@ describe("Admin API", () => {
       expect(body.highlights[0]).toMatchObject({ title: "动力系统", value: "2.0T涡轮增压" });
       expect(body.highlights[1]).toMatchObject({ title: "燃油经济性", value: "7.5L/100km" });
       expect(body.highlights[2]).toMatchObject({ title: "最大功率", value: "245马力" });
+
+      // 验证 vehicleScenario
+      expect(body.vehicleScenario).toBeDefined();
+      if (body.vehicleScenario) {
+        expect(body.vehicleScenario.id).toBe(vehicleScenarioId);
+        expect(body.vehicleScenario.name).toBe("Test Scenario");
+      }
 
       // 验证 interiorImages 数组
       expect(body.interiorImages).toBeDefined();
@@ -298,15 +319,21 @@ describe("Admin API", () => {
       const categoryToDelete = await prisma.carCategory.create({
         data: {
           name: "Category to Delete",
-          tenantId: tenantId,
           image: "delete.jpg",
           tags: [],
           highlights: [],
           interiorImages: [],
           exteriorImages: [],
           offerPictures: [],
+          tenant: {
+            connect: { id: tenantId },
+          },
+          vehicleScenario: {
+            connect: { id: vehicleScenarioId },
+          },
         },
       });
+
       const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-categories/${categoryToDelete.id}`, {
         method: "DELETE",
         headers: {
@@ -324,6 +351,39 @@ describe("Admin API", () => {
         },
       );
       expect(findResponse.status).toBe(404);
+    });
+
+    it("should update a car category's vehicle scenario", async () => {
+      const newScenario = await prisma.vehicleScenario.create({
+        data: {
+          name: "New Test Scenario",
+          description: "New Test Scenario Description",
+          image: "https://example.com/new_scenario.jpg",
+          tenantId: tenantId,
+        },
+      });
+
+      const updatePayload = {
+        vehicleScenarioId: newScenario.id,
+      };
+
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-categories/${categoryId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${adminUser.token}`,
+        },
+        body: JSON.stringify(updatePayload),
+      });
+
+      expect(response.status).toBe(200);
+      const body = (await response.json()) as CarCategory;
+
+      expect(body.vehicleScenario).toBeDefined();
+      if (body.vehicleScenario) {
+        expect(body.vehicleScenario.id).toBe(newScenario.id);
+        expect(body.vehicleScenario.name).toBe("New Test Scenario");
+      }
     });
   });
 
@@ -539,21 +599,24 @@ describe("Admin API", () => {
       await prisma.vehicleScenario.create({
         data: {
           name: "Existing Scenario",
-          image: "existing.jpg",
-          description: "An existing scenario",
+          description: "Existing Scenario Description",
+          image: "https://example.com/existing_scenario.jpg",
           tenantId: tenantId,
         },
       });
+
       const response = await app.request(`/api/v1/admin/tenants/${tenantId}/vehicle-scenarios`, {
-        headers: {
-          Authorization: `Bearer ${adminUser.token}`,
-        },
+        method: "GET",
+        headers: { Authorization: `Bearer ${adminUser.token}` },
       });
       expect(response.status).toBe(200);
-      const body = (await response.json()) as VehicleScenario[];
+      const body = (await response.json()) as any[];
       expect(Array.isArray(body)).toBe(true);
-      expect(body.length).toBeGreaterThan(0);
-      expect(body[0].name).toBe("Existing Scenario");
+      // There are 2 scenarios now, one from beforeEach, one from this test
+      expect(body.length).toBe(2);
+      // Check that both scenarios are present, regardless of order
+      expect(body.some((s) => s.name === "Existing Scenario")).toBe(true);
+      expect(body.some((s) => s.name === "Test Scenario")).toBe(true);
     });
 
     it("should get a vehicle scenario by id", async () => {

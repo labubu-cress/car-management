@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { carFeatureSchema } from "../shared/schema";
+import { vehicleScenarioSchema } from "../vehicle-scenarios/schema";
 
 // 为整个 CarCategory 模型创建一个包含解析后 JSON 字段的 Zod schema
 export const carCategorySchema = z.object({
@@ -15,6 +16,7 @@ export const carCategorySchema = z.object({
   offerPictures: z.array(z.string().url()),
   createdAt: z.date(),
   updatedAt: z.date(),
+  vehicleScenario: vehicleScenarioSchema.optional(),
 });
 
 // 从 schema 推断出 TypeScript 类型
@@ -30,6 +32,7 @@ export const createCarCategorySchema = z.object({
   interiorImages: z.array(z.string().url()).optional().default([]),
   exteriorImages: z.array(z.string().url()).optional().default([]),
   offerPictures: z.array(z.string().url()).optional().default([]),
+  vehicleScenarioId: z.string(),
 });
 
 export const updateCarCategorySchema = createCarCategorySchema.partial();

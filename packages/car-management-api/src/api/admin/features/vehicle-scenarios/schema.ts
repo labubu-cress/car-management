@@ -1,5 +1,14 @@
 import { z } from "zod";
 
+export const vehicleScenarioSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string(),
+  image: z.string().url(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
 // Schema for creating a vehicle scenario
 export const createVehicleScenarioSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
