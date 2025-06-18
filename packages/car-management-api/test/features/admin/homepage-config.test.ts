@@ -15,7 +15,7 @@ describe("Admin API: /api/v1/admin/homepage-config", () => {
     tenantId = setup.tenantId;
   });
 
-  it("should get default empty homepage config if none exists", async () => {
+  it("should get null if homepage config does not exist", async () => {
     const response = await app.request(`/api/v1/admin/tenants/${tenantId}/homepage-config`, {
       method: "GET",
       headers: {
@@ -24,13 +24,7 @@ describe("Admin API: /api/v1/admin/homepage-config", () => {
     });
     expect(response.status).toBe(200);
     const body = await response.json();
-    expect(body).toEqual({
-      tenantId: tenantId,
-      welcomeTitle: "",
-      welcomeDescription: "",
-      bannerImage: "",
-      benefitsImage: "",
-    });
+    expect(body).toBeNull();
   });
 
   it("should create and update homepage config", async () => {

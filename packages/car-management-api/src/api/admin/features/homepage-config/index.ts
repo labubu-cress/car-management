@@ -10,13 +10,7 @@ app.get("/", async (c) => {
   const tenantId = c.get("tenantId");
   const config = await getHomepageConfig(tenantId);
   if (!config) {
-    return c.json({
-      tenantId: tenantId,
-      welcomeTitle: "",
-      welcomeDescription: "",
-      bannerImage: "",
-      benefitsImage: "",
-    });
+    return c.json(null);
   }
   return c.json(config);
 });
