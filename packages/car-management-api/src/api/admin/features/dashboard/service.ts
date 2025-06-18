@@ -19,9 +19,16 @@ export const getDashboardStats = async (tenantId: string) => {
     },
   });
 
+  const vehicleScenariosCount = await prisma.vehicleScenario.count({
+    where: {
+      tenantId,
+    },
+  });
+
   return {
     usersCount,
     carCategoriesCount,
     carTrimsCount,
+    vehicleScenariosCount,
   };
 };

@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { dashboardApi } from '@/lib/api';
-import { faBuilding, faCar, faLayerGroup, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faBuilding, faCar, faCubes, faLayerGroup, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { useQuery } from 'react-query';
@@ -20,6 +20,7 @@ export const Dashboard: React.FC = () => {
   const stats = [
     { title: '当前租户', value: currentTenant?.name || '-', icon: faBuilding, color: '#1890ff' },
     { title: '用户总数', value: statsData?.usersCount ?? '0', icon: faUsers, color: '#52c41a' },
+    { title: '车辆场景', value: statsData?.vehicleScenariosCount ?? '0', icon: faCubes, color: '#13c2c2' },
     { title: '车辆分类', value: statsData?.carCategoriesCount ?? '0', icon: faLayerGroup, color: '#faad14' },
     { title: '车型配置', value: statsData?.carTrimsCount ?? '0', icon: faCar, color: '#722ed1' },
   ];

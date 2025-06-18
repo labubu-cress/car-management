@@ -265,23 +265,23 @@ export const CarTrimForm: React.FC = () => {
         <div className={carTrimFormStyles.section}>
           <h2 className={carTrimFormStyles.sectionTitle}>价格信息</h2>
           
-          <FormField label="原价" required error={errors.originalPrice}>
+          <FormField label="原价（元）" required error={errors.originalPrice}>
             <input
               type="text"
               value={formData.originalPrice}
               onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value })}
               className={formFieldStyles.input}
-              placeholder="如：¥299,800"
+              placeholder="如: 299800"
             />
           </FormField>
 
-          <FormField label="现价" required error={errors.currentPrice}>
+          <FormField label="现价（元）" required error={errors.currentPrice}>
             <input
               type="text"
               value={formData.currentPrice}
               onChange={(e) => setFormData({ ...formData, currentPrice: e.target.value })}
               className={formFieldStyles.input}
-              placeholder="如：¥259,800"
+              placeholder="如: 259800"
             />
           </FormField>
 

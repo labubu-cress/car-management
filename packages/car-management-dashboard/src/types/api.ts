@@ -194,4 +194,5 @@ export interface DashboardStats {
   usersCount: number;
   carCategoriesCount: number;
   carTrimsCount: number;
+  vehicleScenariosCount: number;
 }
