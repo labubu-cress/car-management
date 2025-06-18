@@ -16,6 +16,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import React from 'react';
+import toast from 'react-hot-toast';
 import { ImageUpload } from './ImageUpload';
 import { multiUploadStyles } from './MultiImageUpload.css';
 
@@ -77,6 +78,10 @@ export const MultiImageUpload: React.FC<MultiImageUploadProps> = ({ values, onCh
   );
 
   const handleAddImage = (url: string) => {
+    if (values.includes(url)) {
+      toast.error('图片已存在，请勿重复添加');
+      return;
+    }
     onChange([...values, url]);
   };
 
