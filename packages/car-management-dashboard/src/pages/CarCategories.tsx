@@ -52,6 +52,11 @@ export const CarCategories: React.FC = () => {
       width: '200px',
     },
     {
+      key: 'vehicleScenario.name',
+      title: '所属场景',
+      width: '150px',
+    },
+    {
       key: 'badge',
       title: '标签',
       width: '120px',

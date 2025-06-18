@@ -8,7 +8,7 @@ export interface LoginInput {
 export interface AdminUser {
   id: string;
   username: string;
-  role: 'super_admin' | 'admin';
+  role: "super_admin" | "admin";
   tenantId: string | null;
   createdAt: string;
   updatedAt: string;
@@ -24,7 +24,7 @@ export interface Tenant {
   name: string;
   appId: string;
   appSecret: string;
-  status: 'active' | 'inactive';
+  status: "active" | "inactive";
   config?: Record<string, any>;
   createdAt: string;
   updatedAt: string;
@@ -34,7 +34,7 @@ export interface CreateTenantInput {
   name: string;
   appId: string;
   appSecret: string;
-  status?: 'active' | 'inactive';
+  status?: "active" | "inactive";
   config?: Record<string, any>;
 }
 
@@ -42,13 +42,12 @@ export interface UpdateTenantInput {
   name?: string;
   appId?: string;
   appSecret?: string;
-  status?: 'active' | 'inactive';
+  status?: "active" | "inactive";
   config?: Record<string, any>;
 }
 
 export interface VehicleScenario {
   id: string;
-  tenantId: string;
   name: string;
   description: string;
   image: string;
@@ -86,6 +85,7 @@ export interface CarCategory {
   offerPictures?: string[];
   createdAt: string;
   updatedAt: string;
+  vehicleScenario?: VehicleScenario;
 }
 
 export interface CreateCarCategoryInput {
@@ -97,6 +97,7 @@ export interface CreateCarCategoryInput {
   interiorImages?: string[];
   exteriorImages?: string[];
   offerPictures?: string[];
+  vehicleScenarioId: string;
 }
 
 export interface UpdateCarCategoryInput {
@@ -108,6 +109,7 @@ export interface UpdateCarCategoryInput {
   interiorImages?: string[];
   exteriorImages?: string[];
   offerPictures?: string[];
+  vehicleScenarioId?: string;
 }
 
 export interface Feature {
@@ -167,14 +169,14 @@ export interface User {
 export interface CreateAdminUserInput {
   username: string;
   password: string;
-  role: 'super_admin' | 'admin';
+  role: "super_admin" | "admin";
   tenantId?: string;
 }
 
 export interface UpdateAdminUserInput {
   username?: string;
   password?: string;
-  role?: 'super_admin' | 'admin';
+  role?: "super_admin" | "admin";
   tenantId?: string;
 }
 
@@ -186,4 +188,4 @@ export interface UploadToken {
   bucket: string;
   expiredTime: number;
   startTime: number;
-} 
+}

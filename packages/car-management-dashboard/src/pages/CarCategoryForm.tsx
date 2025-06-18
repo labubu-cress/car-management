@@ -5,7 +5,7 @@ import { ImageUpload } from '@/components/ImageUpload';
 import { MultiImageUpload } from '@/components/MultiImageUpload';
 import { TagInput } from '@/components/TagInput';
 import { useAuth } from '@/contexts/AuthContext';
-import { carCategoriesApi } from '@/lib/api';
+import { carCategoriesApi, vehicleScenariosApi } from '@/lib/api';
 import { CreateCarCategoryInput, UpdateCarCategoryInput } from '@/types/api';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -29,9 +29,24 @@ export const CarCategoryForm: React.FC = () => {
     interiorImages: [] as string[],
     exteriorImages: [] as string[],
     offerPictures: [] as string[],
+    vehicleScenarioId: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // 获取场景列表
+  const { data: scenarios = [] } = useQuery(
+    ['vehicle-scenarios', currentTenant?.id],
+    () => currentTenant ? vehicleScenariosApi.getAll(currentTenant.id) : Promise.resolve([]),
+    {
+      enabled: !!currentTenant,
+      onSuccess: (data) => {
+        if (data.length > 0 && !formData.vehicleScenarioId && !isEdit) {
+          setFormData(prev => ({ ...prev, vehicleScenarioId: data[0].id }));
+        }
+      },
+    }
+  );
 
   // 获取分类详情（编辑模式）
   const { isLoading } = useQuery(
@@ -50,6 +65,7 @@ export const CarCategoryForm: React.FC = () => {
             interiorImages: data.interiorImages || [],
             exteriorImages: data.exteriorImages || [],
             offerPictures: data.offerPictures || [],
+            vehicleScenarioId: data.vehicleScenario?.id || '',
           });
         }
       },
@@ -102,6 +118,10 @@ export const CarCategoryForm: React.FC = () => {
       newErrors.image = '请上传分类图片';
     }
 
+    if (!formData.vehicleScenarioId) {
+      newErrors.vehicleScenarioId = '请选择所属场景';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -123,6 +143,7 @@ export const CarCategoryForm: React.FC = () => {
         interiorImages: formData.interiorImages.length > 0 ? formData.interiorImages : undefined,
         exteriorImages: formData.exteriorImages.length > 0 ? formData.exteriorImages : undefined,
         offerPictures: formData.offerPictures.length > 0 ? formData.offerPictures : undefined,
+        vehicleScenarioId: formData.vehicleScenarioId,
       };
       updateMutation.mutate({ id, data: updateData });
     } else {
@@ -135,6 +156,7 @@ export const CarCategoryForm: React.FC = () => {
         interiorImages: formData.interiorImages.length > 0 ? formData.interiorImages : undefined,
         exteriorImages: formData.exteriorImages.length > 0 ? formData.exteriorImages : undefined,
         offerPictures: formData.offerPictures.length > 0 ? formData.offerPictures : undefined,
+        vehicleScenarioId: formData.vehicleScenarioId,
       };
       createMutation.mutate(createData);
     }
@@ -144,15 +166,33 @@ export const CarCategoryForm: React.FC = () => {
     navigate('/car-categories');
   };
 
+  if (!currentTenant) {
+    return <div>加载租户信息...</div>;
+  }
+
+  // 如果没有场景，显示引导
+  if (scenarios.length === 0) {
+    return (
+      <div className={carCategoryFormStyles.container}>
+        <div className={carCategoryFormStyles.emptyState}>
+          <h2>还没有车辆场景</h2>
+          <p>创建车辆分类前，请先创建车辆场景</p>
+          <button
+            onClick={() => navigate('/vehicle-scenarios')}
+            className={carCategoryFormStyles.createButton}
+          >
+            去创建场景
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (isEdit && isLoading) {
     return <div className={carCategoryFormStyles.loading}>加载中...</div>;
   }
 
   const isSubmitting = createMutation.isLoading || updateMutation.isLoading;
-
-  if (!currentTenant) {
-    return <div>加载租户信息...</div>;
-  }
 
   return (
     <div className={carCategoryFormStyles.container}>
@@ -168,6 +208,21 @@ export const CarCategoryForm: React.FC = () => {
       <form onSubmit={handleSubmit} className={carCategoryFormStyles.form}>
         <div className={carCategoryFormStyles.section}>
           <h2 className={carCategoryFormStyles.sectionTitle}>基本信息</h2>
+          
+          <FormField label="所属场景" required error={errors.vehicleScenarioId}>
+            <select
+              value={formData.vehicleScenarioId}
+              onChange={(e) => setFormData({ ...formData, vehicleScenarioId: e.target.value })}
+              className={formFieldStyles.select}
+            >
+              <option value="" disabled>请选择车辆场景</option>
+              {scenarios.map(scenario => (
+                <option key={scenario.id} value={scenario.id}>
+                  {scenario.name}
+                </option>
+              ))}
+            </select>
+          </FormField>
           
           <FormField label="分类名称" required error={errors.name}>
             <input
