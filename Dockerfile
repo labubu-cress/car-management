@@ -28,9 +28,6 @@ RUN npm run build -w car-management-dashboard
 # Build the backend application
 RUN npm run build -w car-management-api
 
-# Remove development dependencies to lighten the final image
-RUN npm prune --omit=dev
-
 
 # Use a clean, lightweight Node.js image for the final production environment
 FROM node:22.15.0-slim
@@ -39,13 +36,14 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Copy package files and production node_modules from the builder stage
+# Copy package files from the builder stage to install production dependencies
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/package-lock.json ./
-COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/packages/car-management-api/package.json ./packages/car-management-api/
 COPY --from=builder /app/packages/car-management-dashboard/package.json ./packages/car-management-dashboard/
 
+# Install production dependencies
+RUN npm install --omit=dev
 
 # Copy the built backend application artifacts
 COPY --from=builder /app/packages/car-management-api/dist ./packages/car-management-api/dist
@@ -53,9 +51,10 @@ COPY --from=builder /app/packages/car-management-api/dist ./packages/car-managem
 COPY --from=builder /app/packages/car-management-dashboard/dist ./packages/car-management-api/dist/dashboard
 
 # Copy Prisma schema file required by Prisma Client at runtime
-COPY --from=builder /app/packages/car-management-api/prisma/schema.prisma ./packages/car-management-api/prisma/schema.prisma
-COPY --from=builder /app/packages/car-management-api/prisma/migrations ./packages/car-management-api/prisma/migrations
+COPY --from=builder /app/packages/car-management-api/prisma ./packages/car-management-api/prisma
 
+# Generate prisma client in production image
+RUN npm exec -w car-management-api -- prisma generate
 
 # Expose the port the application will run on
 EXPOSE 3000

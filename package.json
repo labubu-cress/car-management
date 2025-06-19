@@ -6,8 +6,8 @@
     "packages/*"
   ],
   "scripts": {
-    "debug:image": "dotenv -- sh -c 'docker run -p 3000:3000 -it $IMAGE_REGISTRY/$IMAGE_NAME:latest sh'",
-    "preview:image": "dotenv -- sh -c 'docker run -p 3000:3000 $IMAGE_REGISTRY/$IMAGE_NAME:latest'",
+    "debug:image": "dotenv -- sh -c 'docker run -p 3000:3000 --env-file packages/car-management-api/.env.preview.docker -it $IMAGE_REGISTRY/$IMAGE_NAME:latest sh'",
+    "preview:image": "dotenv -- sh -c 'docker run -p 3000:3000 --env-file packages/car-management-api/.env.preview.docker $IMAGE_REGISTRY/$IMAGE_NAME:latest'",
     "build:image": "dotenv -- sh -c 'docker build -t $IMAGE_REGISTRY/$IMAGE_NAME:latest .'",
     "push:image": "dotenv -- sh -c 'docker push $IMAGE_REGISTRY/$IMAGE_NAME:latest'",
     "build:image:production": "dotenv -- sh -c 'docker build -t $IMAGE_REGISTRY/$IMAGE_NAME:$npm_package_version .'",
