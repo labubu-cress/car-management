@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "dotenv -e .env.dev -- prisma db push && dotenv -e .env.dev -- prisma db seed && dotenv -e .env.dev -- tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "pkgroll",
     "start": "node dist/index.js",
     "test": "dotenv -e .env.test -- prisma db push && vitest",
     "test:debug": "dotenv -e .env.test -- prisma db push && npx vitest --inspect-brk",
@@ -40,6 +40,7 @@
     "@types/node": "^20.12.7",
     "cos-nodejs-sdk-v5": "^2.16.0-beta.3",
     "dotenv-cli": "^7.4.2",
+    "pkgroll": "^2.0.2",
     "prisma": "^5.12.1",
     "ts-node-dev": "^2.0.0",
     "tsx": "^4.7.2",

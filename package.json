@@ -13,7 +13,12 @@
     "push:image:production": "dotenv -- sh -c 'docker push $IMAGE_REGISTRY/$IMAGE_NAME:$npm_package_version'",
     "test": "npm test --workspaces --if-present",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "preview": "npm-run-all clean --parallel preview:frontend preview:backend:*",
+    "preview:frontend": "npm run build:watch -w car-management-dashboard",
+    "preview:backend:build": "npm exec -w car-management-api -- pkgroll --watch",
+    "preview:backend:serve": "nodemon packages/car-management-api/dist/index.js --watch packages/car-management-api/dist",
+    "clean": "rimraf packages/car-management-api/dist"
   },
   "version": "1.0.0",
   "description": "",
@@ -23,6 +28,9 @@
   "license": "ISC",
   "devDependencies": {
     "dotenv-cli": "^7.4.2",
-    "prettier": "^3.5.3"
+    "nodemon": "^3.1.10",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.5.3",
+    "rimraf": "^6.0.1"
   }
 }
