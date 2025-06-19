@@ -6,6 +6,7 @@
     "packages/*"
   ],
   "scripts": {
+    "debug:image": "dotenv -- sh -c 'docker run -p 3000:3000 -it $IMAGE_REGISTRY/$IMAGE_NAME:latest sh'",
     "preview:image": "dotenv -- sh -c 'docker run -p 3000:3000 $IMAGE_REGISTRY/$IMAGE_NAME:latest'",
     "build:image": "dotenv -- sh -c 'docker build -t $IMAGE_REGISTRY/$IMAGE_NAME:latest .'",
     "push:image": "dotenv -- sh -c 'docker push $IMAGE_REGISTRY/$IMAGE_NAME:latest'",
@@ -17,7 +18,7 @@
     "preview": "npm run clean && npm-run-all --parallel preview:frontend preview:backend:*",
     "preview:frontend": "npm run build:watch -w car-management-dashboard",
     "preview:backend:build": "npm exec -w car-management-api -- pkgroll --watch",
-    "preview:backend:serve": "while [ ! -f packages/car-management-api/dist/index.js ]; do sleep 1; done && npm exec -w car-management-api -- nodemon --watch dist",
+    "preview:backend:serve": "while [ ! -f packages/car-management-api/dist/index.js ]; do sleep 1; done &&  npm run start:dev -w car-management-api",
     "clean": "rimraf packages/car-management-api/dist"
   },
   "version": "1.0.0",

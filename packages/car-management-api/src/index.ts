@@ -23,7 +23,7 @@ if (process.env.NODE_ENV !== "test") {
 
   // Serve static files for the dashboard. The path is relative to the execution directory.
   // In the Docker container, we'll place the frontend build output in `dist/dashboard`.
-  server.use("/dashboard/*", serveStatic({ root: "./dist/dashboard/" }));
+  server.use("/dashboard/*", serveStatic({ root: "./dist/" }));
   server.get("/dashboard", serveStatic({ path: "./dist/dashboard/index.html" }));
   serve({
     fetch: server.fetch,
