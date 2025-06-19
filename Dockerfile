@@ -5,6 +5,9 @@ FROM node:22.15.0-slim AS builder
 
 WORKDIR /app
 
+# Install openssl for prisma
+RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+
 # Copy root package files first to leverage Docker cache
 COPY package.json package-lock.json ./
 
@@ -36,6 +39,9 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
+# Install openssl for prisma
+RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+
 # Copy package files from the builder stage to install production dependencies
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/package-lock.json ./
@@ -60,4 +66,4 @@ RUN npm exec -w car-management-api -- prisma generate
 EXPOSE 3000
 
 # Define the command to start the application
-CMD ["npm", "start", "-w", "car-management-api"] 
+CMD ["sh", "-c", "npm run prisma:deploy -w car-management-api && npm start -w car-management-api"] 

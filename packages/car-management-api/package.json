@@ -4,14 +4,16 @@
   "description": "Car Management Backend API",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "dotenv -e .env.dev -- prisma db push && dotenv -e .env.dev -- prisma db seed && dotenv -e .env.dev -- tsx watch src/index.ts",
+    "dev": "dotenv -e .env.dev -- prisma migrate deploy && dotenv -e .env.dev -- tsx watch src/index.ts",
     "build": "pkgroll",
     "start": "node dist/index.js",
     "start:dev": "dotenv -e .env.dev -- node dist/index.js",
-    "test": "dotenv -e .env.test -- prisma db push && vitest",
-    "test:debug": "dotenv -e .env.test -- prisma db push && npx vitest --inspect-brk",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate dev",
+    "test": "dotenv -e .env.test -- prisma migrate deploy && vitest",
+    "test:debug": "dotenv -e .env.test -- prisma migrate deploy && npx vitest --inspect-brk",
+    "prisma:generate:dev": "dotenv -e .env.dev -- prisma generate",
+    "prisma:migrate:dev": "dotenv -e .env.dev -- prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "prisma:status:dev": "dotenv -e .env.dev -- prisma migrate status",
     "prisma:studio": "prisma studio"
   },
   "prisma": {
