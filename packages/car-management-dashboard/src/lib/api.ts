@@ -45,7 +45,10 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("admin_token");
-      window.location.href = "/login";
+      const loginPath = "/#/login";
+      window.location.href = import.meta.env.BASE_URL
+        ? `${import.meta.env.BASE_URL.replace(/\/$/, "")}${loginPath}`
+        : loginPath;
     }
     return Promise.reject(error);
   },
