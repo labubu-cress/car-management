@@ -48,7 +48,7 @@ interface GetPhoneNumberResponse {
  * 微信小程序服务端 API 客户端
  * 封装了常用的接口，并自动管理 access_token 的获取和刷新。
  */
-class WeChatClient {
+export class WeChatClient {
   private readonly appId: string;
   private readonly appSecret: string;
   /** access_token 的本地缓存文件路径 */
