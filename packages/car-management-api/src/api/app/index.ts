@@ -10,7 +10,7 @@ import vehicleScenariosRoutes from "./features/vehicle-scenarios";
 import type { AppAuthEnv } from "./middleware/auth";
 import { tenantMiddleware, type AppTenantEnv } from "./middleware/tenant";
 
-const app = new Hono();
+const app = new Hono<AppTenantEnv>();
 
 app.onError((err, c) => {
   console.error(`App API Error: ${err}`);

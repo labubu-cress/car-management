@@ -20,6 +20,14 @@ export type TestAdminUserWithToken = {
   tenantId?: string | null;
   token: string;
 };
+
+export type TestTenant = {
+  id: string;
+  name: string;
+  appId: string;
+  appSecret: string;
+};
+
 export const createTestAdminUser = async (
   client: PrismaClient,
   role: AdminRole,
@@ -45,6 +53,22 @@ export const createTestAdminUser = async (
     role: user.role,
     tenantId: user.tenantId,
     token,
+  };
+};
+
+export const createTestTenant = async (client: PrismaClient) => {
+  const { id, name, appId, appSecret } = await client.tenant.create({
+    data: {
+      name: "Test Tenant",
+      appId: "test-app-id",
+      appSecret: "a-secure-secret",
+    },
+  });
+  return {
+    id,
+    name,
+    appId,
+    appSecret,
   };
 };
 

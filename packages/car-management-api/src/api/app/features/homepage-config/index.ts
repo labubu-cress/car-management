@@ -9,7 +9,7 @@ app.get("/", async (c) => {
   const config = await getHomepageConfig(tenantId);
 
   if (!config) {
-    return c.json({ error: "Homepage config not found" }, 404);
+    return c.json(null, 200);
   }
 
   return c.json(config);
