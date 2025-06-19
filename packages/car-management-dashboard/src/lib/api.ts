@@ -104,8 +104,8 @@ export const vehicleScenariosApi = {
 
 // 车辆分类管理
 export const carCategoriesApi = {
-  getAll: (tenantId: string): Promise<CarCategory[]> =>
-    api.get(`/tenants/${tenantId}/car-categories`).then((res) => res.data),
+  getAll: (tenantId: string, name?: string, vehicleScenarioId?: string): Promise<CarCategory[]> =>
+    api.get(`/tenants/${tenantId}/car-categories`, { params: { name, vehicleScenarioId } }).then((res) => res.data),
 
   getById: (tenantId: string, id: string): Promise<CarCategory> =>
     api.get(`/tenants/${tenantId}/car-categories/${id}`).then((res) => res.data),

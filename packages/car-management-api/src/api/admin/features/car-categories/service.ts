@@ -7,9 +7,26 @@ import {
   type UpdateCarCategoryInput,
 } from "./schema";
 
-export const getAllCarCategories = async (tenantId: string): Promise<CarCategory[]> => {
+export const getAllCarCategories = async (
+  tenantId: string,
+  name?: string,
+  vehicleScenarioId?: string,
+): Promise<CarCategory[]> => {
   const prisma = createTenantPrismaClient(tenantId);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const where: any = {};
+  if (name) {
+    where.name = {
+      contains: name,
+      mode: "insensitive",
+    };
+  }
+  if (vehicleScenarioId) {
+    where.vehicleScenarioId = vehicleScenarioId;
+  }
+
   const categories = await prisma.carCategory.findMany({
+    where,
     include: { vehicleScenario: true },
     orderBy: {
       displayOrder: "asc",

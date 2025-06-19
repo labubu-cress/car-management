@@ -45,3 +45,8 @@ export const reorderCarCategoriesSchema = z.object({
   vehicleScenarioId: z.string(),
   categoryIds: z.array(z.string()),
 });
+
+export const getCarCategoriesSchema = z.object({
+  name: z.string().optional(),
+  vehicleScenarioId: z.string().optional(),
+});

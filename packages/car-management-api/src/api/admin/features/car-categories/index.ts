@@ -2,7 +2,12 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import type { AdminAuthTenantEnv } from "../../middleware/auth";
-import { createCarCategorySchema, reorderCarCategoriesSchema, updateCarCategorySchema } from "./schema";
+import {
+  createCarCategorySchema,
+  getCarCategoriesSchema,
+  reorderCarCategoriesSchema,
+  updateCarCategorySchema,
+} from "./schema";
 import {
   createCarCategory,
   deleteCarCategory,
@@ -29,9 +34,10 @@ app.post("/", zValidator("json", createCarCategorySchema), async (c) => {
   return c.json(newCategory, 201);
 });
 
-app.get("/", async (c) => {
+app.get("/", zValidator("query", getCarCategoriesSchema), async (c) => {
   const { tenantId } = c.var;
-  const categories = await getAllCarCategories(tenantId as string);
+  const { name, vehicleScenarioId } = c.req.valid("query");
+  const categories = await getAllCarCategories(tenantId as string, name, vehicleScenarioId);
   return c.json(categories);
 });
 
