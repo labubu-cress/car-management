@@ -45,13 +45,13 @@ export type AdminAuthTenantEnv = AdminAuthEnv & {
   };
 };
 
-export const superAdminMiddleware = createMiddleware<AdminAuthEnv>(async (c, next:Next) => {
+export const superAdminMiddleware = createMiddleware<AdminAuthEnv>(async (c, next: Next) => {
   const adminUser = await handleAdminAuth(c);
   if (adminUser.role !== "super_admin") {
     throw new HTTPException(401, { message: "Role not match" });
   }
   await next();
-})
+});
 
 export const tenantAccessMiddleware = createMiddleware<AdminAuthTenantEnv>(async (c, next) => {
   const adminUser = await handleAdminAuth(c);

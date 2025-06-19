@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router-dom';
 import { FormField } from '../components/FormField';
 import { ImageUpload } from '../components/ImageUpload';
 import { useAuth } from '../contexts/AuthContext';
@@ -16,7 +15,6 @@ import { homepageConfigStyles } from './HomepageConfig.css';
 const HomepageConfigPage = () => {
   const { currentTenant } = useAuth();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const [isCreating, setIsCreating] = useState(false);
 
   const {

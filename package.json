@@ -6,6 +6,11 @@
     "packages/*"
   ],
   "scripts": {
+    "preview:image": "dotenv -- sh -c 'docker run -p 3000:3000 $IMAGE_REGISTRY/$IMAGE_NAME:latest'",
+    "build:image": "dotenv -- sh -c 'docker build -t $IMAGE_REGISTRY/$IMAGE_NAME:latest .'",
+    "push:image": "dotenv -- sh -c 'docker push $IMAGE_REGISTRY/$IMAGE_NAME:latest'",
+    "build:image:production": "dotenv -- sh -c 'docker build -t $IMAGE_REGISTRY/$IMAGE_NAME:$npm_package_version .'",
+    "push:image:production": "dotenv -- sh -c 'docker push $IMAGE_REGISTRY/$IMAGE_NAME:$npm_package_version'",
     "test": "npm test --workspaces --if-present",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
@@ -16,8 +21,8 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {},
   "devDependencies": {
+    "dotenv-cli": "^7.4.2",
     "prettier": "^3.5.3"
   }
 }
