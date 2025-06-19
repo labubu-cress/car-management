@@ -136,6 +136,9 @@ export const carTrimsApi = {
 
   delete: (tenantId: string, id: string): Promise<void> =>
     api.delete(`/tenants/${tenantId}/car-trims/${id}`).then(() => undefined),
+
+  reorder: (tenantId: string, categoryId: string, trimIds: string[]): Promise<void> =>
+    api.put(`/tenants/${tenantId}/car-trims/reorder`, { categoryId, trimIds }).then(() => undefined),
 };
 
 // 用户管理

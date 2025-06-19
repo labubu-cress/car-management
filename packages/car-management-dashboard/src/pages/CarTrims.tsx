@@ -5,7 +5,7 @@ import { carCategoriesApi, carTrimsApi } from '@/lib/api';
 import { CarTrim } from '@/types/api';
 import { faCar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
@@ -31,15 +31,43 @@ export const CarTrims: React.FC = () => {
 
   const { data: trims = [], isLoading } = useQuery(
     ['car-trims', currentTenant?.id, selectedCategoryId],
-    () => currentTenant && selectedCategoryId 
-      ? carTrimsApi.getAll(currentTenant.id, selectedCategoryId) 
-      : Promise.resolve([]),
+    () =>
+      currentTenant && selectedCategoryId
+        ? carTrimsApi.getAll(currentTenant.id, selectedCategoryId)
+        : Promise.resolve([]),
     {
       enabled: !!currentTenant && !!selectedCategoryId,
       onError: (error: any) => {
         toast.error(error.response?.data?.message || '获取车型配置列表失败');
       },
-    }
+      onSuccess: (data) => {
+        setLocalTrims(data);
+      },
+    },
+  );
+
+  const [localTrims, setLocalTrims] = useState(trims);
+
+  useEffect(() => {
+    setLocalTrims(trims);
+  }, [trims]);
+
+  const reorderMutation = useMutation(
+    (data: { trimIds: string[] }) => {
+      if (!currentTenant || !selectedCategoryId) throw new Error('Missing tenant or category ID');
+      return carTrimsApi.reorder(currentTenant.id, selectedCategoryId, data.trimIds);
+    },
+    {
+      onSuccess: () => {
+        toast.success('车型顺序更新成功');
+        queryClient.invalidateQueries(['car-trims', currentTenant?.id, selectedCategoryId]);
+      },
+      onError: (error: any) => {
+        toast.error(error.response?.data?.message || '更新车型顺序失败');
+        // Revert local state on error
+        setLocalTrims(trims);
+      },
+    },
   );
 
   // 删除车型
@@ -116,6 +144,11 @@ export const CarTrims: React.FC = () => {
     }
   };
 
+  const handleReorder = (reorderedTrims: CarTrim[]) => {
+    setLocalTrims(reorderedTrims);
+    reorderMutation.mutate({ trimIds: reorderedTrims.map((t) => t.id) });
+  };
+
   // 如果没有分类，显示引导页面
   if (categories.length === 0) {
     return (
@@ -160,12 +193,13 @@ export const CarTrims: React.FC = () => {
 
       <DataTable
         title="车型配置管理"
-        data={trims}
+        data={localTrims}
         columns={columns}
         loading={isLoading}
         onAdd={selectedCategoryId ? handleAdd : undefined}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onReorder={handleReorder}
         addButtonText="创建车型"
       />
     </div>

@@ -1,4 +1,21 @@
-import { faEdit, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import {
+    closestCenter,
+    DndContext,
+    DragEndEvent,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
+} from '@dnd-kit/core';
+import {
+    arrayMove,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    useSortable,
+    verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { faEdit, faGripVertical, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import * as styles from './DataTable.css';
@@ -19,6 +36,67 @@ export interface DataTableProps<T> {
   onDelete?: (record: T) => void;
   addButtonText?: string;
   title?: string;
+  onReorder?: (data: T[]) => void;
+}
+
+function SortableRow<T extends { id: string }>({
+  record,
+  columns,
+  onEdit,
+  onDelete,
+  getValue,
+  isSortable,
+}: {
+  record: T;
+  columns: Column<T>[];
+  onEdit?: (record: T) => void;
+  onDelete?: (record: T) => void;
+  getValue: (record: T, key: keyof T | string) => any;
+  isSortable: boolean;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: record.id,
+    disabled: !isSortable,
+  });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.8 : 1,
+    zIndex: isDragging ? 1 : 0,
+    position: 'relative',
+  };
+
+  return (
+    <tr ref={setNodeRef} style={style} {...attributes} className={styles.tr}>
+      {isSortable && (
+        <td className={styles.td} style={{ width: '40px', cursor: 'grab' }} {...listeners}>
+          <FontAwesomeIcon icon={faGripVertical} />
+        </td>
+      )}
+      {columns.map((column, index) => (
+        <td key={index} className={styles.td}>
+          {column.render ? column.render(getValue(record, column.key), record) : getValue(record, column.key)}
+        </td>
+      ))}
+      {(onEdit || onDelete) && (
+        <td className={styles.td}>
+          <div className={styles.actions}>
+            {onEdit && (
+              <button onClick={() => onEdit?.(record)} className={styles.editButton} title="编辑">
+                <FontAwesomeIcon icon={faEdit} />
+              </button>
+            )}
+            {onDelete && (
+              <button onClick={() => onDelete?.(record)} className={styles.deleteButton} title="删除">
+                <FontAwesomeIcon icon={faTrash} />
+              </button>
+            )}
+          </div>
+        </td>
+      )}
+    </tr>
+  );
 }
 
 export function DataTable<T extends { id: string }>({
@@ -30,7 +108,15 @@ export function DataTable<T extends { id: string }>({
   onDelete,
   addButtonText = '添加',
   title,
+  onReorder,
 }: DataTableProps<T>) {
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
   const getValue = (record: T, key: keyof T | string): any => {
     if (typeof key === 'string' && key.includes('.')) {
       return key.split('.').reduce((obj, k) => obj?.[k], record as any);
@@ -38,97 +124,85 @@ export function DataTable<T extends { id: string }>({
     return record[key as keyof T];
   };
 
-  return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        {title && <h2 className={styles.title}>{title}</h2>}
-        {onAdd && (
-          <button onClick={onAdd} className={styles.addButton}>
-            <FontAwesomeIcon icon={faPlus} className={styles.buttonIcon} />
-            {addButtonText}
-          </button>
-        )}
-      </div>
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = data.findIndex((item) => item.id === active.id);
+      const newIndex = data.findIndex((item) => item.id === over.id);
+      onReorder?.(arrayMove(data, oldIndex, newIndex));
+    }
+  }
 
-      <div className={styles.tableWrapper}>
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              {columns.map((column, index) => (
-                <th
-                  key={index}
-                  className={styles.th}
-                  style={{ width: column.width }}
-                >
-                  {column.title}
-                </th>
-              ))}
-              {(onEdit || onDelete) && (
-                <th className={styles.th} style={{ width: '120px' }}>
-                  操作
-                </th>
-              )}
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
+  const isSortable = !!onReorder;
+
+  return (
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          {title && <h2 className={styles.title}>{title}</h2>}
+          {onAdd && (
+            <button onClick={onAdd} className={styles.addButton}>
+              <FontAwesomeIcon icon={faPlus} className={styles.buttonIcon} />
+              {addButtonText}
+            </button>
+          )}
+        </div>
+
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead>
               <tr>
-                <td
-                  colSpan={columns.length + (onEdit || onDelete ? 1 : 0)}
-                  className={styles.loadingCell}
-                >
-                  加载中...
-                </td>
+                {isSortable && <th className={styles.th} style={{ width: '40px' }} />}
+                {columns.map((column, index) => (
+                  <th key={index} className={styles.th} style={{ width: column.width }}>
+                    {column.title}
+                  </th>
+                ))}
+                {(onEdit || onDelete) && (
+                  <th className={styles.th} style={{ width: '120px' }}>
+                    操作
+                  </th>
+                )}
               </tr>
-            ) : data.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={columns.length + (onEdit || onDelete ? 1 : 0)}
-                  className={styles.emptyCell}
-                >
-                  暂无数据
-                </td>
-              </tr>
-            ) : (
-              data.map((record) => (
-                <tr key={record.id} className={styles.tr}>
-                  {columns.map((column, index) => (
-                    <td key={index} className={styles.td}>
-                      {column.render
-                        ? column.render(getValue(record, column.key), record)
-                        : getValue(record, column.key)}
+            </thead>
+            <SortableContext items={data.map((d) => d.id)} strategy={verticalListSortingStrategy} disabled={!isSortable}>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td
+                      colSpan={columns.length + (onEdit || onDelete ? 1 : 0) + (isSortable ? 1 : 0)}
+                      className={styles.loadingCell}
+                    >
+                      加载中...
                     </td>
-                  ))}
-                  {(onEdit || onDelete) && (
-                    <td className={styles.td}>
-                      <div className={styles.actions}>
-                        {onEdit && (
-                          <button
-                            onClick={() => onEdit(record)}
-                            className={styles.editButton}
-                            title="编辑"
-                          >
-                            <FontAwesomeIcon icon={faEdit} />
-                          </button>
-                        )}
-                        {onDelete && (
-                          <button
-                            onClick={() => onDelete(record)}
-                            className={styles.deleteButton}
-                            title="删除"
-                          >
-                            <FontAwesomeIcon icon={faTrash} />
-                          </button>
-                        )}
-                      </div>
+                  </tr>
+                ) : data.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={columns.length + (onEdit || onDelete ? 1 : 0) + (isSortable ? 1 : 0)}
+                      className={styles.emptyCell}
+                    >
+                      暂无数据
                     </td>
-                  )}
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                  </tr>
+                ) : (
+                  data.map((record) => (
+                    <SortableRow
+                      key={record.id}
+                      record={record}
+                      columns={columns}
+                      onEdit={onEdit}
+                      onDelete={onDelete}
+                      getValue={getValue}
+                      isSortable={isSortable}
+                    />
+                  ))
+                )}
+              </tbody>
+            </SortableContext>
+          </table>
+        </div>
       </div>
-    </div>
+    </DndContext>
   );
 } 
