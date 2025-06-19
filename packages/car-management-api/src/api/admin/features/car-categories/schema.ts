@@ -14,6 +14,7 @@ export const carCategorySchema = z.object({
   interiorImages: z.array(z.string().url()),
   exteriorImages: z.array(z.string().url()),
   offerPictures: z.array(z.string().url()),
+  displayOrder: z.number(),
   createdAt: z.date(),
   updatedAt: z.date(),
   vehicleScenario: vehicleScenarioSchema.optional(),
@@ -39,3 +40,8 @@ export const updateCarCategorySchema = createCarCategorySchema.partial();
 
 export type CreateCarCategoryInput = z.infer<typeof createCarCategorySchema>;
 export type UpdateCarCategoryInput = z.infer<typeof updateCarCategorySchema>;
+
+export const reorderCarCategoriesSchema = z.object({
+  vehicleScenarioId: z.string(),
+  categoryIds: z.array(z.string()),
+});

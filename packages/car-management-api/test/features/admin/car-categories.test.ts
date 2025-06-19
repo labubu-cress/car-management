@@ -217,4 +217,68 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-categories", () => {
       expect(body.vehicleScenario.name).toBe("New Test Scenario");
     }
   });
+
+  it("should correctly order categories on creation and reorder them", async () => {
+    // 1. Create more categories
+    const category2 = await prisma.carCategory.create({
+      data: {
+        name: "Category 2",
+        tenantId: tenantId,
+        image: "https://example.com/image2.jpg",
+        tags: [],
+        highlights: [],
+        interiorImages: [],
+        exteriorImages: [],
+        offerPictures: [],
+        vehicleScenarioId: vehicleScenarioId,
+      },
+    });
+
+    const category3 = await prisma.carCategory.create({
+      data: {
+        name: "Category 3",
+        tenantId: tenantId,
+        image: "https://example.com/image3.jpg",
+        tags: [],
+        highlights: [],
+        interiorImages: [],
+        exteriorImages: [],
+        offerPictures: [],
+        vehicleScenarioId: vehicleScenarioId,
+      },
+    });
+
+    // 2. Verify initial order
+    const initialResponse = await app.request(`/api/v1/admin/tenants/${tenantId}/car-categories`, {
+      headers: { Authorization: `Bearer ${adminUser.token}` },
+    });
+    expect(initialResponse.status).toBe(200);
+    const initialBody = (await initialResponse.json()) as CarCategory[];
+    expect(initialBody.length).toBe(3);
+    expect(initialBody.map((c) => c.id)).toEqual([categoryId, category2.id, category3.id]);
+
+    // 3. Reorder the categories
+    const reorderPayload = {
+      vehicleScenarioId,
+      categoryIds: [category3.id, categoryId, category2.id],
+    };
+    const reorderResponse = await app.request(`/api/v1/admin/tenants/${tenantId}/car-categories/reorder`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${adminUser.token}`,
+      },
+      body: JSON.stringify(reorderPayload),
+    });
+    expect(reorderResponse.status).toBe(204);
+
+    // 4. Verify the new order
+    const finalResponse = await app.request(`/api/v1/admin/tenants/${tenantId}/car-categories`, {
+      headers: { Authorization: `Bearer ${adminUser.token}` },
+    });
+    expect(finalResponse.status).toBe(200);
+    const finalBody = (await finalResponse.json()) as CarCategory[];
+    expect(finalBody.length).toBe(3);
+    expect(finalBody.map((c) => c.id)).toEqual([category3.id, categoryId, category2.id]);
+  });
 });

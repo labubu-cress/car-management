@@ -11,6 +11,9 @@ export const getAllCarCategories = async (tenantId: string): Promise<CarCategory
   const prisma = createTenantPrismaClient(tenantId);
   const categories = await prisma.carCategory.findMany({
     include: { vehicleScenario: true },
+    orderBy: {
+      displayOrder: "asc",
+    },
   });
   return z.array(carCategorySchema).parse(categories);
 };
@@ -30,9 +33,18 @@ export const getCarCategoryById = async (tenantId: string, id: string): Promise<
 export const createCarCategory = async (tenantId: string, data: CreateCarCategoryInput): Promise<CarCategory> => {
   const prisma = createTenantPrismaClient(tenantId);
   const { vehicleScenarioId, ...restData } = data;
+
+  const maxOrderCategory = await prisma.carCategory.findFirst({
+    where: { vehicleScenarioId },
+    orderBy: { displayOrder: "desc" },
+  });
+
+  const nextOrder = maxOrderCategory ? maxOrderCategory.displayOrder + 1 : 0;
+
   const newCategory = await prisma.carCategory.create({
     data: {
       ...restData,
+      displayOrder: nextOrder,
       tenant: {
         connect: {
           id: tenantId,
@@ -73,4 +85,21 @@ export const updateCarCategory = async (
 export const deleteCarCategory = async (tenantId: string, id: string): Promise<void> => {
   const prisma = createTenantPrismaClient(tenantId);
   await prisma.carCategory.delete({ where: { id, tenantId } });
+};
+
+export const reorderCarCategories = async (
+  tenantId: string,
+  vehicleScenarioId: string,
+  categoryIds: string[],
+): Promise<void> => {
+  const prisma = createTenantPrismaClient(tenantId);
+
+  await prisma.$transaction(
+    categoryIds.map((id, index) =>
+      prisma.carCategory.update({
+        where: { id, tenantId, vehicleScenarioId },
+        data: { displayOrder: index },
+      }),
+    ),
+  );
 };

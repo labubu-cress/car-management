@@ -92,6 +92,7 @@ model CarCategory {
   interiorImages  Json // String[]
   exteriorImages  Json // String[]
   offerPictures   Json // String[]
+  displayOrder    Int      @default(0)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   carTrims        CarTrim[]

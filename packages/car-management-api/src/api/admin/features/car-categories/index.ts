@@ -2,12 +2,13 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import type { AdminAuthTenantEnv } from "../../middleware/auth";
-import { createCarCategorySchema, updateCarCategorySchema } from "./schema";
+import { createCarCategorySchema, reorderCarCategoriesSchema, updateCarCategorySchema } from "./schema";
 import {
   createCarCategory,
   deleteCarCategory,
   getAllCarCategories,
   getCarCategoryById,
+  reorderCarCategories,
   updateCarCategory,
 } from "./service";
 
@@ -54,6 +55,13 @@ app.put("/:id", zValidator("json", updateCarCategorySchema), async (c) => {
     return c.json(updatedCategory);
   }
   return c.json({ message: "Car category not found" }, 404);
+});
+
+app.put("/reorder", zValidator("json", reorderCarCategoriesSchema), async (c) => {
+  const { tenantId } = c.var;
+  const { vehicleScenarioId, categoryIds } = c.req.valid("json");
+  await reorderCarCategories(tenantId as string, vehicleScenarioId, categoryIds);
+  return c.body(null, 204);
 });
 
 app.delete("/:id", async (c) => {
