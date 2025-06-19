@@ -16,7 +16,7 @@ import '@/styles/global.css';
 import React from 'react';
 import { Toaster } from 'react-hot-toast';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { Navigate, Route, HashRouter as Router, Routes } from 'react-router-dom';
 
 const queryClient = new QueryClient({
   defaultOptions: {
