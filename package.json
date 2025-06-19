@@ -14,10 +14,10 @@
     "test": "npm test --workspaces --if-present",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "preview": "npm-run-all clean --parallel preview:frontend preview:backend:*",
+    "preview": "npm run clean && npm-run-all --parallel preview:frontend preview:backend:*",
     "preview:frontend": "npm run build:watch -w car-management-dashboard",
     "preview:backend:build": "npm exec -w car-management-api -- pkgroll --watch",
-    "preview:backend:serve": "nodemon packages/car-management-api/dist/index.js --watch packages/car-management-api/dist",
+    "preview:backend:serve": "while [ ! -f packages/car-management-api/dist/index.js ]; do sleep 1; done && npm exec -w car-management-api -- nodemon --watch dist",
     "clean": "rimraf packages/car-management-api/dist"
   },
   "version": "1.0.0",
