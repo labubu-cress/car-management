@@ -5,7 +5,7 @@ import { carCategoriesApi, vehicleScenariosApi } from '@/lib/api';
 import { CarCategory } from '@/types/api';
 import { faStream } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
@@ -39,6 +39,33 @@ export const CarCategories: React.FC = () => {
       enabled: !!currentTenant && !!selectedScenarioId,
       onError: (error: any) => {
         toast.error(error.response?.data?.message || '获取车辆分类列表失败');
+      },
+      onSuccess: (data) => {
+        setLocalCategories(data);
+      },
+    }
+  );
+
+  const [localCategories, setLocalCategories] = useState(categories);
+
+  useEffect(() => {
+    setLocalCategories(categories);
+  }, [categories]);
+
+  const reorderMutation = useMutation(
+    (data: { categoryIds: string[] }) => {
+      if (!currentTenant || !selectedScenarioId) throw new Error('Missing tenant or scenario ID');
+      return carCategoriesApi.reorder(currentTenant.id, selectedScenarioId, data.categoryIds);
+    },
+    {
+      onSuccess: () => {
+        toast.success('分类顺序更新成功');
+        queryClient.invalidateQueries(['car-categories', currentTenant?.id, selectedScenarioId]);
+      },
+      onError: (error: any) => {
+        toast.error(error.response?.data?.message || '更新分类顺序失败');
+        // Revert local state on error
+        setLocalCategories(categories);
       },
     }
   );
@@ -109,6 +136,11 @@ export const CarCategories: React.FC = () => {
     }
   };
 
+  const handleReorder = (reorderedCategories: CarCategory[]) => {
+    setLocalCategories(reorderedCategories);
+    reorderMutation.mutate({ categoryIds: reorderedCategories.map((c) => c.id) });
+  };
+
   if (scenarios.length === 0) {
     return (
       <EmptyState
@@ -150,12 +182,13 @@ export const CarCategories: React.FC = () => {
       </div>
       <DataTable
         title="车辆分类管理"
-        data={categories}
+        data={localCategories}
         columns={columns}
         loading={isLoading}
         onAdd={selectedScenarioId ? handleAdd : undefined}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onReorder={handleReorder}
         addButtonText="创建分类"
       />
     </div>

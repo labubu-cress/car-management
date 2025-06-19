@@ -118,6 +118,9 @@ export const carCategoriesApi = {
 
   delete: (tenantId: string, id: string): Promise<void> =>
     api.delete(`/tenants/${tenantId}/car-categories/${id}`).then(() => undefined),
+
+  reorder: (tenantId: string, vehicleScenarioId: string, categoryIds: string[]): Promise<void> =>
+    api.put(`/tenants/${tenantId}/car-categories/reorder`, { vehicleScenarioId, categoryIds }).then(() => undefined),
 };
 
 // 车型配置管理
