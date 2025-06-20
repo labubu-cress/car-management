@@ -66,4 +66,4 @@ RUN npm exec -w car-management-api -- prisma generate
 EXPOSE 3000
 
 # Define the command to start the application
-CMD ["sh", "-c", "npm run prisma:deploy -w car-management-api && npm start -w car-management-api"] 
+CMD ["sh", "-c", "npm start -w car-management-api"] 
