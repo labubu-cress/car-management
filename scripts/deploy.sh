@@ -1,5 +1,43 @@
 #!/bin/bash
 
+# --- 部署脚本说明 ---
+#
+# 用法:
+#   bash scripts/deploy.sh [environment]
+#
+#   [environment] - 必需参数，指定部署环境。可选值为 `staging` 或 `production`。
+#                   例如: `bash scripts/deploy.sh staging`
+#
+# 脚本功能:
+#   1. 环境检查: 检查是否提供了部署环境参数 (staging/production)。
+#   2. 配置文件检查: 检查本地是否存在对应环境的 `.env` 文件 (e.g., `packages/car-management-api/.env.staging`)。
+#   3. 环境变量加载: 从项目根目录的 `.env` 文件加载 `VPC_IMAGE_REGISTRY` 和 `IMAGE_NAME`。
+#   4. 远程配置文件同步:
+#      - 检查远程服务器上是否存在对应的 `.env` 文件。
+#      - 如果远程文件不存在，则上传本地的 `.env` 文件。
+#      - 如果远程文件存在，则比较本地和远程文件的 checksum。如果 checksum不匹配，脚本会中止并提示用户手动同步，防止配置错误。
+#   5. Docker 镜像部署:
+#      - 根据环境确定 Docker 镜像的 tag (`latest` for staging, version from `package.json` for production)。
+#      - SSH 连接到远程主机 (`aliyun-car`)。
+#      - 拉取最新的 Docker 镜像。
+#      - 停止并删除同名的旧容器。
+#      - 使用新的镜像和远程的 `.env` 文件启动新容器。
+#      - 清理无用的旧 Docker 镜像。
+#
+# 副作用 (Side Effects):
+#   - 会在远程服务器上创建目录 (`/apps/car-management`)。
+#   - 会上传或覆盖远程服务器上的 `.env.[environment]` 文件。
+#   - 会停止并删除名为 `car-management` 的 Docker 容器。
+#   - 会从远程 Docker 仓库拉取镜像，可能会产生网络流量费用。
+#   - 会删除远程服务器上未被任何容器使用的 Docker 镜像。
+#
+# 风险 (Risks):
+#   - **配置覆盖**: 如果远程 `.env` 文件有未同步到本地的重要修改，直接运行此脚本（在远程文件不存在的情况下）会导致这些修改被本地文件覆盖。
+#   - **服务中断**: 部署过程中，从停止旧容器到启动新容器会有短暂的服务中断。
+#   - **部署失败**: 如果新镜像有问题（例如，无法启动或运行出错），服务将保持中断状态，需要手动干预恢复。
+#   - **环境错误**: 错误地将 staging 环境部署到 production 主机（或反之）可能导致数据错误或服务不可用。请确保脚本中的 `REMOTE_HOST` 等配置正确无误。
+#   - **依赖根 .env 文件**: 脚本依赖项目根目录下的 `.env` 文件来获取镜像仓库信息。如果该文件缺失或配置错误，部署会失败。
+
 # 如果任何命令失败，立即退出脚本
 set -e
 
@@ -23,7 +61,7 @@ if [ ! -f "$LOCAL_ENV_FILE" ]; then
   exit 1
 fi
 
-# --- 加载根目录的 .env 文件以获取 IMAGE_REGISTRY 和 IMAGE_NAME ---
+# --- 加载根目录的 .env 文件以获取 VPC_IMAGE_REGISTRY 和 IMAGE_NAME ---
 # 确保此脚本与 package.json 中的脚本具有相同的环境变量
 if [ ! -f ".env" ]; then
     echo "错误: 根目录下的 .env 文件不存在。"
@@ -36,9 +74,9 @@ echo "正在检查远程环境文件..."
 LOCAL_CHECKSUM=$(shasum -a 256 "$LOCAL_ENV_FILE" | awk '{print $1}')
 
 REMOTE_CHECKSUM=$(ssh "$REMOTE_HOST" "
-  mkdir -p $REMOTE_APP_DIR && \
-  if [ -f \"$REMOTE_ENV_FILE_PATH\" ]; then
-    shasum -a 256 \"$REMOTE_ENV_FILE_PATH\" | awk '{print \\\$1}'
+  mkdir -p $REMOTE_APP_DIR && \\
+  if [ -f \\"$REMOTE_ENV_FILE_PATH\\" ]; then
+    sha256sum \\"$REMOTE_ENV_FILE_PATH\\" | awk '{print \\\$1}'
   else
     echo 'NOT_FOUND'
   fi
@@ -65,8 +103,8 @@ fi
 echo "正在部署环境 '${ENV}' 到主机 '${REMOTE_HOST}'..."
 
 # 从根 .env 文件加载镜像名称
-if [ -z "$IMAGE_REGISTRY" ] || [ -z "$IMAGE_NAME" ]; then
-  echo "错误: 根目录的 .env 文件中未设置 IMAGE_REGISTRY 和/或 IMAGE_NAME。"
+if [ -z "$VPC_IMAGE_REGISTRY" ] || [ -z "$IMAGE_NAME" ]; then
+  echo "错误: 根目录的 .env 文件中未设置 VPC_IMAGE_REGISTRY 和/或 IMAGE_NAME。"
   exit 1
 fi
 
@@ -81,14 +119,14 @@ if [ "$ENV" == "production" ]; then
   IMAGE_TAG="$VERSION"
 fi
 
-FULL_IMAGE_NAME="${IMAGE_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
+FULL_IMAGE_NAME="${VPC_IMAGE_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
 
 echo "使用镜像: $FULL_IMAGE_NAME"
 
 ssh "$REMOTE_HOST" "
   set -e
   echo '正在拉取最新镜像...'
-  docker pull \$FULL_IMAGE_NAME
+  docker pull $FULL_IMAGE_NAME
 
   echo '正在停止并删除旧容器...'
   (docker stop $CONTAINER_NAME || true) && (docker rm $CONTAINER_NAME || true)
@@ -99,7 +137,7 @@ ssh "$REMOTE_HOST" "
     --name $CONTAINER_NAME \\
     -p 3000:3000 \\
     --env-file $REMOTE_ENV_FILE_PATH \\
-    \$FULL_IMAGE_NAME
+    $FULL_IMAGE_NAME
 
   echo '正在清理旧镜像...'
   docker image prune -f
