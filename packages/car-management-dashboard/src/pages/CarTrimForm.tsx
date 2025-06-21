@@ -189,7 +189,7 @@ export const CarTrimForm: React.FC = () => {
             onClick={() => navigate('/car-categories')}
             className={carTrimFormStyles.createCategoryButton}
           >
-            去创建分类
+            去创建车型
           </button>
         </div>
       </div>
@@ -209,7 +209,7 @@ export const CarTrimForm: React.FC = () => {
           {isEdit ? '编辑车型参数' : '创建车型参数'}
         </h1>
         <button onClick={handleBack} className={carTrimFormStyles.backButton}>
-          返回列表
+          返回参数列表
         </button>
       </div>
 

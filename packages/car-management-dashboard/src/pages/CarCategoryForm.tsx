@@ -70,7 +70,7 @@ export const CarCategoryForm: React.FC = () => {
         }
       },
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || '获取分类详情失败');
+        toast.error(error.response?.data?.message || '获取车型详情失败');
         navigate('/car-categories');
       },
     }
@@ -113,11 +113,11 @@ export const CarCategoryForm: React.FC = () => {
     const newErrors: Record<string, string> = {};
     
     if (!formData.name.trim()) {
-      newErrors.name = '请输入分类名称';
+      newErrors.name = '请输入车型名称';
     }
     
     if (!formData.image.trim()) {
-      newErrors.image = '请上传分类图片';
+      newErrors.image = '请上传车型图片';
     }
 
     if (!formData.vehicleScenarioId) {
@@ -183,7 +183,7 @@ export const CarCategoryForm: React.FC = () => {
             onClick={() => navigate('/vehicle-scenarios')}
             className={carCategoryFormStyles.createButton}
           >
-            去创建分类
+            去创建车辆分类
           </button>
         </div>
       </div>
@@ -203,7 +203,7 @@ export const CarCategoryForm: React.FC = () => {
           {isEdit ? '编辑车型' : '创建车型'}
         </h1>
         <button onClick={handleBack} className={carCategoryFormStyles.backButton}>
-          返回列表
+          返回车型列表
         </button>
       </div>
 
@@ -226,17 +226,17 @@ export const CarCategoryForm: React.FC = () => {
             </select>
           </FormField>
           
-          <FormField label="分类名称" required error={errors.name}>
+          <FormField label="车型名称" required error={errors.name}>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className={formFieldStyles.input}
-              placeholder="请输入分类名称"
+              placeholder="请输入车型名称"
             />
           </FormField>
 
-          <FormField label="分类图片" required error={errors.image}>
+          <FormField label="车型图片" required error={errors.image}>
             <ImageUpload
               value={formData.image}
               onChange={(url) => setFormData({ ...formData, image: url })}

@@ -182,7 +182,7 @@ export const CarTrims: React.FC = () => {
           }}
           disabled={categories.length <= 1}
         >
-          {categories.length > 1 && <option value="">请选择分类</option>}
+          {categories.length > 1 && <option value="">请选择车型</option>}
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
               {category.name}

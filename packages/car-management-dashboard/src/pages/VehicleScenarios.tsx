@@ -94,12 +94,12 @@ export const VehicleScenarios: React.FC = () => {
       title: '图片',
       width: '100px',
       render: (value: string) => (
-        <img src={value} alt="场景图片" className={styles.scenarioImage} />
+        <img src={value} alt="分类图片" className={styles.scenarioImage} />
       ),
     },
     {
       key: 'name',
-      title: '场景名称',
+      title: '分类名称',
       width: '200px',
     },
     {
@@ -152,17 +152,17 @@ export const VehicleScenarios: React.FC = () => {
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      toast.error('请输入场景名称');
+      toast.error('请输入分类名称');
       return;
     }
 
     if (!formData.description.trim()) {
-      toast.error('请输入场景描述');
+      toast.error('请输入分类描述');
       return;
     }
 
     if (!formData.image.trim()) {
-      toast.error('请上传场景图片');
+      toast.error('请上传分类图片');
       return;
     }
 
@@ -209,7 +209,7 @@ export const VehicleScenarios: React.FC = () => {
         onAdd={handleAdd}
         onEdit={handleEdit}
         onDelete={handleDelete}
-        addButtonText="添加场景"
+        addButtonText="添加分类"
       />
 
       <Modal
@@ -240,34 +240,34 @@ export const VehicleScenarios: React.FC = () => {
       >
         <form id="scenario-form" onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.formGroup}>
-            <label className={styles.label}>场景名称 *</label>
+            <label className={styles.label}>分类名称 *</label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
               className={styles.input}
-              placeholder="请输入场景名称"
+              placeholder="请输入分类名称"
               disabled={isSubmitting}
             />
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>描述 *</label>
+            <label className={styles.label}>分类描述 *</label>
             <textarea
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
               className={styles.textarea}
-              placeholder="请输入场景描述"
+              placeholder="请输入分类描述"
               disabled={isSubmitting}
               rows={4}
             />
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>场景图片 *</label>
+            <label className={styles.label}>分类图片 *</label>
             <ImageUpload
               value={formData.image}
-              onChange={(url) => handleInputChange('image', url)}
+              onChange={(url: string) => handleInputChange('image', url)}
               tenantId={currentTenant.id}
             />
           </div>

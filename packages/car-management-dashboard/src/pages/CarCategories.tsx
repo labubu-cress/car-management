@@ -59,11 +59,11 @@ export const CarCategories: React.FC = () => {
     },
     {
       onSuccess: () => {
-        toast.success('分类顺序更新成功');
+        toast.success('车型顺序更新成功');
         queryClient.invalidateQueries(['car-categories', currentTenant?.id, selectedScenarioId]);
       },
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || '更新分类顺序失败');
+        toast.error(error.response?.data?.message || '更新车型顺序失败');
         // Revert local state on error
         setLocalCategories(categories);
       },
@@ -91,12 +91,12 @@ export const CarCategories: React.FC = () => {
       title: '图片',
       width: '100px',
       render: (value: string) => (
-        <img src={value} alt="分类图片" style={{ width: '60px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
+        <img src={value} alt="车型图片" style={{ width: '60px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
       ),
     },
     {
       key: 'name',
-      title: '分类名称',
+      title: '车型名称',
       width: '200px',
     },
     {
@@ -189,7 +189,7 @@ export const CarCategories: React.FC = () => {
         onEdit={handleEdit}
         onDelete={handleDelete}
         onReorder={handleReorder}
-        addButtonText="创建分类"
+        addButtonText="创建车型"
       />
     </div>
   );
