@@ -32,11 +32,10 @@ adminApi.onError((err, c) => {
 const superAdminProtected = new Hono<AdminAuthEnv>();
 superAdminProtected.use("*", superAdminMiddleware);
 
-superAdminProtected.route("/tenants", tenantsRoutes);
-
 const authProtected = new Hono<AdminAuthEnv>();
 authProtected.use("*", authMiddleware);
 
+authProtected.route("/tenants", tenantsRoutes);
 authProtected.route("/admin-users", adminUsersRoutes);
 
 const tenantSpecificRoutes = new Hono<AdminAuthTenantEnv>();
