@@ -20,9 +20,9 @@ export const Dashboard: React.FC = () => {
   const stats = [
     { title: '当前租户', value: currentTenant?.name || '-', icon: faBuilding, color: '#1890ff' },
     { title: '用户总数', value: statsData?.usersCount ?? '0', icon: faUsers, color: '#52c41a' },
-    { title: '车辆场景', value: statsData?.vehicleScenariosCount ?? '0', icon: faCubes, color: '#13c2c2' },
-    { title: '车辆分类', value: statsData?.carCategoriesCount ?? '0', icon: faLayerGroup, color: '#faad14' },
-    { title: '车型配置', value: statsData?.carTrimsCount ?? '0', icon: faCar, color: '#722ed1' },
+    { title: '车辆分类', value: statsData?.vehicleScenariosCount ?? '0', icon: faCubes, color: '#13c2c2' },
+    { title: '车型', value: statsData?.carCategoriesCount ?? '0', icon: faLayerGroup, color: '#faad14' },
+    { title: '车型参数', value: statsData?.carTrimsCount ?? '0', icon: faCar, color: '#722ed1' },
   ];
 
   return (
@@ -55,16 +55,16 @@ export const Dashboard: React.FC = () => {
               <p>创建和管理不同的租户，每个租户都有独立的数据空间</p>
             </div>
             <div className={styles.quickAction}>
-              <h3>2. 配置车辆场景</h3>
-              <p>设置不同的车辆使用场景，如商务、家用、越野等</p>
+              <h3>2. 配置车辆分类</h3>
+              <p>创建各种车辆分类，定义您的服务范围</p>
             </div>
             <div className={styles.quickAction}>
-              <h3>3. 添加车辆分类</h3>
-              <p>创建车辆分类，包括图片、标签和亮点信息</p>
+              <h3>3. 添加车型</h3>
+              <p>创建车型，包括图片、标签和亮点信息</p>
             </div>
             <div className={styles.quickAction}>
-              <h3>4. 配置车型</h3>
-              <p>为每个分类添加具体的车型配置和价格信息</p>
+              <h3>4. 配置车型参数</h3>
+              <p>为每个车型添加具体的车型参数和价格信息</p>
             </div>
           </div>
         </div>

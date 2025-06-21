@@ -38,7 +38,7 @@ export const CarTrims: React.FC = () => {
     {
       enabled: !!currentTenant && !!selectedCategoryId,
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || '获取车型配置列表失败');
+        toast.error(error.response?.data?.message || '获取车型参数列表失败');
       },
       onSuccess: (data) => {
         setLocalTrims(data);
@@ -59,28 +59,28 @@ export const CarTrims: React.FC = () => {
     },
     {
       onSuccess: () => {
-        toast.success('车型顺序更新成功');
+        toast.success('车型参数顺序更新成功');
         queryClient.invalidateQueries(['car-trims', currentTenant?.id, selectedCategoryId]);
       },
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || '更新车型顺序失败');
+        toast.error(error.response?.data?.message || '更新车型参数顺序失败');
         // Revert local state on error
         setLocalTrims(trims);
       },
     },
   );
 
-  // 删除车型
+  // 删除车型参数
   const deleteMutation = useMutation(
     (id: string) => carTrimsApi.delete(currentTenant!.id, id),
     {
       onSuccess: () => {
-        toast.success('车型配置删除成功');
+        toast.success('车型参数删除成功');
         queryClient.invalidateQueries(['car-trims', currentTenant?.id, selectedCategoryId]);
         queryClient.invalidateQueries(['dashboard-stats', currentTenant?.id]);
       },
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || '删除车型配置失败');
+        toast.error(error.response?.data?.message || '删除车型参数失败');
       },
     }
   );
@@ -91,12 +91,12 @@ export const CarTrims: React.FC = () => {
       title: '图片',
       width: '100px',
       render: (value: string) => (
-        <img src={value} alt="车型图片" style={{ width: '60px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
+        <img src={value} alt="车型参数图片" style={{ width: '60px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
       ),
     },
     {
       key: 'name',
-      title: '车型名称',
+      title: '车型参数名称',
       width: '200px',
     },
     {
@@ -139,7 +139,7 @@ export const CarTrims: React.FC = () => {
   };
 
   const handleDelete = (trim: CarTrim) => {
-    if (window.confirm(`确定要删除车型配置 "${trim.name}" 吗？`)) {
+    if (window.confirm(`确定要删除车型参数 "${trim.name}" 吗？`)) {
       deleteMutation.mutate(trim.id);
     }
   };
@@ -153,9 +153,9 @@ export const CarTrims: React.FC = () => {
   if (categories.length === 0) {
     return (
       <EmptyState
-        title="还没有车辆分类"
-        description="创建车型配置前，需要先创建车辆分类。车型配置必须归属于某个分类。"
-        actionLabel="创建车辆分类"
+        title="还没有车型"
+        description="创建车型参数前，需要先创建车型。车型参数必须归属于某个车型。"
+        actionLabel="创建车型"
         onAction={() => navigate('/car-categories')}
         icon={<FontAwesomeIcon icon={faCar} />}
       />
@@ -167,7 +167,7 @@ export const CarTrims: React.FC = () => {
       {/* 分类选择器 */}
       <div style={{ marginBottom: '20px', padding: '16px', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
         <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151' }}>
-          选择车辆分类：
+          选择车型：
         </label>
         <select
           value={selectedCategoryId}
@@ -192,7 +192,7 @@ export const CarTrims: React.FC = () => {
       </div>
 
       <DataTable
-        title="车型配置管理"
+        title="车型参数管理"
         data={localTrims}
         columns={columns}
         loading={isLoading}
@@ -200,7 +200,7 @@ export const CarTrims: React.FC = () => {
         onEdit={handleEdit}
         onDelete={handleDelete}
         onReorder={handleReorder}
-        addButtonText="创建车型"
+        addButtonText="创建车型参数"
       />
     </div>
   );

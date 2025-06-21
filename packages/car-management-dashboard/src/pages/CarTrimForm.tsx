@@ -45,7 +45,7 @@ export const CarTrimForm: React.FC = () => {
     }
   );
 
-  // 获取车型详情（编辑模式）
+  // 获取车型参数详情（编辑模式）
   const { isLoading } = useQuery(
     ['car-trim', currentTenant?.id, id],
     () => currentTenant && id ? carTrimsApi.getById(currentTenant.id, id) : null,
@@ -66,41 +66,41 @@ export const CarTrimForm: React.FC = () => {
         }
       },
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || '获取车型详情失败');
+        toast.error(error.response?.data?.message || '获取车型参数详情失败');
         navigate('/car-trims');
       },
     }
   );
 
-  // 创建车型
+  // 创建车型参数
   const createMutation = useMutation(
     (data: CreateCarTrimInput) => carTrimsApi.create(currentTenant!.id, data),
     {
       onSuccess: () => {
-        toast.success('车型配置创建成功');
+        toast.success('车型参数创建成功');
         queryClient.invalidateQueries(['car-trims']);
         queryClient.invalidateQueries(['dashboard-stats', currentTenant?.id]);
         navigate('/car-trims');
       },
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || '创建车型配置失败');
+        toast.error(error.response?.data?.message || '创建车型参数失败');
       },
     }
   );
 
-  // 更新车型
+  // 更新车型参数
   const updateMutation = useMutation(
     ({ id, data }: { id: string; data: UpdateCarTrimInput }) =>
       carTrimsApi.update(currentTenant!.id, id, data),
     {
       onSuccess: () => {
-        toast.success('车型配置更新成功');
+        toast.success('车型参数更新成功');
         queryClient.invalidateQueries(['car-trims']);
         queryClient.invalidateQueries(['dashboard-stats', currentTenant?.id]);
         navigate('/car-trims');
       },
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || '更新车型配置失败');
+        toast.error(error.response?.data?.message || '更新车型参数失败');
       },
     }
   );
@@ -109,7 +109,7 @@ export const CarTrimForm: React.FC = () => {
     const newErrors: Record<string, string> = {};
     
     if (!formData.name.trim()) {
-      newErrors.name = '请输入车型名称';
+      newErrors.name = '请输入车型参数名称';
     }
     
     if (!formData.subtitle.trim()) {
@@ -117,7 +117,7 @@ export const CarTrimForm: React.FC = () => {
     }
     
     if (!formData.image.trim()) {
-      newErrors.image = '请上传车型图片';
+      newErrors.image = '请上传车型参数图片';
     }
     
     if (!formData.originalPrice.trim()) {
@@ -129,7 +129,7 @@ export const CarTrimForm: React.FC = () => {
     }
     
     if (!formData.categoryId) {
-      newErrors.categoryId = '请选择车辆分类';
+      newErrors.categoryId = '请选择车型';
     }
 
     setErrors(newErrors);
@@ -183,8 +183,8 @@ export const CarTrimForm: React.FC = () => {
     return (
       <div className={carTrimFormStyles.container}>
         <div className={carTrimFormStyles.emptyState}>
-          <h2>还没有车辆分类</h2>
-          <p>创建车型配置前，请先创建车辆分类</p>
+          <h2>还没有车型</h2>
+          <p>创建车型参数前，请先创建车型</p>
           <button 
             onClick={() => navigate('/car-categories')}
             className={carTrimFormStyles.createCategoryButton}
@@ -206,7 +206,7 @@ export const CarTrimForm: React.FC = () => {
     <div className={carTrimFormStyles.container}>
       <div className={carTrimFormStyles.header}>
         <h1 className={carTrimFormStyles.title}>
-          {isEdit ? '编辑车型配置' : '创建车型配置'}
+          {isEdit ? '编辑车型参数' : '创建车型参数'}
         </h1>
         <button onClick={handleBack} className={carTrimFormStyles.backButton}>
           返回列表
@@ -217,13 +217,13 @@ export const CarTrimForm: React.FC = () => {
         <div className={carTrimFormStyles.section}>
           <h2 className={carTrimFormStyles.sectionTitle}>基本信息</h2>
           
-          <FormField label="车型名称" required error={errors.name}>
+          <FormField label="车型参数名称" required error={errors.name}>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className={formFieldStyles.input}
-              placeholder="请输入车型名称"
+              placeholder="请输入车型参数名称"
             />
           </FormField>
 
@@ -237,7 +237,7 @@ export const CarTrimForm: React.FC = () => {
             />
           </FormField>
 
-          <FormField label="车型图片" required error={errors.image}>
+          <FormField label="车型参数图片" required error={errors.image}>
             <ImageUpload
               value={formData.image}
               onChange={(url) => setFormData({ ...formData, image: url })}
@@ -245,14 +245,14 @@ export const CarTrimForm: React.FC = () => {
             />
           </FormField>
 
-          <FormField label="所属分类" required error={errors.categoryId}>
+          <FormField label="所属车型" required error={errors.categoryId}>
             <select
               value={formData.categoryId}
               onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
               className={formFieldStyles.select}
               disabled={categories.length <= 1}
             >
-              {categories.length > 1 && <option value="">请选择分类</option>}
+              {categories.length > 1 && <option value="">请选择车型</option>}
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
@@ -297,7 +297,7 @@ export const CarTrimForm: React.FC = () => {
         </div>
 
         <div className={carTrimFormStyles.section}>
-          <h2 className={carTrimFormStyles.sectionTitle}>车型特色</h2>
+          <h2 className={carTrimFormStyles.sectionTitle}>车型参数特色</h2>
           <FormField label="特色功能">
             <HighlightInput
               value={formData.features}

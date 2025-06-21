@@ -80,6 +80,7 @@ model VehicleScenario {
   @@index([tenantId])
 }
 
+// car model
 model CarCategory {
   id              String   @id @default(cuid())
   tenantId        String

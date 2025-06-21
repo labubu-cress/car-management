@@ -25,9 +25,9 @@ const menuItems: MenuItem[] = [
   { path: '/dashboard', label: '仪表盘', icon: faTachometerAlt },
   { path: '/tenants', label: '租户管理', icon: faBuilding },
   { path: '/admin-users', label: '管理员', icon: faUserShield },
-  { path: '/vehicle-scenarios', label: '车辆场景', icon: faImage },
-  { path: '/car-categories', label: '车辆分类', icon: faLayerGroup },
-  { path: '/car-trims', label: '车型配置', icon: faCogs },
+  { path: '/vehicle-scenarios', label: '分类管理', icon: faImage },
+  { path: '/car-categories', label: '车型管理', icon: faLayerGroup },
+  { path: '/car-trims', label: '参数管理', icon: faCogs },
   { path: '/users', label: '用户管理', icon: faUsers },
   { path: '/homepage-config', label: '首页配置', icon: faWrench },
 ];

@@ -38,7 +38,7 @@ export const CarCategories: React.FC = () => {
     {
       enabled: !!currentTenant && !!selectedScenarioId,
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || '获取车辆分类列表失败');
+        toast.error(error.response?.data?.message || '获取车型列表失败');
       },
       onSuccess: (data) => {
         setLocalCategories(data);
@@ -75,12 +75,12 @@ export const CarCategories: React.FC = () => {
     (id: string) => carCategoriesApi.delete(currentTenant!.id, id),
     {
       onSuccess: () => {
-        toast.success('车辆分类删除成功');
+        toast.success('车型删除成功');
         queryClient.invalidateQueries(['car-categories', currentTenant?.id, selectedScenarioId]);
         queryClient.invalidateQueries(['dashboard-stats', currentTenant?.id]);
       },
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || '删除车辆分类失败');
+        toast.error(error.response?.data?.message || '删除车型失败');
       },
     }
   );
@@ -101,7 +101,7 @@ export const CarCategories: React.FC = () => {
     },
     {
       key: 'vehicleScenario.name',
-      title: '所属场景',
+      title: '所属分类',
       width: '150px',
     },
     {
@@ -131,7 +131,7 @@ export const CarCategories: React.FC = () => {
   };
 
   const handleDelete = (category: CarCategory) => {
-    if (window.confirm(`确定要删除车辆分类 "${category.name}" 吗？`)) {
+    if (window.confirm(`确定要删除车型 "${category.name}" 吗？`)) {
       deleteMutation.mutate(category.id);
     }
   };
@@ -144,9 +144,9 @@ export const CarCategories: React.FC = () => {
   if (scenarios.length === 0) {
     return (
       <EmptyState
-        title="还没有车辆场景"
-        description="创建车辆分类前，需要先创建车辆场景。车辆分类必须归属于某个场景。"
-        actionLabel="创建车辆场景"
+        title="还没有车辆分类"
+        description="创建车型前，需要先创建车辆分类。车型必须归属于某个分类。"
+        actionLabel="创建车辆分类"
         onAction={() => navigate('/vehicle-scenarios')}
         icon={<FontAwesomeIcon icon={faStream} />}
       />
@@ -157,7 +157,7 @@ export const CarCategories: React.FC = () => {
     <div>
       <div style={{ marginBottom: '20px', padding: '16px', backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
         <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151' }}>
-          选择车辆场景：
+          选择车辆分类：
         </label>
         <select
           value={selectedScenarioId}
@@ -172,7 +172,7 @@ export const CarCategories: React.FC = () => {
           }}
           disabled={scenarios.length <= 1}
         >
-          {scenarios.length > 1 && <option value="">请选择场景</option>}
+          {scenarios.length > 1 && <option value="">请选择分类</option>}
           {scenarios.map((scenario) => (
             <option key={scenario.id} value={scenario.id}>
               {scenario.name}
@@ -181,7 +181,7 @@ export const CarCategories: React.FC = () => {
         </select>
       </div>
       <DataTable
-        title="车辆分类管理"
+        title="车型管理"
         data={localCategories}
         columns={columns}
         loading={isLoading}

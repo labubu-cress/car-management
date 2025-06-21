@@ -81,13 +81,13 @@ export const CarCategoryForm: React.FC = () => {
     (data: CreateCarCategoryInput) => carCategoriesApi.create(currentTenant!.id, data),
     {
       onSuccess: () => {
-        toast.success('车辆分类创建成功');
+        toast.success('车型创建成功');
         queryClient.invalidateQueries(['car-categories', currentTenant?.id]);
         queryClient.invalidateQueries(['dashboard-stats', currentTenant?.id]);
         navigate('/car-categories');
       },
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || '创建车辆分类失败');
+        toast.error(error.response?.data?.message || '创建车型失败');
       },
     }
   );
@@ -98,13 +98,13 @@ export const CarCategoryForm: React.FC = () => {
       carCategoriesApi.update(currentTenant!.id, id, data),
     {
       onSuccess: () => {
-        toast.success('车辆分类更新成功');
+        toast.success('车型更新成功');
         queryClient.invalidateQueries(['car-categories', currentTenant?.id]);
         queryClient.invalidateQueries(['dashboard-stats', currentTenant?.id]);
         navigate('/car-categories');
       },
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || '更新车辆分类失败');
+        toast.error(error.response?.data?.message || '更新车型失败');
       },
     }
   );
@@ -121,7 +121,7 @@ export const CarCategoryForm: React.FC = () => {
     }
 
     if (!formData.vehicleScenarioId) {
-      newErrors.vehicleScenarioId = '请选择所属场景';
+      newErrors.vehicleScenarioId = '请选择所属分类';
     }
 
     setErrors(newErrors);
@@ -177,13 +177,13 @@ export const CarCategoryForm: React.FC = () => {
     return (
       <div className={carCategoryFormStyles.container}>
         <div className={carCategoryFormStyles.emptyState}>
-          <h2>还没有车辆场景</h2>
-          <p>创建车辆分类前，请先创建车辆场景</p>
+          <h2>还没有车辆分类</h2>
+          <p>创建车型前，请先创建车辆分类</p>
           <button
             onClick={() => navigate('/vehicle-scenarios')}
             className={carCategoryFormStyles.createButton}
           >
-            去创建场景
+            去创建分类
           </button>
         </div>
       </div>
@@ -200,7 +200,7 @@ export const CarCategoryForm: React.FC = () => {
     <div className={carCategoryFormStyles.container}>
       <div className={carCategoryFormStyles.header}>
         <h1 className={carCategoryFormStyles.title}>
-          {isEdit ? '编辑车辆分类' : '创建车辆分类'}
+          {isEdit ? '编辑车型' : '创建车型'}
         </h1>
         <button onClick={handleBack} className={carCategoryFormStyles.backButton}>
           返回列表
@@ -211,13 +211,13 @@ export const CarCategoryForm: React.FC = () => {
         <div className={carCategoryFormStyles.section}>
           <h2 className={carCategoryFormStyles.sectionTitle}>基本信息</h2>
           
-          <FormField label="所属场景" required error={errors.vehicleScenarioId}>
+          <FormField label="所属分类" required error={errors.vehicleScenarioId}>
             <select
               value={formData.vehicleScenarioId}
               onChange={(e) => setFormData({ ...formData, vehicleScenarioId: e.target.value })}
               className={formFieldStyles.select}
             >
-              <option value="" disabled>请选择车辆场景</option>
+              <option value="" disabled>请选择车辆分类</option>
               {scenarios.map(scenario => (
                 <option key={scenario.id} value={scenario.id}>
                   {scenario.name}

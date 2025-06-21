@@ -29,61 +29,61 @@ export const VehicleScenarios: React.FC = () => {
   const { currentTenant } = useAuth();
   const queryClient = useQueryClient();
 
-  // 获取车辆场景列表
+  // 获取车辆分类列表
   const { data: scenarios = [], isLoading } = useQuery(
     ['vehicle-scenarios', currentTenant?.id],
     () => currentTenant ? vehicleScenariosApi.getAll(currentTenant.id) : Promise.resolve([]),
     {
       enabled: !!currentTenant,
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || '获取车辆场景列表失败');
+        toast.error(error.response?.data?.message || '获取车辆分类列表失败');
       },
     }
   );
 
-  // 创建车辆场景
+  // 创建车辆分类
   const createMutation = useMutation(
     (data: CreateVehicleScenarioInput) => 
       currentTenant ? vehicleScenariosApi.create(currentTenant.id, data) : Promise.reject('No tenant'),
     {
       onSuccess: () => {
-        toast.success('车辆场景创建成功');
+        toast.success('车辆分类创建成功');
         queryClient.invalidateQueries(['vehicle-scenarios', currentTenant?.id]);
         handleCloseModal();
       },
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || '创建车辆场景失败');
+        toast.error(error.response?.data?.message || '创建车辆分类失败');
       },
     }
   );
 
-  // 更新车辆场景
+  // 更新车辆分类
   const updateMutation = useMutation(
     ({ id, data }: { id: string; data: UpdateVehicleScenarioInput }) =>
       currentTenant ? vehicleScenariosApi.update(currentTenant.id, id, data) : Promise.reject('No tenant'),
     {
       onSuccess: () => {
-        toast.success('车辆场景更新成功');
+        toast.success('车辆分类更新成功');
         queryClient.invalidateQueries(['vehicle-scenarios', currentTenant?.id]);
         handleCloseModal();
       },
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || '更新车辆场景失败');
+        toast.error(error.response?.data?.message || '更新车辆分类失败');
       },
     }
   );
 
-  // 删除车辆场景
+  // 删除车辆分类
   const deleteMutation = useMutation(
     (id: string) => 
       currentTenant ? vehicleScenariosApi.delete(currentTenant.id, id) : Promise.reject('No tenant'),
     {
       onSuccess: () => {
-        toast.success('车辆场景删除成功');
+        toast.success('车辆分类删除成功');
         queryClient.invalidateQueries(['vehicle-scenarios', currentTenant?.id]);
       },
       onError: (error: any) => {
-        toast.error(error.response?.data?.message || '删除车辆场景失败');
+        toast.error(error.response?.data?.message || '删除车辆分类失败');
       },
     }
   );
@@ -138,7 +138,7 @@ export const VehicleScenarios: React.FC = () => {
   };
 
   const handleDelete = (scenario: VehicleScenario) => {
-    if (window.confirm(`确定要删除车辆场景 "${scenario.name}" 吗？`)) {
+    if (window.confirm(`确定要删除车辆分类 "${scenario.name}" 吗？`)) {
       deleteMutation.mutate(scenario.id);
     }
   };
@@ -193,7 +193,7 @@ export const VehicleScenarios: React.FC = () => {
       <div className={styles.container}>
         <div className={styles.noTenant}>
           <h2>请选择租户</h2>
-          <p>请先选择一个租户来管理车辆场景</p>
+          <p>请先选择一个租户来管理车辆分类</p>
         </div>
       </div>
     );
@@ -202,7 +202,7 @@ export const VehicleScenarios: React.FC = () => {
   return (
     <div className={styles.container}>
       <DataTable
-        title="车辆场景管理"
+        title="车辆分类管理"
         columns={columns}
         data={scenarios}
         loading={isLoading}
@@ -215,7 +215,7 @@ export const VehicleScenarios: React.FC = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        title={editingScenario ? '编辑车辆场景' : '添加车辆场景'}
+        title={editingScenario ? '编辑车辆分类' : '添加车辆分类'}
         footer={
           <div className={styles.modalFooter}>
             <button
