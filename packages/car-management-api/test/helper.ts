@@ -1,11 +1,13 @@
 import { login } from "@/api/admin/features/auth/service";
+import * as appAuthService from "@/api/app/features/auth/service";
 import { password2hash } from "@/lib/transform";
-import { AdminRole, PrismaClient } from "@prisma/client";
+import { AdminRole, PrismaClient, type User } from "@prisma/client";
 
 export const clearTestDb = async (client: PrismaClient) => {
   await client.contactUsConfig.deleteMany();
   await client.homepageConfig.deleteMany();
   await client.userFavoriteCarTrim.deleteMany();
+  await client.userMessage.deleteMany();
   await client.carTrim.deleteMany();
   await client.carCategory.deleteMany();
   await client.vehicleScenario.deleteMany();
@@ -28,6 +30,27 @@ export type TestTenant = {
   name: string;
   appId: string;
   appSecret: string;
+};
+
+export type TestUser = User;
+
+export const createTestUser = async (client: PrismaClient, tenantId: string) => {
+  const user = await client.user.create({
+    data: {
+      tenantId: tenantId,
+      openId: "test_openid_for_user_message",
+      unionId: "test_unionid_for_user_message",
+      nickname: "Test User for Message",
+      avatarUrl: "",
+      phoneNumber: "",
+    },
+  });
+  return user;
+};
+
+export const getTestAppUserToken = async (user: TestUser) => {
+  const { token } = await appAuthService.generateUserToken(user);
+  return token;
 };
 
 export const createTestAdminUser = async (

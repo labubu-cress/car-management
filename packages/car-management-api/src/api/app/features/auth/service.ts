@@ -5,6 +5,12 @@ import jwt from "jsonwebtoken";
 
 const jwtSecret = process.env.JWT_SECRET || "your-default-secret";
 
+export async function generateUserToken(user: User) {
+  const payload: AppJwtPayload = { id: user.id, tenantId: user.tenantId, openId: user.openId };
+  const token = jwt.sign(payload, jwtSecret, { expiresIn: "30d" });
+  return { token, user };
+}
+
 export const loginOrRegister = async (
   tenantId: string,
   openId: string,
@@ -25,9 +31,7 @@ export const loginOrRegister = async (
     });
   }
 
-  const payload: AppJwtPayload = { id: user.id, tenantId, openId };
-  const token = jwt.sign(payload, jwtSecret, { expiresIn: "30d" });
-  return { token, user };
+  return generateUserToken(user);
 };
 
 export const verifyToken = async (token: string): Promise<User | null> => {
