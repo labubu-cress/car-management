@@ -10,6 +10,7 @@ import faqsRoutes from "./features/faqs";
 import homepageConfigRoutes from "./features/homepage-config";
 import imgRoutes from "./features/img";
 import tenantsRoutes from "./features/tenants";
+import userMessagesRoutes from "./features/user-messages";
 import usersRoutes from "./features/users";
 import vehicleScenariosRoutes from "./features/vehicle-scenarios";
 import type { AdminAuthEnv, AdminAuthTenantEnv } from "./middleware/auth";
@@ -52,6 +53,7 @@ tenantSpecificRoutes.route("/dashboard", dashboardRoutes);
 tenantSpecificRoutes.route("/homepage-config", homepageConfigRoutes);
 tenantSpecificRoutes.route("/contact-us-config", contactUsConfigRoutes);
 tenantSpecificRoutes.route("/faqs", faqsRoutes);
+tenantSpecificRoutes.route("/user-messages", userMessagesRoutes);
 
 // Unprotected auth routes
 adminApi.route("/auth", authRoutes);
