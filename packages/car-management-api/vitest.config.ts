@@ -1,15 +1,11 @@
 import dotenv from "dotenv";
-import path from "path";
+import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
 
 dotenv.config({ path: ".env.test" });
 
 export default defineConfig({
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
+  plugins: [tsconfigPaths()],
   test: {
     // 设置测试环境
     environment: "node",

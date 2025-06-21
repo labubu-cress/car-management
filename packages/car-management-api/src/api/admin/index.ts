@@ -6,6 +6,7 @@ import carCategoriesAdminRoutes from "./features/car-categories";
 import carTrimsAdminRoutes from "./features/car-trims";
 import contactUsConfigRoutes from "./features/contact-us-config";
 import dashboardRoutes from "./features/dashboard";
+import faqsRoutes from "./features/faqs";
 import homepageConfigRoutes from "./features/homepage-config";
 import imgRoutes from "./features/img";
 import tenantsRoutes from "./features/tenants";
@@ -50,6 +51,7 @@ tenantSpecificRoutes.route("/img", imgRoutes);
 tenantSpecificRoutes.route("/dashboard", dashboardRoutes);
 tenantSpecificRoutes.route("/homepage-config", homepageConfigRoutes);
 tenantSpecificRoutes.route("/contact-us-config", contactUsConfigRoutes);
+tenantSpecificRoutes.route("/faqs", faqsRoutes);
 
 // Unprotected auth routes
 adminApi.route("/auth", authRoutes);
