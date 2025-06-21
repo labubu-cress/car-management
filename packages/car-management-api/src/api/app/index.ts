@@ -5,6 +5,7 @@ import authRoutes from "./features/auth";
 import carCategoriesRoutes from "./features/car-categories";
 import carTrimsRoutes from "./features/car-trims";
 import contactUsConfigRoutes from "./features/contact-us-config";
+import faqsRoutes from "./features/faqs";
 import favoritesRoutes from "./features/favorites";
 import homepageConfigRoutes from "./features/homepage-config";
 import usersRoutes from "./features/users";
@@ -43,6 +44,7 @@ tenantApp.route("/car-categories", carCategoriesRoutes);
 tenantApp.route("/car-trims", carTrimsRoutes);
 tenantApp.route("/homepage-config", homepageConfigRoutes);
 tenantApp.route("/contact-us-config", contactUsConfigRoutes);
+tenantApp.route("/faqs", faqsRoutes);
 
 // Routes that require authentication
 const authedApp = new Hono<AppAuthEnv>();

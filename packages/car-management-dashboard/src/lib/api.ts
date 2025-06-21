@@ -190,7 +190,7 @@ export const contactUsConfigApi = {
 // 常见问题管理
 export const faqsApi = {
   getAll: (tenantId: string): Promise<Faq[]> =>
-    api.get(`/tenants/${tenantId}/faqs`).then((res) => res.data.faqs),
+    api.get(`/tenants/${tenantId}/faqs`).then((res) => res.data.items),
 
   create: (tenantId: string, data: CreateFaqInput): Promise<Faq> =>
     api.post(`/tenants/${tenantId}/faqs`, data).then((res) => res.data),
