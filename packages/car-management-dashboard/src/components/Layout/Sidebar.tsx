@@ -1,13 +1,14 @@
+import { useAuth } from '@/contexts/AuthContext';
 import {
-    faBuilding,
-    faCar,
-    faCogs,
-    faImage,
-    faLayerGroup,
-    faTachometerAlt,
-    faUsers,
-    faUserShield,
-    faWrench,
+  faBuilding,
+  faCar,
+  faCogs,
+  faImage,
+  faLayerGroup,
+  faTachometerAlt,
+  faUsers,
+  faUserShield,
+  faWrench,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
@@ -33,6 +34,14 @@ const menuItems: MenuItem[] = [
 
 export const Sidebar: React.FC = () => {
   const location = useLocation();
+  const { user } = useAuth();
+
+  const filteredMenuItems =
+    user?.role === 'admin'
+      ? menuItems.filter(
+          (item) => item.label !== '租户管理' && item.label !== '管理员'
+        )
+      : menuItems;
 
   return (
     <div className={styles.sidebar}>
@@ -42,7 +51,7 @@ export const Sidebar: React.FC = () => {
       </div>
 
       <nav className={styles.nav}>
-        {menuItems.map((item) => (
+        {filteredMenuItems.map((item) => (
           <Link
             key={item.path}
             to={item.path}
