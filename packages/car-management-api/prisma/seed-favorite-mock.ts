@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-async function main() {
+export async function main() {
   console.log(`开始执行收藏夹模拟数据填充脚本...`);
 
   const tenant = await prisma.tenant.upsert({
@@ -156,14 +156,13 @@ export async function seedUserFavoriteCarTrims(prisma: PrismaClient) {
   console.log('Finished seeding user favorite car trims.');
 }
 
-
-main()
-  .then(async () => {
-    await prisma.$disconnect();
-    console.log('收藏夹模拟数据填充脚本执行完毕。');
-  })
-  .catch(async (e) => {
-    console.error('收藏夹模拟数据填充脚本执行失败:', e);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+// main()
+//   .then(async () => {
+//     await prisma.$disconnect();
+//     console.log('收藏夹模拟数据填充脚本执行完毕。');
+//   })
+//   .catch(async (e) => {
+//     console.error('收藏夹模拟数据填充脚本执行失败:', e);
+//     await prisma.$disconnect();
+//     process.exit(1);
+//   });
