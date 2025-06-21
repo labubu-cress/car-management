@@ -275,3 +275,17 @@ export interface UpdateFaqInput {
   question?: string;
   answer?: string;
 }
+
+export interface UserMessage {
+  id: string;
+  name: string;
+  contact: string;
+  content: string;
+  createdAt: string;
+  user: {
+    nickname: string;
+    avatarUrl: string;
+    phoneNumber: string;
+    createdAt: string;
+  };
+}

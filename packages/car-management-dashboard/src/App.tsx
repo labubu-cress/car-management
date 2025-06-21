@@ -12,6 +12,7 @@ import { Faqs } from '@/pages/Faqs';
 import { FirstTenantSetup } from '@/pages/FirstTenantSetup';
 import HomepageConfigPage from '@/pages/HomepageConfig';
 import { Tenants } from '@/pages/Tenants';
+import { UserMessages } from '@/pages/UserMessages';
 import { Users } from '@/pages/Users';
 import { VehicleScenarios } from '@/pages/VehicleScenarios';
 import '@/styles/global.css';
@@ -72,6 +73,7 @@ const AppRoutes: React.FC = () => {
                 <Route path="/homepage-config" element={<HomepageConfigPage />} />
                 <Route path="/contact-us-config" element={<ContactUsConfigPage />} />
                 <Route path="/faqs" element={<Faqs />} />
+                <Route path="/user-messages" element={<UserMessages />} />
               </Routes>
             </Layout>
           </ProtectedRoute>

@@ -26,6 +26,7 @@ import type {
     UpdateVehicleScenarioInput,
     UploadToken,
     User,
+    UserMessage,
     UserWithFavorites,
     VehicleScenario,
 } from "@/types/api";
@@ -200,6 +201,18 @@ export const faqsApi = {
 
   delete: (tenantId: string, id: string): Promise<void> =>
     api.delete(`/tenants/${tenantId}/faqs/${id}`).then(() => undefined),
+};
+
+// 用户留言管理
+export const userMessagesApi = {
+  getAll: (
+    tenantId: string,
+    page: number,
+    pageSize: number,
+  ): Promise<{ messages: UserMessage[]; total: number }> =>
+    api
+      .get(`/tenants/${tenantId}/user-messages`, { params: { page, pageSize } })
+      .then((res) => res.data),
 };
 
 export default api;

@@ -3,6 +3,7 @@ import {
     faBuilding,
     faCar,
     faCogs,
+    faCommentDots,
     faImage,
     faLayerGroup,
     faPhone,
@@ -34,6 +35,7 @@ const menuItems: MenuItem[] = [
   { path: '/homepage-config', label: '首页配置', icon: faWrench },
   { path: '/contact-us-config', label: '联系我们', icon: faPhone },
   { path: '/faqs', label: '常见问题', icon: faQuestionCircle },
+  { path: '/user-messages', label: '用户留言', icon: faCommentDots },
 ];
 
 export const Sidebar: React.FC = () => {
