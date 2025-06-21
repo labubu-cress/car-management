@@ -24,6 +24,18 @@ async function main() {
 
   console.log(`超级管理员 ${superAdmin.username} 已成功创建或确认存在。`);
   
+  const adminUsername = 'admin';
+  const admin = await prisma.adminUser.upsert({
+    where: { username: adminUsername },
+    update: {},
+    create: {
+      username: adminUsername,
+      passwordHash: password2hash('123456'),
+      role: 'admin',
+    },
+  });
+  console.log(`管理员 ${admin.username} 已成功创建或确认存在。`);
+
   // 你还可以在这里创建默认的租户或其他初始数据
   // 例如:
 //   const defaultTenant = await prisma.tenant.upsert({
