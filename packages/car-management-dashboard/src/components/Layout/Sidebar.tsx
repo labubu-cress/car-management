@@ -1,14 +1,15 @@
 import { useAuth } from '@/contexts/AuthContext';
 import {
-  faBuilding,
-  faCar,
-  faCogs,
-  faImage,
-  faLayerGroup,
-  faTachometerAlt,
-  faUsers,
-  faUserShield,
-  faWrench,
+    faBuilding,
+    faCar,
+    faCogs,
+    faImage,
+    faLayerGroup,
+    faPhone,
+    faTachometerAlt,
+    faUsers,
+    faUserShield,
+    faWrench,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
@@ -30,6 +31,7 @@ const menuItems: MenuItem[] = [
   { path: '/car-trims', label: '参数管理', icon: faCogs },
   { path: '/users', label: '用户管理', icon: faUsers },
   { path: '/homepage-config', label: '首页配置', icon: faWrench },
+  { path: '/contact-us-config', label: '联系我们', icon: faPhone },
 ];
 
 export const Sidebar: React.FC = () => {

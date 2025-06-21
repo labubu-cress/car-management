@@ -3,6 +3,7 @@ import type {
     CarCategory,
     CarTrim,
     CarTrimWithFavorites,
+    ContactUsConfig,
     CreateAdminUserInput,
     CreateCarCategoryInput,
     CreateCarTrimInput,
@@ -16,6 +17,7 @@ import type {
     UpdateAdminUserInput,
     UpdateCarCategoryInput,
     UpdateCarTrimInput,
+    UpdateContactUsConfigInput,
     UpdateHomepageConfigInput,
     UpdateTenantInput,
     UpdateVehicleScenarioInput,
@@ -173,6 +175,13 @@ export const homepageConfigApi = {
     api.get(`/tenants/${tenantId}/homepage-config`).then((res) => res.data),
   update: (tenantId: string, data: UpdateHomepageConfigInput): Promise<HomepageConfig> =>
     api.put(`/tenants/${tenantId}/homepage-config`, data).then((res) => res.data),
+};
+
+export const contactUsConfigApi = {
+  get: (tenantId: string): Promise<ContactUsConfig> =>
+    api.get(`/tenants/${tenantId}/contact-us-config`).then((res) => res.data),
+  update: (tenantId: string, data: UpdateContactUsConfigInput): Promise<ContactUsConfig> =>
+    api.put(`/tenants/${tenantId}/contact-us-config`, data).then((res) => res.data),
 };
 
 export default api;

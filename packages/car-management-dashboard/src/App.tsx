@@ -6,6 +6,7 @@ import { CarCategories } from '@/pages/CarCategories';
 import { CarCategoryForm } from '@/pages/CarCategoryForm';
 import { CarTrimForm } from '@/pages/CarTrimForm';
 import { CarTrims } from '@/pages/CarTrims';
+import ContactUsConfigPage from '@/pages/ContactUsConfig';
 import { Dashboard } from '@/pages/Dashboard';
 import { FirstTenantSetup } from '@/pages/FirstTenantSetup';
 import HomepageConfigPage from '@/pages/HomepageConfig';
@@ -68,6 +69,7 @@ const AppRoutes: React.FC = () => {
                 <Route path="/car-trims/:id/edit" element={<CarTrimForm />} />
                 <Route path="/users" element={<Users />} />
                 <Route path="/homepage-config" element={<HomepageConfigPage />} />
+                <Route path="/contact-us-config" element={<ContactUsConfigPage />} />
               </Routes>
             </Layout>
           </ProtectedRoute>

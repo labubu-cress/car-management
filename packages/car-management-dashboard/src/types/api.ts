@@ -239,3 +239,21 @@ export interface UpdateHomepageConfigInput {
   bannerImage: string;
   benefitsImage: string;
 }
+
+export interface ContactUsConfig {
+  id: string;
+  tenantId: string;
+  phoneConsultationDescription?: string;
+  phoneNumber?: string;
+  emailContactDescription?: string;
+  contactEmail?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UpdateContactUsConfigInput {
+  phoneConsultationDescription?: string;
+  phoneNumber?: string;
+  emailContactDescription?: string;
+  contactEmail?: string;
+}
