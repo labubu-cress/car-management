@@ -1,3 +1,4 @@
+import type { UserWithFavorites } from "@/api/admin/features/users/types";
 import app from "@/index";
 import { prisma } from "@/lib/db";
 import type { User } from "@prisma/client";
@@ -56,7 +57,43 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/users", () => {
     expect(body[0].nickname).toBe("Test User");
   });
 
-  it("should get a user by id", async () => {
+  it("should get a user by id with favorite car trims", async () => {
+    const scenario = await prisma.vehicleScenario.create({
+      data: {
+        tenantId,
+        name: "Test Scenario",
+        description: "Test Scenario",
+        image: "image.jpg",
+      },
+    });
+
+    const category = await prisma.carCategory.create({
+      data: {
+        tenantId,
+        vehicleScenarioId: scenario.id,
+        name: "Test Category",
+        image: "image.jpg",
+        tags: [],
+        highlights: [],
+        interiorImages: [],
+        exteriorImages: [],
+        offerPictures: [],
+      },
+    });
+
+    const trim = await prisma.carTrim.create({
+      data: {
+        tenantId,
+        categoryId: category.id,
+        name: "Test Trim",
+        subtitle: "Test Subtitle",
+        image: "image.jpg",
+        originalPrice: 100000,
+        currentPrice: 90000,
+        features: [],
+      },
+    });
+
     const user = await prisma.user.create({
       data: {
         openId: "test-user-openid-for-get-by-id",
@@ -67,6 +104,13 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/users", () => {
       },
     });
 
+    await prisma.userFavoriteCarTrim.create({
+      data: {
+        userId: user.id,
+        carTrimId: trim.id,
+      },
+    });
+
     const response = await app.request(`/api/v1/admin/tenants/${tenantId}/users/${user.id}`, {
       headers: {
         Authorization: `Bearer ${adminUser.token}`,
@@ -74,9 +118,14 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/users", () => {
     });
 
     expect(response.status).toBe(200);
-    const body = (await response.json()) as User;
+    const body = (await response.json()) as UserWithFavorites;
     expect(Array.isArray(body)).toBe(false);
     expect(body.id).toBe(user.id);
     expect(body.nickname).toBe("Test User for Get By Id");
+    expect(body.favoriteCarTrims).toBeDefined();
+    expect(Array.isArray(body.favoriteCarTrims)).toBe(true);
+    expect(body.favoriteCarTrims.length).toBe(1);
+    expect(body.favoriteCarTrims[0].carTrimId).toBe(trim.id);
+    expect(body.favoriteCarTrims[0].carTrim.name).toBe("Test Trim");
   });
 });

@@ -2,6 +2,13 @@ import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { carFeatureSchema } from "../shared/schema";
 
+const userInFavoriteSchema = z.object({
+  id: z.string(),
+  nickname: z.string(),
+  avatarUrl: z.string(),
+  openId: z.string(),
+});
+
 export const carTrimSchema = z.object({
   id: z.string(),
   tenantId: z.string(),
@@ -18,7 +25,19 @@ export const carTrimSchema = z.object({
   updatedAt: z.date(),
 });
 
+export const carTrimWithFavoritesSchema = carTrimSchema.extend({
+  favoritedBy: z
+    .array(
+      z.object({
+        user: userInFavoriteSchema,
+        createdAt: z.date(),
+      }),
+    )
+    .default([]),
+});
+
 export type CarTrim = z.infer<typeof carTrimSchema>;
+export type CarTrimWithFavorites = z.infer<typeof carTrimWithFavoritesSchema>;
 
 // Schema for creating a car trim
 export const createCarTrimSchema = z.object({

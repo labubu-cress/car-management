@@ -1,4 +1,4 @@
-import type { CarTrim, CreateCarTrimInput } from "@/api/admin/features/car-trims/schema";
+import type { CarTrim, CarTrimWithFavorites, CreateCarTrimInput } from "@/api/admin/features/car-trims/schema";
 import app from "@/index";
 import { prisma } from "@/lib/db";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -206,7 +206,7 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
     expect(body[1].displayOrder).toBe(1);
   });
 
-  it("should get a car trim by id", async () => {
+  it("should get a car trim by id with users who favorited it", async () => {
     const trim = await prisma.carTrim.create({
       data: {
         name: "Test Trim for Get",
@@ -219,15 +219,38 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
         tenantId: tenantId,
       },
     });
+
+    const user = await prisma.user.create({
+      data: {
+        openId: "test-user-openid-for-favorite",
+        nickname: "Favorite User",
+        avatarUrl: "avatar.jpg",
+        phoneNumber: "12345678903",
+        tenantId: tenantId,
+      },
+    });
+
+    await prisma.userFavoriteCarTrim.create({
+      data: {
+        userId: user.id,
+        carTrimId: trim.id,
+      },
+    });
+
     const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims/${trim.id}`, {
       headers: {
         Authorization: `Bearer ${adminUser.token}`,
       },
     });
     expect(response.status).toBe(200);
-    const body = (await response.json()) as CarTrim;
+    const body = (await response.json()) as CarTrimWithFavorites;
     expect(body.id).toBe(trim.id);
     expect(body.name).toBe("Test Trim for Get");
+    expect(body.favoritedBy).toBeDefined();
+    expect(Array.isArray(body.favoritedBy)).toBe(true);
+    expect(body.favoritedBy.length).toBe(1);
+    expect(body.favoritedBy[0].user.id).toBe(user.id);
+    expect(body.favoritedBy[0].user.nickname).toBe(user.nickname);
   });
 
   it("should delete a car trim", async () => {

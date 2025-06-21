@@ -1,6 +1,13 @@
 import { createTenantPrismaClient } from "@/lib/db";
 import { z } from "zod";
-import { carTrimSchema, type CarTrim, type CreateCarTrimInput, type UpdateCarTrimInput } from "./schema";
+import {
+    carTrimSchema,
+    carTrimWithFavoritesSchema,
+    type CarTrim,
+    type CarTrimWithFavorites,
+    type CreateCarTrimInput,
+    type UpdateCarTrimInput,
+} from "./schema";
 
 export const getAllCarTrims = async (tenantId: string, categoryId: string): Promise<CarTrim[]> => {
   const prisma = createTenantPrismaClient(tenantId);
@@ -13,13 +20,25 @@ export const getAllCarTrims = async (tenantId: string, categoryId: string): Prom
   return z.array(carTrimSchema).parse(trims);
 };
 
-export const getCarTrimById = async (tenantId: string, id: string): Promise<CarTrim | null> => {
+export const getCarTrimById = async (tenantId: string, id: string): Promise<CarTrimWithFavorites | null> => {
   const prisma = createTenantPrismaClient(tenantId);
-  const trim = await prisma.carTrim.findFirst({ where: { id, tenantId } });
+  const trim = await prisma.carTrim.findFirst({
+    where: { id, tenantId },
+    include: {
+      favoritedBy: {
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          user: true,
+        },
+      },
+    },
+  });
   if (!trim) {
     return null;
   }
-  return carTrimSchema.parse(trim);
+  return carTrimWithFavoritesSchema.parse(trim);
 };
 
 export const createCarTrim = async (tenantId: string, data: CreateCarTrimInput): Promise<CarTrim> => {
