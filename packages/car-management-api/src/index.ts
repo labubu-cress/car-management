@@ -2,7 +2,8 @@ import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono, type Context } from "hono";
 import * as fs from "node:fs";
-import { createServer } from "node:https";
+import { createServer as createHttpServer } from "node:http";
+import { createServer as createHttpsServer } from "node:https";
 import adminRoutes from "./api/admin";
 import appRoutes from "./api/app";
 
@@ -47,14 +48,17 @@ if (process.env.NODE_ENV !== "test") {
         cert: fs.readFileSync(certPath),
       };
 
-      serve({
-        fetch: server.fetch,
-        port,
-        createServer,
-        serverOptions,
-      });
-
-      console.log(`Server is running on https://localhost:${port}`);
+      serve(
+        {
+          fetch: server.fetch,
+          port,
+          createServer: createHttpsServer,
+          serverOptions,
+        },
+        (info) => {
+          console.log(`Server is running on https://localhost:${info.port}`);
+        }
+      );
     } catch (error) {
       console.error(
         "Failed to start HTTPS server. Make sure certificate files are available at the specified paths.",
@@ -65,11 +69,16 @@ if (process.env.NODE_ENV !== "test") {
   } else {
     console.log("HTTPS is not enabled. Starting HTTP server.");
     const port = Number(process.env.PORT) || 3000;
-    serve({
-      fetch: server.fetch,
-      port,
-    });
-    console.log(`Server is running on http://localhost:${port}`);
+    serve(
+      {
+        fetch: server.fetch,
+        port,
+        createServer: createHttpServer,
+      },
+      (info) => {
+        console.log(`Server is running on http://localhost:${info.port}`);
+      }
+    );
   }
 }
 
