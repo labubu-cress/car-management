@@ -129,3 +129,6 @@ dist/
 # tmp
 tmp/
 .tmp/
+
+# ssl certs
+.certificates/

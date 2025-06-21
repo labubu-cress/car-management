@@ -63,7 +63,7 @@ COPY --from=builder /app/packages/car-management-api/prisma ./packages/car-manag
 RUN npm exec -w car-management-api -- prisma generate
 
 # Expose the port the application will run on
-EXPOSE 3000
+EXPOSE 443
 
 # Define the command to start the application
 CMD ["sh", "-c", "npm start -w car-management-api"] 

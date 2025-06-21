@@ -48,6 +48,8 @@ REMOTE_APP_DIR="/apps/car-management" # 远程服务器上的应用目录
 CONTAINER_NAME="car-management"
 LOCAL_ENV_FILE="packages/car-management-api/.env.${ENV}"
 REMOTE_ENV_FILE_PATH="${REMOTE_APP_DIR}/.env.${ENV}"
+LOCAL_CERT_DIR="packages/car-management-api/.certificates"
+REMOTE_CERT_DIR="${REMOTE_APP_DIR}/.certificates"
 
 # --- 检查环境参数 ---
 if [ -z "$ENV" ]; then
@@ -68,6 +70,19 @@ if [ ! -f ".env" ]; then
     exit 1
 fi
 export $(grep -v '^#' .env | xargs)
+
+# --- 同步证书文件 ---
+echo "正在检查远程证书文件..."
+if [ -d "$LOCAL_CERT_DIR" ]; then
+  # 确保远程目录存在
+  ssh "$REMOTE_HOST" "mkdir -p $REMOTE_CERT_DIR"
+  echo "正在同步证书文件到 ${REMOTE_HOST}:${REMOTE_CERT_DIR}"
+  # 最好使用 rsync，但为了简单起见，并且与现有脚本保持一致，这里使用 scp
+  scp -r "${LOCAL_CERT_DIR}/." "${REMOTE_HOST}:${REMOTE_CERT_DIR}/"
+  echo "证书文件同步完成。"
+else
+  echo "警告: 本地证书目录 '$LOCAL_CERT_DIR' 未找到。如果启用了 HTTPS，部署可能会失败。"
+fi
 
 # --- 环境文件同步 ---
 echo "正在检查远程环境文件..."
@@ -132,11 +147,12 @@ ssh "$REMOTE_HOST" "
   (docker stop $CONTAINER_NAME || true) && (docker rm $CONTAINER_NAME || true)
 
   echo '正在启动新容器...'
-  docker run -d \\
-    --restart always \\
-    --name $CONTAINER_NAME \\
-    -p 3000:3000 \\
-    --env-file $REMOTE_ENV_FILE_PATH \\
+  docker run -d \
+    --restart always \
+    --name $CONTAINER_NAME \
+    -p 443:443 \
+    --env-file $REMOTE_ENV_FILE_PATH \
+    -v ${REMOTE_CERT_DIR}:/app/packages/car-management-api/.certificates:ro \
     $FULL_IMAGE_NAME
 
   echo '正在清理旧镜像...'
