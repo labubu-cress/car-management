@@ -7,9 +7,11 @@ import type {
     CreateAdminUserInput,
     CreateCarCategoryInput,
     CreateCarTrimInput,
+    CreateFaqInput,
     CreateTenantInput,
     CreateVehicleScenarioInput,
     DashboardStats,
+    Faq,
     HomepageConfig,
     LoginInput,
     LoginResponse,
@@ -18,6 +20,7 @@ import type {
     UpdateCarCategoryInput,
     UpdateCarTrimInput,
     UpdateContactUsConfigInput,
+    UpdateFaqInput,
     UpdateHomepageConfigInput,
     UpdateTenantInput,
     UpdateVehicleScenarioInput,
@@ -182,6 +185,21 @@ export const contactUsConfigApi = {
     api.get(`/tenants/${tenantId}/contact-us-config`).then((res) => res.data),
   update: (tenantId: string, data: UpdateContactUsConfigInput): Promise<ContactUsConfig> =>
     api.put(`/tenants/${tenantId}/contact-us-config`, data).then((res) => res.data),
+};
+
+// 常见问题管理
+export const faqsApi = {
+  getAll: (tenantId: string): Promise<Faq[]> =>
+    api.get(`/tenants/${tenantId}/faqs`).then((res) => res.data.faqs),
+
+  create: (tenantId: string, data: CreateFaqInput): Promise<Faq> =>
+    api.post(`/tenants/${tenantId}/faqs`, data).then((res) => res.data),
+
+  update: (tenantId: string, id: string, data: UpdateFaqInput): Promise<Faq> =>
+    api.put(`/tenants/${tenantId}/faqs/${id}`, data).then((res) => res.data),
+
+  delete: (tenantId: string, id: string): Promise<void> =>
+    api.delete(`/tenants/${tenantId}/faqs/${id}`).then(() => undefined),
 };
 
 export default api;

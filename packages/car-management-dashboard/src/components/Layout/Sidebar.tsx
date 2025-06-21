@@ -6,6 +6,7 @@ import {
     faImage,
     faLayerGroup,
     faPhone,
+    faQuestionCircle,
     faTachometerAlt,
     faUsers,
     faUserShield,
@@ -32,6 +33,7 @@ const menuItems: MenuItem[] = [
   { path: '/users', label: '用户管理', icon: faUsers },
   { path: '/homepage-config', label: '首页配置', icon: faWrench },
   { path: '/contact-us-config', label: '联系我们', icon: faPhone },
+  { path: '/faqs', label: '常见问题', icon: faQuestionCircle },
 ];
 
 export const Sidebar: React.FC = () => {
