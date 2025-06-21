@@ -154,6 +154,20 @@ export interface UpdateCarTrimInput {
   categoryId?: string;
 }
 
+export interface UserInFavorite {
+  id: string;
+  nickname: string;
+  avatarUrl: string;
+  openId: string;
+}
+
+export interface CarTrimWithFavorites extends CarTrim {
+  favoritedBy: {
+    user: UserInFavorite;
+    createdAt: string;
+  }[];
+}
+
 export interface User {
   id: string;
   tenantId: string;
@@ -164,6 +178,17 @@ export interface User {
   unionId: string | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface UserFavoriteCarTrim {
+  userId: string;
+  carTrimId: string;
+  createdAt: string;
+  carTrim: CarTrim;
+}
+
+export interface UserWithFavorites extends User {
+  favoriteCarTrims: UserFavoriteCarTrim[];
 }
 
 export interface CreateAdminUserInput {

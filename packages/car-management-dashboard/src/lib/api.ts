@@ -1,26 +1,28 @@
 import type {
-  AdminUser,
-  CarCategory,
-  CarTrim,
-  CreateAdminUserInput,
-  CreateCarCategoryInput,
-  CreateCarTrimInput,
-  CreateTenantInput,
-  CreateVehicleScenarioInput,
-  DashboardStats,
-  HomepageConfig,
-  LoginInput,
-  LoginResponse,
-  Tenant,
-  UpdateAdminUserInput,
-  UpdateCarCategoryInput,
-  UpdateCarTrimInput,
-  UpdateHomepageConfigInput,
-  UpdateTenantInput,
-  UpdateVehicleScenarioInput,
-  UploadToken,
-  User,
-  VehicleScenario,
+    AdminUser,
+    CarCategory,
+    CarTrim,
+    CarTrimWithFavorites,
+    CreateAdminUserInput,
+    CreateCarCategoryInput,
+    CreateCarTrimInput,
+    CreateTenantInput,
+    CreateVehicleScenarioInput,
+    DashboardStats,
+    HomepageConfig,
+    LoginInput,
+    LoginResponse,
+    Tenant,
+    UpdateAdminUserInput,
+    UpdateCarCategoryInput,
+    UpdateCarTrimInput,
+    UpdateHomepageConfigInput,
+    UpdateTenantInput,
+    UpdateVehicleScenarioInput,
+    UploadToken,
+    User,
+    UserWithFavorites,
+    VehicleScenario,
 } from "@/types/api";
 import axios from "axios";
 
@@ -131,7 +133,7 @@ export const carTrimsApi = {
   getAll: (tenantId: string, categoryId: string): Promise<CarTrim[]> =>
     api.get(`/tenants/${tenantId}/car-trims?categoryId=${categoryId}`).then((res) => res.data),
 
-  getById: (tenantId: string, id: string): Promise<CarTrim> =>
+  getById: (tenantId: string, id: string): Promise<CarTrimWithFavorites> =>
     api.get(`/tenants/${tenantId}/car-trims/${id}`).then((res) => res.data),
 
   create: (tenantId: string, data: CreateCarTrimInput): Promise<CarTrim> =>
@@ -151,7 +153,7 @@ export const carTrimsApi = {
 export const usersApi = {
   getAll: (tenantId: string): Promise<User[]> => api.get(`/tenants/${tenantId}/users`).then((res) => res.data),
 
-  getById: (tenantId: string, id: string): Promise<User> =>
+  getById: (tenantId: string, id: string): Promise<UserWithFavorites> =>
     api.get(`/tenants/${tenantId}/users/${id}`).then((res) => res.data),
 };
 

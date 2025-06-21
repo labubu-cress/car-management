@@ -168,4 +168,44 @@ export const carTrimFormStyles = {
     color: "#6b7280",
     marginTop: "4px",
   }),
+
+  userList: style({
+    listStyleType: "none",
+    padding: 0,
+    margin: 0,
+  }),
+
+  userListItem: style({
+    display: "flex",
+    alignItems: "center",
+    padding: "12px 0",
+    borderBottom: "1px solid #f3f4f6",
+    ":last-child": {
+      borderBottom: "none",
+    },
+  }),
+
+  userAvatar: style({
+    width: "48px",
+    height: "48px",
+    borderRadius: "50%",
+    marginRight: "16px",
+    objectFit: "cover",
+  }),
+
+  userInfo: style({
+    display: "flex",
+    flexDirection: "column",
+  }),
+
+  userNickname: style({
+    fontWeight: 500,
+    color: "#111827",
+  }),
+  
+  favoriteDate: style({
+    fontSize: "12px",
+    color: "#6b7280",
+    marginTop: "4px",
+  }),
 };

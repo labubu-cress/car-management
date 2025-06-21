@@ -46,7 +46,7 @@ export const CarTrimForm: React.FC = () => {
   );
 
   // 获取车型参数详情（编辑模式）
-  const { isLoading } = useQuery(
+  const { data: carTrimDetails, isLoading } = useQuery(
     ['car-trim', currentTenant?.id, id],
     () => currentTenant && id ? carTrimsApi.getById(currentTenant.id, id) : null,
     {
@@ -260,6 +260,16 @@ export const CarTrimForm: React.FC = () => {
               ))}
             </select>
           </FormField>
+
+          <FormField label="优惠政策亮点" required error={errors.badge}>
+            <input
+              type="text"
+              value={formData.badge}
+              onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
+              className={formFieldStyles.input}
+              placeholder="请输入优惠政策亮点，例如：金融贴息至高8000元"
+            />
+          </FormField>
         </div>
 
         <div className={carTrimFormStyles.section}>
@@ -282,16 +292,6 @@ export const CarTrimForm: React.FC = () => {
               onChange={(e) => setFormData({ ...formData, currentPrice: e.target.value })}
               className={formFieldStyles.input}
               placeholder="如: 259800"
-            />
-          </FormField>
-
-          <FormField label="标签徽章">
-            <input
-              type="text"
-              value={formData.badge}
-              onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
-              className={formFieldStyles.input}
-              placeholder="如：热销、限时优惠等"
             />
           </FormField>
         </div>
@@ -325,6 +325,23 @@ export const CarTrimForm: React.FC = () => {
           </button>
         </div>
       </form>
+
+      {isEdit && carTrimDetails && carTrimDetails.favoritedBy && carTrimDetails.favoritedBy.length > 0 && (
+        <div className={carTrimFormStyles.section}>
+          <h2 className={carTrimFormStyles.sectionTitle}>收藏用户列表 ({carTrimDetails.favoritedBy.length})</h2>
+          <ul className={carTrimFormStyles.userList}>
+            {carTrimDetails.favoritedBy.map(fav => (
+              <li key={fav.user.id} className={carTrimFormStyles.userListItem}>
+                <img src={fav.user.avatarUrl} alt={fav.user.nickname} className={carTrimFormStyles.userAvatar} />
+                <div className={carTrimFormStyles.userInfo}>
+                  <span className={carTrimFormStyles.userNickname}>{fav.user.nickname}</span>
+                  <span className={carTrimFormStyles.favoriteDate}>收藏于: {new Date(fav.createdAt).toLocaleString('zh-CN')}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }; 
