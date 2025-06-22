@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "/api/app"
+      "url": "/api/v1/app"
     }
   ],
   "paths": {
