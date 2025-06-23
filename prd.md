@@ -1,33 +1,23 @@
 # gaol
 
-需要微信小程序首页调整配置参数
+需要微信小程序faq 的配置做调整
 
 ```diff
- model HomepageConfig {
--  id                 String   @id @default(cuid())
--  tenantId           String   @unique
--  tenant             Tenant   @relation(fields: [tenantId], references: [id])
--  welcomeTitle       String?
--  welcomeDescription String?
--  bannerImage        String
--  benefitsImage      String
--  createdAt          DateTime @default(now())
--  updatedAt          DateTime @updatedAt
-+  id              String   @id @default(cuid())
-+  tenantId        String   @unique
-+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
-+  firstTitle      String
-+  firstTitleIcon  String
-+  secondTitle     String
-+  secondTitleIcon String
-+  bannerImage     String
-+  benefitsImage   String
-+  createdAt       DateTime @default(now())
-+  updatedAt       DateTime @updatedAt
- }
-
-上面是 schema 的修改，已经 prisma generate 和 migrate dev 过了，现在修改后端代码相关的部分，并编写测试，
+diff --git a/packages/car-management-api/prisma/schema.prisma b/packages/car-management-api/prisma/schema.prisma
+index e0424c5..f31ac12 100644
+--- a/packages/car-management-api/prisma/schema.prisma
++++ b/packages/car-management-api/prisma/schema.prisma
+@@ -175,6 +175,7 @@ model Faq {
+   id        String   @id @default(cuid())
+   question  String
+   answer    String   @db.Text
++  icon      String
+   tenantId  String
+   tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+   createdAt DateTime @default(now())
 ```
+
+上面是 schema 的修改，已经 prisma generate 和 migrate dev 过了
 
 # task A
 
