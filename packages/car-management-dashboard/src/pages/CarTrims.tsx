@@ -109,8 +109,23 @@ export const CarTrims: React.FC = () => {
       ),
     },
     {
+      key: 'configImageUrl',
+      title: '配置图片',
+      width: '100px',
+      render: (value: string) =>
+        value ? (
+          <img
+            src={value}
+            alt="配置参数图片"
+            style={{ width: '60px', height: '40px', objectFit: 'cover', borderRadius: '4px' }}
+          />
+        ) : (
+          '未上传'
+        ),
+    },
+    {
       key: 'name',
-      title: '车型参数名称',
+      title: '名称',
       width: '200px',
     },
     {
