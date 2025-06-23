@@ -107,8 +107,8 @@ function SortableRow<T extends { id: string }>({
                     onClick={() => action.onClick(record)}
                     className={
                       action.isDanger
-                        ? styles.deleteButton
-                        : styles.editButton
+                        ? styles.actionButtonDanger
+                        : styles.actionButton
                     }
                     title={action.label}
                   >

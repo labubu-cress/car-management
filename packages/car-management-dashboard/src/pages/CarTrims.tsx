@@ -147,6 +147,7 @@ export const CarTrims: React.FC = () => {
             fontWeight: '600',
             backgroundColor: isArchived ? '#fef2f2' : '#ecfdf5',
             color: isArchived ? '#ef4444' : '#10b981',
+            whiteSpace: 'nowrap',
           }}
         >
           {isArchived ? '已下架' : '销售中'}

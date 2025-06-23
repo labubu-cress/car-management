@@ -27,7 +27,6 @@ export const CarTrimForm: React.FC = () => {
     badge: '',
     features: [] as Highlight[],
     categoryId: '',
-    isArchived: false,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -35,12 +34,12 @@ export const CarTrimForm: React.FC = () => {
   // 获取分类列表
   const { data: categories = [] } = useQuery(
     ['car-categories', currentTenant?.id],
-    () => currentTenant ? carCategoriesApi.getAll(currentTenant.id) : Promise.resolve([]),
+    () => (currentTenant ? carCategoriesApi.getAll(currentTenant.id) : Promise.resolve([])),
     {
       enabled: !!currentTenant,
       onSuccess: (data) => {
         if (data.length > 0 && !formData.categoryId && !isEdit) {
-          setFormData(prev => ({ ...prev, categoryId: data[0].id }));
+          setFormData((prev) => ({ ...prev, categoryId: data[0].id }));
         }
       },
     }
@@ -63,7 +62,6 @@ export const CarTrimForm: React.FC = () => {
             badge: data.badge || '',
             features: data.features || [],
             categoryId: data.categoryId,
-            isArchived: data.isArchived || false,
           });
         }
       },
@@ -155,7 +153,6 @@ export const CarTrimForm: React.FC = () => {
         badge: formData.badge.trim() || undefined,
         features: formData.features.length > 0 ? formData.features : undefined,
         categoryId: formData.categoryId,
-        isArchived: formData.isArchived,
       };
       updateMutation.mutate({ id, data: updateData });
     } else {
@@ -168,7 +165,6 @@ export const CarTrimForm: React.FC = () => {
         badge: formData.badge.trim() || undefined,
         features: formData.features.length > 0 ? formData.features : undefined,
         categoryId: formData.categoryId,
-        isArchived: formData.isArchived,
       };
       createMutation.mutate(createData);
     }
@@ -221,21 +217,6 @@ export const CarTrimForm: React.FC = () => {
         <div className={carTrimFormStyles.section}>
           <h2 className={carTrimFormStyles.sectionTitle}>基本信息</h2>
           
-          <FormField label="车型状态">
-            <div className={carTrimFormStyles.switchContainer}>
-              <span className={carTrimFormStyles.switchLabel}>销售中</span>
-              <label className={carTrimFormStyles.switch}>
-                <input
-                  type="checkbox"
-                  checked={formData.isArchived}
-                  onChange={(e) => setFormData({ ...formData, isArchived: e.target.checked })}
-                />
-                <span className={carTrimFormStyles.slider}></span>
-              </label>
-              <span className={carTrimFormStyles.switchLabel}>已下架</span>
-            </div>
-          </FormField>
-
           <FormField label="车型参数名称" required error={errors.name}>
             <input
               type="text"
