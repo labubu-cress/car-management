@@ -1,11 +1,13 @@
-import { prisma } from '@/lib/db';
-import { z } from 'zod';
-import { UserMessageQuerySchema } from './schema';
+import { prisma } from "@/lib/db";
+import createError from "http-errors";
+import { z } from "zod";
+import { UserMessageQuerySchema } from "./schema";
 
-export const find = async (tenantId: string, { page, pageSize }: z.infer<typeof UserMessageQuerySchema>) => {
+export const find = async (tenantId: string, { page, pageSize, status }: z.infer<typeof UserMessageQuerySchema>) => {
+  const where = { tenantId, status };
   const [messages, total] = await prisma.$transaction([
     prisma.userMessage.findMany({
-      where: { tenantId },
+      where,
       include: {
         user: {
           select: {
@@ -13,16 +15,44 @@ export const find = async (tenantId: string, { page, pageSize }: z.infer<typeof 
             avatarUrl: true,
             phoneNumber: true,
             createdAt: true,
-          }
-        }
+          },
+        },
+        processedBy: {
+          select: {
+            username: true,
+          },
+        },
       },
       skip: (page - 1) * pageSize,
       take: pageSize,
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     }),
-    prisma.userMessage.count({ where: { tenantId } }),
+    prisma.userMessage.count({ where }),
   ]);
   return { messages, total };
-}; 
+};
+
+export const process = async (id: string, adminUserId: string) => {
+  const message = await prisma.userMessage.findUnique({
+    where: { id },
+  });
+
+  if (!message) {
+    throw createError(404, "User message not found");
+  }
+
+  if (message.status === "PROCESSED") {
+    throw createError(400, "User message already processed");
+  }
+
+  return await prisma.userMessage.update({
+    where: { id },
+    data: {
+      status: "PROCESSED",
+      processedAt: new Date(),
+      processedById: adminUserId,
+    },
+  });
+};
