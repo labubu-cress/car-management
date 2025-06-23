@@ -186,6 +186,7 @@ model Faq {
   @@unique([tenantId, question])
 }
 
+// 用户反馈
 model UserMessage {
   id        String   @id @default(cuid())
   name      String
