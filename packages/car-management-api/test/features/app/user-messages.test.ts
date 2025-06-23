@@ -1,13 +1,20 @@
-import app from '@/index';
-import { prisma } from '@/lib/db';
-import type { UserMessage } from '@prisma/client';
-import { afterEach, beforeAll, describe, expect, it } from 'vitest';
-import { clearTestDb, createTestTenant, createTestUser, getTestAppUserToken, type TestTenant, type TestUser } from '../../helper';
+import app from "@/index";
+import { prisma } from "@/lib/db";
+import type { UserMessage } from "@prisma/client";
+import { afterEach, beforeAll, describe, expect, it } from "vitest";
+import {
+  clearTestDb,
+  createTestTenant,
+  createTestUser,
+  getTestAppUserToken,
+  type TestTenant,
+  type TestUser,
+} from "../../helper";
 
-describe('App API: /api/v1/app/user-messages', () => {
+describe("App API: /api/v1/app/user-messages", () => {
   let tenant: TestTenant;
   let user: TestUser;
-  let token = '';
+  let token = "";
 
   beforeAll(async () => {
     await clearTestDb(prisma);
@@ -20,17 +27,17 @@ describe('App API: /api/v1/app/user-messages', () => {
     await prisma.userMessage.deleteMany();
   });
 
-  it('should create a new user message', async () => {
+  it("should create a new user message", async () => {
     const messageData = {
-      name: 'Test User',
-      contact: '1234567890',
-      content: 'This is a test message.',
+      name: "Test User",
+      phone: "1234567890",
+      message: "This is a test message.",
     };
 
     const response = await app.request(`/api/v1/app/tenants/${tenant.id}/user-messages`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(messageData),
@@ -41,8 +48,8 @@ describe('App API: /api/v1/app/user-messages', () => {
 
     expect(createdMessage).toBeDefined();
     expect(createdMessage.name).toBe(messageData.name);
-    expect(createdMessage.contact).toBe(messageData.contact);
-    expect(createdMessage.content).toBe(messageData.content);
+    expect(createdMessage.phone).toBe(messageData.phone);
+    expect(createdMessage.message).toBe(messageData.message);
     expect(createdMessage.tenantId).toBe(tenant.id);
     expect(createdMessage.userId).toBe(user.id);
 
@@ -50,4 +57,4 @@ describe('App API: /api/v1/app/user-messages', () => {
     expect(dbMessage).not.toBeNull();
     expect(dbMessage?.name).toBe(messageData.name);
   });
-}); 
+});
