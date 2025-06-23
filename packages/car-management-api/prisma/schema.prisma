@@ -18,6 +18,11 @@ enum TenantStatus {
   inactive
 }
 
+enum UserMessageStatus {
+  PENDING
+  PROCESSED
+}
+
 model Tenant {
   id        String       @id @default(cuid())
   name      String
@@ -41,14 +46,15 @@ model Tenant {
 }
 
 model AdminUser {
-  id           String    @id @default(cuid())
-  username     String    @unique
-  passwordHash String
-  role         AdminRole
-  tenantId     String?
-  tenant       Tenant?   @relation(fields: [tenantId], references: [id])
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id                String        @id @default(cuid())
+  username          String        @unique
+  passwordHash      String
+  role              AdminRole
+  tenantId          String?
+  tenant            Tenant?       @relation(fields: [tenantId], references: [id])
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  processedMessages UserMessage[]
 
   @@index([tenantId])
 }
@@ -188,17 +194,20 @@ model Faq {
 
 // 用户反馈
 model UserMessage {
-  id        String   @id @default(cuid())
-  name      String
-  contact   String
-  content   String   @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  userId   String?
-  user     User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
-  tenantId String
-  tenant   Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  id            String            @id @default(cuid())
+  tenantId      String
+  tenant        Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User              @relation(fields: [userId], references: [id])
+  name          String
+  phone         String
+  message       String
+  status        UserMessageStatus @default(PENDING)
+  processedAt   DateTime?
+  processedById String?
+  processedBy   AdminUser?        @relation(fields: [processedById], references: [id], onDelete: SetNull)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 
   @@index([userId])
   @@index([tenantId])
