@@ -8,7 +8,7 @@ import { Faq, UpdateFaqInput } from '@/types/api';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import * as styles from './Faqs.css';
+import { container, formStyles, tableStyles } from './Faqs.css';
 
 interface FaqFormData {
   question: string;
@@ -94,6 +94,9 @@ export const Faqs: React.FC = () => {
     {
       key: 'icon',
       title: '图标',
+      render: (value: string) => (
+        <img src={value} alt="图标" className={tableStyles.iconImage} />
+      ),
     },
     {
       key: 'createdAt',
@@ -144,7 +147,7 @@ export const Faqs: React.FC = () => {
   const isSubmitting = createMutation.isLoading || updateMutation.isLoading;
 
   return (
-    <div className={styles.container}>
+    <div className={container}>
       <DataTable
         title="常见问题管理"
         columns={columns}
@@ -185,7 +188,11 @@ export const Faqs: React.FC = () => {
               tenantId={tenantId!}
             />
           </FormField>
-          <button type="submit" disabled={isSubmitting}>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={formStyles.submitButton}
+          >
             {isSubmitting ? '提交中...' : '提交'}
           </button>
         </form>
