@@ -111,22 +111,23 @@ model CarCategory {
 }
 
 model CarTrim {
-  id            String      @id @default(cuid())
-  tenantId      String
-  tenant        Tenant      @relation(fields: [tenantId], references: [id])
-  name          String
-  subtitle      String
-  image         String
-  badge         String?
-  originalPrice Decimal
-  currentPrice  Decimal
-  features      Json // CarFeature[]
-  categoryId    String
-  category      CarCategory @relation(fields: [categoryId], references: [id])
-  displayOrder  Int         @default(0)
-  isArchived    Boolean     @default(false)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id             String      @id @default(cuid())
+  tenantId       String
+  tenant         Tenant      @relation(fields: [tenantId], references: [id])
+  name           String
+  subtitle       String
+  image          String
+  configImageUrl String?
+  badge          String?
+  originalPrice  Decimal
+  currentPrice   Decimal
+  features       Json // CarFeature[]
+  categoryId     String
+  category       CarCategory @relation(fields: [categoryId], references: [id])
+  displayOrder   Int         @default(0)
+  isArchived     Boolean     @default(false)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
 
   favoritedBy UserFavoriteCarTrim[]
 
