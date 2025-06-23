@@ -19,25 +19,25 @@ enum TenantStatus {
 }
 
 model Tenant {
-  id        String   @id @default(cuid())
+  id        String       @id @default(cuid())
   name      String
-  appId     String   @unique
+  appId     String       @unique
   appSecret String
   status    TenantStatus @default(active)
-  config    Json     @default("{}")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  config    Json         @default("{}")
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 
-  users           User[]
-  adminUsers      AdminUser[]
+  users            User[]
+  adminUsers       AdminUser[]
   vehicleScenarios VehicleScenario[]
-  carCategories   CarCategory[]
-  carTrims        CarTrim[]
-  faqs            Faq[]
+  carCategories    CarCategory[]
+  carTrims         CarTrim[]
+  faqs             Faq[]
 
-  homepageConfig   HomepageConfig?
-  contactUsConfig  ContactUsConfig?
-  userMessages     UserMessage[]
+  homepageConfig  HomepageConfig?
+  contactUsConfig ContactUsConfig?
+  userMessages    UserMessage[]
 }
 
 model AdminUser {
@@ -73,36 +73,36 @@ model User {
 }
 
 model VehicleScenario {
-  id          String   @id @default(cuid())
-  tenantId    String
-  tenant      Tenant   @relation(fields: [tenantId], references: [id])
-  name        String
-  description String
-  image       String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  carCategories  CarCategory[]
+  id            String        @id @default(cuid())
+  tenantId      String
+  tenant        Tenant        @relation(fields: [tenantId], references: [id])
+  name          String
+  description   String
+  image         String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  carCategories CarCategory[]
 
   @@index([tenantId])
 }
 
 // car model
 model CarCategory {
-  id              String   @id @default(cuid())
-  tenantId        String
-  tenant          Tenant   @relation(fields: [tenantId], references: [id])
-  name            String
-  image           String
-  badge           String?
-  tags            Json // String[]
-  highlights      Json // CarFeature[]
-  interiorImages  Json // String[]
-  exteriorImages  Json // String[]
-  offerPictures   Json // String[]
-  displayOrder    Int      @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  carTrims        CarTrim[]
+  id                String          @id @default(cuid())
+  tenantId          String
+  tenant            Tenant          @relation(fields: [tenantId], references: [id])
+  name              String
+  image             String
+  badge             String?
+  tags              Json // String[]
+  highlights        Json // CarFeature[]
+  interiorImages    Json // String[]
+  exteriorImages    Json // String[]
+  offerPictures     Json // String[]
+  displayOrder      Int             @default(0)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  carTrims          CarTrim[]
   vehicleScenarioId String
   vehicleScenario   VehicleScenario @relation(fields: [vehicleScenarioId], references: [id])
 
@@ -111,9 +111,9 @@ model CarCategory {
 }
 
 model CarTrim {
-  id            String   @id @default(cuid())
+  id            String      @id @default(cuid())
   tenantId      String
-  tenant        Tenant   @relation(fields: [tenantId], references: [id])
+  tenant        Tenant      @relation(fields: [tenantId], references: [id])
   name          String
   subtitle      String
   image         String
@@ -127,7 +127,7 @@ model CarTrim {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
-  favoritedBy   UserFavoriteCarTrim[]
+  favoritedBy UserFavoriteCarTrim[]
 
   @@index([tenantId])
   @@index([categoryId])
@@ -137,8 +137,8 @@ model HomepageConfig {
   id                 String   @id @default(cuid())
   tenantId           String   @unique
   tenant             Tenant   @relation(fields: [tenantId], references: [id])
-  welcomeTitle       String?   
-  welcomeDescription String?   
+  welcomeTitle       String?
+  welcomeDescription String?
   bannerImage        String
   benefitsImage      String
   createdAt          DateTime @default(now())
@@ -189,16 +189,16 @@ model UserMessage {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  tenantId  String
-  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  userId   String?
+  user     User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  tenantId String
+  tenant   Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([tenantId])
 }
 
 model SystemConfig {
-  id    String @id @default(cuid())
-  key   String
+  id  String @id @default(cuid())
+  key String
 }
