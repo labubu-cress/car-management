@@ -42,8 +42,10 @@ const HomepageConfigPage = () => {
       reset(config);
     } else {
       reset({
-        welcomeTitle: '',
-        welcomeDescription: '',
+        firstTitle: '',
+        firstTitleIcon: '',
+        secondTitle: '',
+        secondTitleIcon: '',
         bannerImage: '',
         benefitsImage: '',
       });
@@ -107,11 +109,39 @@ const HomepageConfigPage = () => {
         onSubmit={handleSubmit(onSubmit)}
         className={homepageConfigStyles.form}
       >
-        <FormField label="欢迎标题" error={errors.welcomeTitle?.message}>
-          <input type="text" {...register('welcomeTitle')} />
+        <FormField label="第一行标题" error={errors.firstTitle?.message}>
+          <input type="text" {...register('firstTitle', { required: '第一行标题不能为空' })} />
         </FormField>
-        <FormField label="欢迎描述" error={errors.welcomeDescription?.message}>
-          <textarea {...register('welcomeDescription')} />
+        <FormField label="第一行标题图标" error={errors.firstTitleIcon?.message}>
+          <Controller
+            name="firstTitleIcon"
+            control={control}
+            rules={{ required: '第一行标题图标不能为空' }}
+            render={({ field }) => (
+              <ImageUpload
+                value={field.value ?? null}
+                onChange={field.onChange}
+                tenantId={currentTenant.id}
+              />
+            )}
+          />
+        </FormField>
+        <FormField label="第二行标题" error={errors.secondTitle?.message}>
+          <input type="text" {...register('secondTitle', { required: '第二行标题不能为空' })} />
+        </FormField>
+        <FormField label="第二行标题图标" error={errors.secondTitleIcon?.message}>
+          <Controller
+            name="secondTitleIcon"
+            control={control}
+            rules={{ required: '第二行标题图标不能为空' }}
+            render={({ field }) => (
+              <ImageUpload
+                value={field.value ?? null}
+                onChange={field.onChange}
+                tenantId={currentTenant.id}
+              />
+            )}
+          />
         </FormField>
 
         <FormField label="主 Banner 图" error={errors.bannerImage?.message}>

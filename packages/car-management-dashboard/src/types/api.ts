@@ -225,8 +225,10 @@ export interface DashboardStats {
 export interface HomepageConfig {
   id: string;
   tenantId: string;
-  welcomeTitle?: string;
-  welcomeDescription?: string;
+  firstTitle: string;
+  firstTitleIcon: string;
+  secondTitle: string;
+  secondTitleIcon: string;
   bannerImage: string;
   benefitsImage: string;
   createdAt: string;
@@ -234,8 +236,10 @@ export interface HomepageConfig {
 }
 
 export interface UpdateHomepageConfigInput {
-  welcomeTitle?: string;
-  welcomeDescription?: string;
+  firstTitle: string;
+  firstTitleIcon: string;
+  secondTitle: string;
+  secondTitleIcon: string;
   bannerImage: string;
   benefitsImage: string;
 }
