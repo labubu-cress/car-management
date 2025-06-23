@@ -15,7 +15,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { faEdit, faEye, faEyeSlash, faGripVertical, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faEdit, faGripVertical, faPlus, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import * as styles from './DataTable.css';
@@ -126,7 +126,7 @@ function SortableRow<T extends { id: string; isArchived?: boolean }>({
                 className={record.isArchived ? styles.unarchiveButton : styles.archiveButton}
                 title={record.isArchived ? '上架' : '下架'}
               >
-                <FontAwesomeIcon icon={record.isArchived ? faEye : faEyeSlash} />
+                <FontAwesomeIcon icon={record.isArchived ? faCheck : faTimes} />
               </button>
             )}
 
