@@ -2,3 +2,4 @@
 这是一个monorepo, 安装包或运行命令的时候注意这点。
 这个项目用的是 npm ,不是 pnpm
 prisma generate 以后，编辑器不会马上更新类型，需要 restart ts language server
+编写测试以后，请只执行编写的测试，不要执行全部测试

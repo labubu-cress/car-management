@@ -1,8 +1,10 @@
 import { z } from "zod";
 
 export const HomepageConfigUpdateSchema = z.object({
-  welcomeTitle: z.string().optional(),
-  welcomeDescription: z.string().optional(),
+  firstTitle: z.string(),
+  firstTitleIcon: z.string(),
+  secondTitle: z.string(),
+  secondTitleIcon: z.string(),
   bannerImage: z.string(),
   benefitsImage: z.string(),
 });

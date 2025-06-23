@@ -30,8 +30,10 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/homepage-config", () => {
   it("should create and update homepage config", async () => {
     // Create
     const createData = {
-      welcomeTitle: "Welcome!",
-      welcomeDescription: "To our amazing car dealership.",
+      firstTitle: "First Title",
+      firstTitleIcon: "first-icon.png",
+      secondTitle: "Second Title",
+      secondTitleIcon: "second-icon.png",
       bannerImage: "banner.jpg",
       benefitsImage: "benefits.jpg",
     };
@@ -60,7 +62,10 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/homepage-config", () => {
 
     // Update
     const updateData = {
-      welcomeTitle: "Welcome Back!",
+      firstTitle: "Updated First Title",
+      firstTitleIcon: "updated-first-icon.png",
+      secondTitle: "Updated Second Title",
+      secondTitleIcon: "updated-second-icon.png",
       bannerImage: "new-banner.jpg",
       benefitsImage: "new-benefits.jpg",
     };
@@ -74,10 +79,7 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/homepage-config", () => {
     });
     expect(updateResponse.status).toBe(200);
     const updatedBody = (await updateResponse.json()) as HomepageConfig;
-    expect(updatedBody).toMatchObject({
-      ...createData,
-      ...updateData,
-    });
+    expect(updatedBody).toMatchObject(updateData);
 
     // Verify it was updated
     const getAfterUpdateResponse = await app.request(`/api/v1/admin/tenants/${tenantId}/homepage-config`, {
@@ -86,9 +88,6 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/homepage-config", () => {
       },
     });
     const getAfterUpdateBody = await getAfterUpdateResponse.json();
-    expect(getAfterUpdateBody).toMatchObject({
-      ...createData,
-      ...updateData,
-    });
+    expect(getAfterUpdateBody).toMatchObject(updateData);
   });
 });

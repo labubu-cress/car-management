@@ -22,8 +22,10 @@ describe("App API: /api/v1/app/tenants/:tenantId/homepage-config", () => {
     // Create homepage config via Prisma directly (bypassing admin API for app tests)
     const homepageConfigData = {
       tenantId: tenant.id,
-      welcomeTitle: "App Welcome",
-      welcomeDescription: "Welcome to the App!",
+      firstTitle: "App First Title",
+      firstTitleIcon: "app-first-icon.png",
+      secondTitle: "App Second Title",
+      secondTitleIcon: "app-second-icon.png",
       bannerImage: "app-banner.jpg",
       benefitsImage: "app-benefits.jpg",
     };
