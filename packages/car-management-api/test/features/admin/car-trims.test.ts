@@ -43,6 +43,7 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
       name: "豪华版",
       subtitle: "旗舰豪华配置，尊享驾乘体验",
       image: "https://example.com/trim-luxury.jpg",
+      configImageUrl: "https://example.com/trim-luxury-config.jpg",
       originalPrice: 580000,
       currentPrice: 548000,
       features: [
@@ -70,6 +71,7 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
       name: newTrim.name,
       subtitle: newTrim.subtitle,
       image: newTrim.image,
+      configImageUrl: newTrim.configImageUrl,
       originalPrice: String(newTrim.originalPrice),
       currentPrice: String(newTrim.currentPrice),
       categoryId: categoryId,
@@ -105,11 +107,44 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
     expect(typeof body.name).toBe("string");
     expect(typeof body.subtitle).toBe("string");
     expect(typeof body.image).toBe("string");
+    expect(typeof body.configImageUrl).toBe("string");
     expect(typeof body.originalPrice).toBe("string");
     expect(typeof body.currentPrice).toBe("string");
     expect(Array.isArray(body.features)).toBe(true);
     expect(typeof body.categoryId).toBe("string");
     expect(typeof body.tenantId).toBe("string");
+  });
+
+  it("should create a new car trim without configImageUrl", async () => {
+    const newTrim: CreateCarTrimInput = {
+      name: "标准版",
+      subtitle: "基础配置，经济实用",
+      image: "https://example.com/trim-standard.jpg",
+      originalPrice: 480000,
+      currentPrice: 450000,
+      features: [],
+      categoryId: categoryId,
+    };
+    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${adminUser.token}`,
+      },
+      body: JSON.stringify(newTrim),
+    });
+    expect(response.status).toBe(201);
+    const body = (await response.json()) as CarTrim;
+    expect(body).toMatchObject({
+      name: newTrim.name,
+      subtitle: newTrim.subtitle,
+      image: newTrim.image,
+      originalPrice: String(newTrim.originalPrice),
+      currentPrice: String(newTrim.currentPrice),
+      categoryId: categoryId,
+      tenantId: tenantId,
+    });
+    expect(body.configImageUrl).toBeNull();
   });
 
   it("should get all car trims for a category, sorted by displayOrder", async () => {
@@ -118,6 +153,7 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
         name: "Trim 2",
         subtitle: "A nice trim",
         image: "https://example.com/trim.jpg",
+        configImageUrl: "https://example.com/trim2-config.jpg",
         originalPrice: 50000,
         currentPrice: 48000,
         features: [],
@@ -150,7 +186,9 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
     expect(Array.isArray(body)).toBe(true);
     expect(body.length).toBe(2);
     expect(body[0].name).toBe("Trim 1");
+    expect(body[0].configImageUrl).toBeNull();
     expect(body[1].name).toBe("Trim 2");
+    expect(body[1].configImageUrl).toBe("https://example.com/trim2-config.jpg");
   });
 
   it("should reorder car trims", async () => {
@@ -212,6 +250,7 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
         name: "Test Trim for Get",
         subtitle: "A nice trim",
         image: "https://example.com/trim.jpg",
+        configImageUrl: "https://example.com/trim-get-config.jpg",
         originalPrice: 50000,
         currentPrice: 48000,
         features: [],
@@ -246,6 +285,7 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
     const body = (await response.json()) as CarTrimWithFavorites;
     expect(body.id).toBe(trim.id);
     expect(body.name).toBe("Test Trim for Get");
+    expect(body.configImageUrl).toBe("https://example.com/trim-get-config.jpg");
     expect(body.favoritedBy).toBeDefined();
     expect(Array.isArray(body.favoritedBy)).toBe(true);
     expect(body.favoritedBy.length).toBe(1);
@@ -297,9 +337,26 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
       },
     });
 
-    // Archive the car trim
-    const archiveUpdateData = { name: "Updated Trim Name", isArchived: true };
+    // Update name and configImageUrl
+    const updateData = { name: "Updated Trim Name", configImageUrl: "https://example.com/updated-config.jpg" };
     let response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims/${trim.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${adminUser.token}`,
+      },
+      body: JSON.stringify(updateData),
+    });
+    expect(response.status).toBe(200);
+    let body = (await response.json()) as CarTrim;
+    expect(body.name).toBe(updateData.name);
+    expect(body.configImageUrl).toBe(updateData.configImageUrl);
+    let updatedTrimInDb = await prisma.carTrim.findUnique({ where: { id: trim.id } });
+    expect(updatedTrimInDb?.configImageUrl).toBe(updateData.configImageUrl);
+
+    // Archive the car trim
+    const archiveUpdateData = { isArchived: true };
+    response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims/${trim.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -308,8 +365,7 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
       body: JSON.stringify(archiveUpdateData),
     });
     expect(response.status).toBe(200);
-    let body = (await response.json()) as CarTrim;
-    expect(body.name).toBe(archiveUpdateData.name);
+    body = (await response.json()) as CarTrim;
     expect(body.isArchived).toBe(true);
 
     // Verify it's archived in the DB
