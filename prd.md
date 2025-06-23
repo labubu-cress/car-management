@@ -8,7 +8,7 @@ car-trim 要提供一个可配置下架的功能：
 修改 prisma schema
 执行 generate 和 migrate dev
 
-# task B
+# task B (completed)
 
 实现后端的相关逻辑，并编写测试，并确保能执行通过。
 

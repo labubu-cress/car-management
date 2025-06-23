@@ -130,6 +130,7 @@ export interface CarTrim {
   categoryId: string;
   createdAt: string;
   updatedAt: string;
+  isArchived: boolean;
 }
 
 export interface CreateCarTrimInput {
@@ -141,6 +142,7 @@ export interface CreateCarTrimInput {
   badge?: string;
   features?: Feature[];
   categoryId: string;
+  isArchived?: boolean;
 }
 
 export interface UpdateCarTrimInput {
@@ -152,6 +154,7 @@ export interface UpdateCarTrimInput {
   badge?: string;
   features?: Feature[];
   categoryId?: string;
+  isArchived?: boolean;
 }
 
 export interface UserInFavorite {

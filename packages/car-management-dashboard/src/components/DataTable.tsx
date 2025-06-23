@@ -27,6 +27,12 @@ export interface Column<T> {
   width?: string;
 }
 
+export interface Action<T> {
+  label: string;
+  onClick: (record: T) => void;
+  isDanger?: boolean;
+}
+
 export interface DataTableProps<T> {
   columns: Column<T>[];
   data: T[];
@@ -34,6 +40,7 @@ export interface DataTableProps<T> {
   onAdd?: () => void;
   onEdit?: (record: T) => void;
   onDelete?: (record: T) => void;
+  getActions?: (record: T) => Action<T>[];
   addButtonText?: string;
   title?: string;
   onReorder?: (data: T[]) => void;
@@ -44,6 +51,7 @@ function SortableRow<T extends { id: string }>({
   columns,
   onEdit,
   onDelete,
+  getActions,
   getValue,
   isSortable,
 }: {
@@ -51,10 +59,18 @@ function SortableRow<T extends { id: string }>({
   columns: Column<T>[];
   onEdit?: (record: T) => void;
   onDelete?: (record: T) => void;
+  getActions?: (record: T) => Action<T>[];
   getValue: (record: T, key: keyof T | string) => any;
   isSortable: boolean;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
     id: record.id,
     disabled: !isSortable,
   });
@@ -66,6 +82,8 @@ function SortableRow<T extends { id: string }>({
     zIndex: isDragging ? 1 : 0,
     position: 'relative',
   };
+
+  const actions = getActions ? getActions(record) : [];
 
   return (
     <tr ref={setNodeRef} style={style} {...attributes} className={styles.tr}>
@@ -79,16 +97,41 @@ function SortableRow<T extends { id: string }>({
           {column.render ? column.render(getValue(record, column.key), record) : getValue(record, column.key)}
         </td>
       ))}
-      {(onEdit || onDelete) && (
+      {(onEdit || onDelete || (actions && actions.length > 0)) && (
         <td className={styles.td}>
           <div className={styles.actions}>
-            {onEdit && (
-              <button onClick={() => onEdit?.(record)} className={styles.editButton} title="编辑">
+            {getActions
+              ? actions.map((action) => (
+                  <button
+                    key={action.label}
+                    onClick={() => action.onClick(record)}
+                    className={
+                      action.isDanger
+                        ? styles.deleteButton
+                        : styles.editButton
+                    }
+                    title={action.label}
+                  >
+                    {action.label}
+                  </button>
+                ))
+              : null}
+
+            {!getActions && onEdit && (
+              <button
+                onClick={() => onEdit?.(record)}
+                className={styles.editButton}
+                title="编辑"
+              >
                 <FontAwesomeIcon icon={faEdit} />
               </button>
             )}
-            {onDelete && (
-              <button onClick={() => onDelete?.(record)} className={styles.deleteButton} title="删除">
+            {!getActions && onDelete && (
+              <button
+                onClick={() => onDelete?.(record)}
+                className={styles.deleteButton}
+                title="删除"
+              >
                 <FontAwesomeIcon icon={faTrash} />
               </button>
             )}
@@ -106,6 +149,7 @@ export function DataTable<T extends { id: string }>({
   onAdd,
   onEdit,
   onDelete,
+  getActions,
   addButtonText = '添加',
   title,
   onReorder,
@@ -134,6 +178,8 @@ export function DataTable<T extends { id: string }>({
   }
 
   const isSortable = !!onReorder;
+  const hasActions =
+    !!onEdit || !!onDelete || (data.length > 0 && !!getActions);
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -158,8 +204,8 @@ export function DataTable<T extends { id: string }>({
                     {column.title}
                   </th>
                 ))}
-                {(onEdit || onDelete) && (
-                  <th className={styles.th} style={{ width: '120px' }}>
+                {hasActions && (
+                  <th className={styles.th} style={{ width: '180px' }}>
                     操作
                   </th>
                 )}
@@ -170,7 +216,7 @@ export function DataTable<T extends { id: string }>({
                 {loading ? (
                   <tr>
                     <td
-                      colSpan={columns.length + (onEdit || onDelete ? 1 : 0) + (isSortable ? 1 : 0)}
+                      colSpan={columns.length + (hasActions ? 1 : 0) + (isSortable ? 1 : 0)}
                       className={styles.loadingCell}
                     >
                       加载中...
@@ -179,7 +225,7 @@ export function DataTable<T extends { id: string }>({
                 ) : data.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={columns.length + (onEdit || onDelete ? 1 : 0) + (isSortable ? 1 : 0)}
+                      colSpan={columns.length + (hasActions ? 1 : 0) + (isSortable ? 1 : 0)}
                       className={styles.emptyCell}
                     >
                       暂无数据
@@ -193,6 +239,7 @@ export function DataTable<T extends { id: string }>({
                       columns={columns}
                       onEdit={onEdit}
                       onDelete={onDelete}
+                      getActions={getActions}
                       getValue={getValue}
                       isSortable={isSortable}
                     />
