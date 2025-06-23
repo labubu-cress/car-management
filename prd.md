@@ -1,28 +1,17 @@
 # gaol
 
-需要微信小程序faq 的配置做调整
+car-category 要添加一个属性 isArchived， 业务含义如下：
+car-category 的 isArchived 永远通过统计 car-trim 的 isArchied 属性来计算得到。
+如果用户想要修改 car-category 的 isArchived, 其实是通过修改 所有 car-trim 的 isArchied 属性来实现的。
 
-```diff
-diff --git a/packages/car-management-api/prisma/schema.prisma b/packages/car-management-api/prisma/schema.prisma
-index e0424c5..f31ac12 100644
---- a/packages/car-management-api/prisma/schema.prisma
-+++ b/packages/car-management-api/prisma/schema.prisma
-@@ -175,6 +175,7 @@ model Faq {
-   id        String   @id @default(cuid())
-   question  String
-   answer    String   @db.Text
-+  icon      String
-   tenantId  String
-   tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-   createdAt DateTime @default(now())
-```
+# task A
 
-上面是 schema 的修改，已经 prisma generate 和 migrate dev 过了
+确认是否不需要修改 prisma schema，如果不需要修改，则自动执行 task B
 
-# task A （completed）
+# task B
 
 实现后端的相关逻辑，并编写测试，并确保能执行通过。
 
-# task B
+# task C
 
 实现管理后台前端的相关逻辑
