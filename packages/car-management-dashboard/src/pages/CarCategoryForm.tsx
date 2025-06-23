@@ -30,6 +30,7 @@ export const CarCategoryForm: React.FC = () => {
     exteriorImages: [] as string[],
     offerPictures: [] as string[],
     vehicleScenarioId: '',
+    isArchived: false,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -66,6 +67,7 @@ export const CarCategoryForm: React.FC = () => {
             exteriorImages: data.exteriorImages || [],
             offerPictures: data.offerPictures || [],
             vehicleScenarioId: data.vehicleScenario?.id || '',
+            isArchived: data.isArchived || false,
           });
         }
       },
@@ -146,6 +148,7 @@ export const CarCategoryForm: React.FC = () => {
         exteriorImages: formData.exteriorImages.length > 0 ? formData.exteriorImages : undefined,
         offerPictures: formData.offerPictures.length > 0 ? formData.offerPictures : undefined,
         vehicleScenarioId: formData.vehicleScenarioId,
+        isArchived: formData.isArchived,
       };
       updateMutation.mutate({ id, data: updateData });
     } else {
@@ -253,6 +256,22 @@ export const CarCategoryForm: React.FC = () => {
               placeholder="如：热门、推荐等"
             />
           </FormField>
+
+          {isEdit && (
+            <FormField label="归档">
+              <label className={formFieldStyles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={formData.isArchived}
+                  onChange={(e) => setFormData({ ...formData, isArchived: e.target.checked })}
+                  className={formFieldStyles.checkbox}
+                />
+                <span className={formFieldStyles.checkboxText}>
+                  将此车型归档（归档后在小程序端将对用户不可见）
+                </span>
+              </label>
+            </FormField>
+          )}
         </div>
 
         <div className={carCategoryFormStyles.section}>

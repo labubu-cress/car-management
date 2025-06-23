@@ -115,6 +115,12 @@ export const CarCategories: React.FC = () => {
       render: (value: string[]) => value?.join(', ') || '-',
     },
     {
+      key: 'isArchived',
+      title: '已归档',
+      width: '100px',
+      render: (isArchived: boolean) => (isArchived ? '是' : '否'),
+    },
+    {
       key: 'createdAt',
       title: '创建时间',
       width: '180px',

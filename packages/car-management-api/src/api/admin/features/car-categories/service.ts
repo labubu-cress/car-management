@@ -27,24 +27,57 @@ export const getAllCarCategories = async (
 
   const categories = await prisma.carCategory.findMany({
     where,
-    include: { vehicleScenario: true },
+    include: {
+      vehicleScenario: true,
+      carTrims: {
+        select: {
+          isArchived: true,
+        },
+      },
+    },
     orderBy: {
       displayOrder: "asc",
     },
   });
-  return z.array(carCategorySchema).parse(categories);
+
+  const categoriesWithArchived = categories.map((c) => {
+    const isArchived = c.carTrims.length > 0 && c.carTrims.every((t) => t.isArchived);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { carTrims, ...rest } = c;
+    return {
+      ...rest,
+      isArchived,
+    };
+  });
+
+  return z.array(carCategorySchema).parse(categoriesWithArchived);
 };
 
 export const getCarCategoryById = async (tenantId: string, id: string): Promise<CarCategory | null> => {
   const prisma = createTenantPrismaClient(tenantId);
   const category = await prisma.carCategory.findFirst({
     where: { id, tenantId },
-    include: { vehicleScenario: true },
+    include: {
+      vehicleScenario: true,
+      carTrims: {
+        select: {
+          isArchived: true,
+        },
+      },
+    },
   });
   if (!category) {
     return null;
   }
-  return carCategorySchema.parse(category);
+
+  const isArchived = category.carTrims.length > 0 && category.carTrims.every((t) => t.isArchived);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { carTrims, ...rest } = category;
+
+  return carCategorySchema.parse({
+    ...rest,
+    isArchived,
+  });
 };
 
 export const createCarCategory = async (tenantId: string, data: CreateCarCategoryInput): Promise<CarCategory> => {
@@ -75,7 +108,7 @@ export const createCarCategory = async (tenantId: string, data: CreateCarCategor
     },
     include: { vehicleScenario: true },
   });
-  return carCategorySchema.parse(newCategory);
+  return carCategorySchema.parse({ ...newCategory, isArchived: false });
 };
 
 export const updateCarCategory = async (
@@ -84,19 +117,48 @@ export const updateCarCategory = async (
   data: UpdateCarCategoryInput,
 ): Promise<CarCategory> => {
   const prisma = createTenantPrismaClient(tenantId);
-  const { vehicleScenarioId, ...restData } = data;
+  const { vehicleScenarioId, isArchived, ...restData } = data;
+
+  if (typeof isArchived === "boolean") {
+    await prisma.carTrim.updateMany({
+      where: {
+        categoryId: id,
+      },
+      data: {
+        isArchived,
+      },
+    });
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updateData: any = { ...restData };
   if (vehicleScenarioId) {
     updateData.vehicleScenario = { connect: { id: vehicleScenarioId } };
   }
-  const updatedCategory = await prisma.carCategory.update({
+
+  const updatedCategoryWithTrims = await prisma.carCategory.update({
     where: { id },
     data: updateData,
-    include: { vehicleScenario: true },
+    include: {
+      vehicleScenario: true,
+      carTrims: {
+        select: {
+          isArchived: true,
+        },
+      },
+    },
   });
-  return carCategorySchema.parse(updatedCategory);
+
+  const isArchivedComputed =
+    updatedCategoryWithTrims.carTrims.length > 0 && updatedCategoryWithTrims.carTrims.every((t) => t.isArchived);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { carTrims, ...rest } = updatedCategoryWithTrims;
+
+  return carCategorySchema.parse({
+    ...rest,
+    isArchived: isArchivedComputed,
+  });
 };
 
 export const deleteCarCategory = async (tenantId: string, id: string): Promise<void> => {

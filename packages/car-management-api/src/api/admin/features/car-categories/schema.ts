@@ -18,6 +18,7 @@ export const carCategorySchema = z.object({
   createdAt: z.date(),
   updatedAt: z.date(),
   vehicleScenario: vehicleScenarioSchema.optional(),
+  isArchived: z.boolean(),
 });
 
 // 从 schema 推断出 TypeScript 类型
@@ -36,7 +37,9 @@ export const createCarCategorySchema = z.object({
   vehicleScenarioId: z.string(),
 });
 
-export const updateCarCategorySchema = createCarCategorySchema.partial();
+export const updateCarCategorySchema = createCarCategorySchema.partial().extend({
+  isArchived: z.boolean().optional(),
+});
 
 export type CreateCarCategoryInput = z.infer<typeof createCarCategorySchema>;
 export type UpdateCarCategoryInput = z.infer<typeof updateCarCategorySchema>;

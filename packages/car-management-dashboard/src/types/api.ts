@@ -86,6 +86,7 @@ export interface CarCategory {
   createdAt: string;
   updatedAt: string;
   vehicleScenario?: VehicleScenario;
+  isArchived: boolean;
 }
 
 export interface CreateCarCategoryInput {
@@ -110,6 +111,7 @@ export interface UpdateCarCategoryInput {
   exteriorImages?: string[];
   offerPictures?: string[];
   vehicleScenarioId?: string;
+  isArchived?: boolean;
 }
 
 export interface Feature {
