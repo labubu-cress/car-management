@@ -250,7 +250,8 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
     expect(Array.isArray(body.favoritedBy)).toBe(true);
     expect(body.favoritedBy.length).toBe(1);
     expect(body.favoritedBy[0].user.id).toBe(user.id);
-    expect(body.favoritedBy[0].user.nickname).toBe(user.nickname);
+    expect(body.favoritedBy[0].user.nickname).toBe("Favorite User");
+    expect(body.favoritedBy[0].user.openId).toBe("test-user-openid-for-favorite");
   });
 
   it("should delete a car trim", async () => {
@@ -280,5 +281,57 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
       },
     });
     expect(findResponse.status).toBe(404);
+  });
+
+  it("should update a car trim, including archiving and unarchiving", async () => {
+    const trim = await prisma.carTrim.create({
+      data: {
+        name: "Test Trim for Update",
+        subtitle: "Initial subtitle",
+        image: "https://example.com/trim_initial.jpg",
+        originalPrice: 60000,
+        currentPrice: 55000,
+        features: [],
+        categoryId: categoryId,
+        tenantId: tenantId,
+      },
+    });
+
+    // Archive the car trim
+    const archiveUpdateData = { name: "Updated Trim Name", isArchived: true };
+    let response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims/${trim.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${adminUser.token}`,
+      },
+      body: JSON.stringify(archiveUpdateData),
+    });
+    expect(response.status).toBe(200);
+    let body = (await response.json()) as CarTrim;
+    expect(body.name).toBe(archiveUpdateData.name);
+    expect(body.isArchived).toBe(true);
+
+    // Verify it's archived in the DB
+    let updatedTrim = await prisma.carTrim.findUnique({ where: { id: trim.id } });
+    expect(updatedTrim?.isArchived).toBe(true);
+
+    // Unarchive the car trim
+    const unarchiveUpdateData = { isArchived: false };
+    response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims/${trim.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${adminUser.token}`,
+      },
+      body: JSON.stringify(unarchiveUpdateData),
+    });
+    expect(response.status).toBe(200);
+    body = (await response.json()) as CarTrim;
+    expect(body.isArchived).toBe(false);
+
+    // Verify it's unarchived in the DB
+    updatedTrim = await prisma.carTrim.findUnique({ where: { id: trim.id } });
+    expect(updatedTrim?.isArchived).toBe(false);
   });
 });

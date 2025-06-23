@@ -23,6 +23,7 @@ export const carTrimSchema = z.object({
   displayOrder: z.number(),
   createdAt: z.date(),
   updatedAt: z.date(),
+  isArchived: z.boolean(),
 });
 
 export const carTrimWithFavoritesSchema = carTrimSchema.extend({
@@ -52,7 +53,9 @@ export const createCarTrimSchema = z.object({
 });
 
 // Schema for updating a car trim
-export const updateCarTrimSchema = createCarTrimSchema.partial();
+export const updateCarTrimSchema = createCarTrimSchema.partial().extend({
+  isArchived: z.boolean().optional(),
+});
 
 export const reorderCarTrimsSchema = z.object({
   categoryId: z.string().cuid(),

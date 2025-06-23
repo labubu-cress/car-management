@@ -72,4 +72,39 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-trims", () => {
     expect(body.categoryId).toBe(categoryId);
     expect(body.tenantId).toBe(tenant.id);
   });
+
+  it("should not get archived car trims in the list", async () => {
+    // Archive one of the trims
+    await prisma.carTrim.create({
+      data: {
+        name: "Archived Trim",
+        subtitle: "This one is archived",
+        image: "https://example.com/trim-archived.jpg",
+        originalPrice: 120000,
+        currentPrice: 110000,
+        features: [],
+        categoryId: categoryId,
+        tenantId: tenant.id,
+        isArchived: true,
+      },
+    });
+
+    const response = await app.request(`/api/v1/app/tenants/${tenant.id}/car-trims?categoryId=${categoryId}`);
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as CarTrim[];
+    expect(Array.isArray(body)).toBe(true);
+    expect(body.length).toBe(1);
+    expect(body[0].name).toBe("Test Trim App");
+  });
+
+  it("should not get an archived car trim by id", async () => {
+    // Archive the existing trim
+    await prisma.carTrim.update({
+      where: { id: trimId },
+      data: { isArchived: true },
+    });
+
+    const response = await app.request(`/api/v1/app/tenants/${tenant.id}/car-trims/${trimId}`);
+    expect(response.status).toBe(404);
+  });
 });

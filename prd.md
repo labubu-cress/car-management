@@ -3,7 +3,7 @@
 car-trim 要提供一个可配置下架的功能：
 管理端可配置某个 car-trim 下架
 
-# task A
+# task A (completed)
 
 修改 prisma schema
 执行 generate 和 migrate dev
