@@ -15,17 +15,19 @@ describe("App API: /api/v1/app/tenants/:tenantId/faqs", () => {
       data: {
         question: "Test Question 1?",
         answer: "Test Answer 1.",
+        icon: "test-icon-1",
         tenantId: tenant.id,
       },
     });
 
     await prisma.faq.create({
-        data: {
-          question: "Test Question 2?",
-          answer: "Test Answer 2.",
-          tenantId: tenant.id,
-        },
-      });
+      data: {
+        question: "Test Question 2?",
+        answer: "Test Answer 2.",
+        icon: "test-icon-2",
+        tenantId: tenant.id,
+      },
+    });
   });
 
   it("should get all faqs for the tenant", async () => {
@@ -35,6 +37,7 @@ describe("App API: /api/v1/app/tenants/:tenantId/faqs", () => {
     expect(Array.isArray(body)).toBe(true);
     expect(body.length).toBe(2);
     expect(body[0].question).toBe("Test Question 1?");
+    expect(body[0].icon).toBe("test-icon-1");
     expect(body[0].tenantId).toBe(tenant.id);
   });
-}); 
+});
