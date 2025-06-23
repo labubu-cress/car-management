@@ -1,5 +1,6 @@
 import { Column, DataTable } from '@/components/DataTable';
 import { FormField } from '@/components/FormField';
+import { ImageUpload } from '@/components/ImageUpload';
 import { Modal } from '@/components/Modal';
 import { useAuth } from '@/contexts/AuthContext';
 import { faqsApi } from '@/lib/api';
@@ -178,11 +179,10 @@ export const Faqs: React.FC = () => {
             />
           </FormField>
           <FormField label="图标">
-            <input
-              type="text"
+            <ImageUpload
               value={formData.icon}
-              onChange={(e) => handleInputChange('icon', e.target.value)}
-              required
+              onChange={(url) => handleInputChange('icon', url)}
+              tenantId={tenantId!}
             />
           </FormField>
           <button type="submit" disabled={isSubmitting}>
