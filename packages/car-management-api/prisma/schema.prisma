@@ -124,6 +124,7 @@ model CarTrim {
   categoryId    String
   category      CarCategory @relation(fields: [categoryId], references: [id])
   displayOrder  Int         @default(0)
+  isArchived    Boolean     @default(false)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
