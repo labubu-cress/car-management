@@ -93,11 +93,11 @@ export const CarCategories: React.FC = () => {
     },
     {
       onSuccess: (_, { isArchived }) => {
-        toast.success(`车型 ${isArchived ? '归档' : '取消归档'} 成功`);
+        toast.success(`车型 ${isArchived ? '下架' : '上架'} 成功`);
         queryClient.invalidateQueries(['car-categories', currentTenant?.id, selectedScenarioId]);
       },
       onError: (error: any, { isArchived }) => {
-        toast.error(error.response?.data?.message || `车型 ${isArchived ? '归档' : '取消归档'} 失败`);
+        toast.error(error.response?.data?.message || `车型 ${isArchived ? '下架' : '上架'} 失败`);
       },
     },
   );
@@ -133,9 +133,23 @@ export const CarCategories: React.FC = () => {
     },
     {
       key: 'isArchived',
-      title: '已归档',
+      title: '状态',
       width: '100px',
-      render: (isArchived: boolean) => (isArchived ? '是' : '否'),
+      render: (isArchived: boolean) => (
+        <span
+          style={{
+            padding: '2px 8px',
+            borderRadius: '12px',
+            fontSize: '12px',
+            fontWeight: '600',
+            backgroundColor: isArchived ? '#fef2f2' : '#ecfdf5',
+            color: isArchived ? '#ef4444' : '#10b981',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {isArchived ? '已下架' : '销售中'}
+        </span>
+      ),
     },
     {
       key: 'createdAt',

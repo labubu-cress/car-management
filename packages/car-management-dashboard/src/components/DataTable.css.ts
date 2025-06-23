@@ -128,6 +128,36 @@ export const actionButtonDanger = style([
   },
 ]);
 
+export const archiveButton = style({
+  padding: "6px 8px",
+  background: "#888",
+  color: "white",
+  border: "none",
+  borderRadius: "4px",
+  cursor: "pointer",
+  fontSize: "12px",
+  transition: "background-color 0.2s ease",
+
+  ":hover": {
+    backgroundColor: "#666",
+  },
+});
+
+export const unarchiveButton = style({
+  padding: "6px 8px",
+  background: "#f97316",
+  color: "white",
+  border: "none",
+  borderRadius: "4px",
+  cursor: "pointer",
+  fontSize: "12px",
+  transition: "background-color 0.2s ease",
+
+  ":hover": {
+    backgroundColor: "#ea580c",
+  },
+});
+
 export const editButton = style({
   padding: "6px 8px",
   background: "#52c41a",
