@@ -72,24 +72,4 @@ export const formFieldStyles = {
       boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)",
     },
   }),
-
-  checkboxLabel: style({
-    display: "flex",
-    alignItems: "center",
-    cursor: "pointer",
-    marginTop: "8px",
-  }),
-
-  checkbox: style({
-    marginRight: "8px",
-    height: "16px",
-    width: "16px",
-    cursor: "pointer",
-    accentColor: "#3b82f6",
-  }),
-
-  checkboxText: style({
-    fontSize: "14px",
-    color: "#4b5563",
-  }),
 };

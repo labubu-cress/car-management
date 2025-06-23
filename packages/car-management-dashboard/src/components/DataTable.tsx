@@ -1,21 +1,21 @@
 import {
-    closestCenter,
-    DndContext,
-    DragEndEvent,
-    KeyboardSensor,
-    PointerSensor,
-    useSensor,
-    useSensors,
+  closestCenter,
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
 } from '@dnd-kit/core';
 import {
-    arrayMove,
-    SortableContext,
-    sortableKeyboardCoordinates,
-    useSortable,
-    verticalListSortingStrategy,
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { faEdit, faGripVertical, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faArchive, faBoxOpen, faEdit, faGripVertical, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import * as styles from './DataTable.css';
@@ -40,17 +40,19 @@ export interface DataTableProps<T> {
   onAdd?: () => void;
   onEdit?: (record: T) => void;
   onDelete?: (record: T) => void;
+  onArchiveToggle?: (record: T) => void;
   getActions?: (record: T) => Action<T>[];
   addButtonText?: string;
   title?: string;
   onReorder?: (data: T[]) => void;
 }
 
-function SortableRow<T extends { id: string }>({
+function SortableRow<T extends { id: string; isArchived?: boolean }>({
   record,
   columns,
   onEdit,
   onDelete,
+  onArchiveToggle,
   getActions,
   getValue,
   isSortable,
@@ -59,6 +61,7 @@ function SortableRow<T extends { id: string }>({
   columns: Column<T>[];
   onEdit?: (record: T) => void;
   onDelete?: (record: T) => void;
+  onArchiveToggle?: (record: T) => void;
   getActions?: (record: T) => Action<T>[];
   getValue: (record: T, key: keyof T | string) => any;
   isSortable: boolean;
@@ -97,7 +100,7 @@ function SortableRow<T extends { id: string }>({
           {column.render ? column.render(getValue(record, column.key), record) : getValue(record, column.key)}
         </td>
       ))}
-      {(onEdit || onDelete || (actions && actions.length > 0)) && (
+      {(onEdit || onDelete || onArchiveToggle || (actions && actions.length > 0)) && (
         <td className={styles.td}>
           <div className={styles.actions}>
             {getActions
@@ -116,6 +119,16 @@ function SortableRow<T extends { id: string }>({
                   </button>
                 ))
               : null}
+
+            {!getActions && onArchiveToggle && (
+              <button
+                onClick={() => onArchiveToggle?.(record)}
+                className={styles.actionButton}
+                title={record.isArchived ? '取消归档' : '归档'}
+              >
+                <FontAwesomeIcon icon={record.isArchived ? faBoxOpen : faArchive} />
+              </button>
+            )}
 
             {!getActions && onEdit && (
               <button
@@ -142,13 +155,14 @@ function SortableRow<T extends { id: string }>({
   );
 }
 
-export function DataTable<T extends { id: string }>({
+export function DataTable<T extends { id: string; isArchived?: boolean }>({
   columns,
   data,
   loading = false,
   onAdd,
   onEdit,
   onDelete,
+  onArchiveToggle,
   getActions,
   addButtonText = '添加',
   title,
@@ -239,6 +253,7 @@ export function DataTable<T extends { id: string }>({
                       columns={columns}
                       onEdit={onEdit}
                       onDelete={onDelete}
+                      onArchiveToggle={onArchiveToggle}
                       getActions={getActions}
                       getValue={getValue}
                       isSortable={isSortable}

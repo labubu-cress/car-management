@@ -85,6 +85,23 @@ export const CarCategories: React.FC = () => {
     }
   );
 
+  // 归档/取消归档分类
+  const archiveMutation = useMutation(
+    ({ id, isArchived }: { id: string; isArchived: boolean }) => {
+      if (!currentTenant) throw new Error("Missing tenant ID");
+      return carCategoriesApi.update(currentTenant.id, id, { isArchived });
+    },
+    {
+      onSuccess: (_, { isArchived }) => {
+        toast.success(`车型 ${isArchived ? '归档' : '取消归档'} 成功`);
+        queryClient.invalidateQueries(['car-categories', currentTenant?.id, selectedScenarioId]);
+      },
+      onError: (error: any, { isArchived }) => {
+        toast.error(error.response?.data?.message || `车型 ${isArchived ? '归档' : '取消归档'} 失败`);
+      },
+    },
+  );
+
   const columns: Column<CarCategory>[] = [
     {
       key: 'image',
@@ -142,6 +159,10 @@ export const CarCategories: React.FC = () => {
     }
   };
 
+  const handleArchiveToggle = (category: CarCategory) => {
+    archiveMutation.mutate({ id: category.id, isArchived: !category.isArchived });
+  };
+
   const handleReorder = (reorderedCategories: CarCategory[]) => {
     setLocalCategories(reorderedCategories);
     reorderMutation.mutate({ categoryIds: reorderedCategories.map((c) => c.id) });
@@ -194,6 +215,7 @@ export const CarCategories: React.FC = () => {
         onAdd={selectedScenarioId ? handleAdd : undefined}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onArchiveToggle={handleArchiveToggle}
         onReorder={handleReorder}
         addButtonText="创建车型"
       />
