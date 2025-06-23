@@ -134,15 +134,17 @@ model CarTrim {
 }
 
 model HomepageConfig {
-  id                 String   @id @default(cuid())
-  tenantId           String   @unique
-  tenant             Tenant   @relation(fields: [tenantId], references: [id])
-  welcomeTitle       String?
-  welcomeDescription String?
-  bannerImage        String
-  benefitsImage      String
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id              String   @id @default(cuid())
+  tenantId        String   @unique
+  tenant          Tenant   @relation(fields: [tenantId], references: [id])
+  firstTitle      String
+  firstTitleIcon  String
+  secondTitle     String
+  secondTitleIcon String
+  bannerImage     String
+  benefitsImage   String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model UserFavoriteCarTrim {
