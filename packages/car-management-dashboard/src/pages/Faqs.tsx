@@ -12,6 +12,7 @@ import * as styles from './Faqs.css';
 interface FaqFormData {
   question: string;
   answer: string;
+  icon: string;
 }
 
 export const Faqs: React.FC = () => {
@@ -20,6 +21,7 @@ export const Faqs: React.FC = () => {
   const [formData, setFormData] = useState<FaqFormData>({
     question: '',
     answer: '',
+    icon: '',
   });
 
   const { currentTenant } = useAuth();
@@ -89,6 +91,10 @@ export const Faqs: React.FC = () => {
       title: '答案',
     },
     {
+      key: 'icon',
+      title: '图标',
+    },
+    {
       key: 'createdAt',
       title: '创建时间',
       render: (value: string) => new Date(value).toLocaleString('zh-CN'),
@@ -97,13 +103,13 @@ export const Faqs: React.FC = () => {
 
   const handleAdd = () => {
     setEditingFaq(null);
-    setFormData({ question: '', answer: '' });
+    setFormData({ question: '', answer: '', icon: '' });
     setIsModalOpen(true);
   };
 
   const handleEdit = (faq: Faq) => {
     setEditingFaq(faq);
-    setFormData({ question: faq.question, answer: faq.answer });
+    setFormData({ question: faq.question, answer: faq.answer, icon: faq.icon });
     setIsModalOpen(true);
   };
 
@@ -168,6 +174,14 @@ export const Faqs: React.FC = () => {
               value={formData.answer}
               onChange={(e) => handleInputChange('answer', e.target.value)}
               rows={5}
+              required
+            />
+          </FormField>
+          <FormField label="图标">
+            <input
+              type="text"
+              value={formData.icon}
+              onChange={(e) => handleInputChange('icon', e.target.value)}
               required
             />
           </FormField>

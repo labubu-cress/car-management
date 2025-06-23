@@ -269,6 +269,7 @@ export interface Faq {
   id: string;
   question: string;
   answer: string;
+  icon: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -276,11 +277,13 @@ export interface Faq {
 export interface CreateFaqInput {
   question: string;
   answer: string;
+  icon: string;
 }
 
 export interface UpdateFaqInput {
   question?: string;
   answer?: string;
+  icon?: string;
 }
 
 export interface UserMessage {
