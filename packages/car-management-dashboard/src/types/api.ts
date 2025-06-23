@@ -297,6 +297,11 @@ export interface UserMessage {
   contact: string;
   content: string;
   createdAt: string;
+  status: "PENDING" | "PROCESSED";
+  processedAt: string | null;
+  processedBy: {
+    username: string;
+  } | null;
   user: {
     nickname: string;
     avatarUrl: string;

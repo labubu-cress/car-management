@@ -1,34 +1,34 @@
 import type {
-    AdminUser,
-    CarCategory,
-    CarTrim,
-    CarTrimWithFavorites,
-    ContactUsConfig,
-    CreateAdminUserInput,
-    CreateCarCategoryInput,
-    CreateCarTrimInput,
-    CreateFaqInput,
-    CreateTenantInput,
-    CreateVehicleScenarioInput,
-    DashboardStats,
-    Faq,
-    HomepageConfig,
-    LoginInput,
-    LoginResponse,
-    Tenant,
-    UpdateAdminUserInput,
-    UpdateCarCategoryInput,
-    UpdateCarTrimInput,
-    UpdateContactUsConfigInput,
-    UpdateFaqInput,
-    UpdateHomepageConfigInput,
-    UpdateTenantInput,
-    UpdateVehicleScenarioInput,
-    UploadToken,
-    User,
-    UserMessage,
-    UserWithFavorites,
-    VehicleScenario,
+  AdminUser,
+  CarCategory,
+  CarTrim,
+  CarTrimWithFavorites,
+  ContactUsConfig,
+  CreateAdminUserInput,
+  CreateCarCategoryInput,
+  CreateCarTrimInput,
+  CreateFaqInput,
+  CreateTenantInput,
+  CreateVehicleScenarioInput,
+  DashboardStats,
+  Faq,
+  HomepageConfig,
+  LoginInput,
+  LoginResponse,
+  Tenant,
+  UpdateAdminUserInput,
+  UpdateCarCategoryInput,
+  UpdateCarTrimInput,
+  UpdateContactUsConfigInput,
+  UpdateFaqInput,
+  UpdateHomepageConfigInput,
+  UpdateTenantInput,
+  UpdateVehicleScenarioInput,
+  UploadToken,
+  User,
+  UserMessage,
+  UserWithFavorites,
+  VehicleScenario,
 } from "@/types/api";
 import axios from "axios";
 
@@ -190,8 +190,7 @@ export const contactUsConfigApi = {
 
 // 常见问题管理
 export const faqsApi = {
-  getAll: (tenantId: string): Promise<Faq[]> =>
-    api.get(`/tenants/${tenantId}/faqs`).then((res) => res.data.items),
+  getAll: (tenantId: string): Promise<Faq[]> => api.get(`/tenants/${tenantId}/faqs`).then((res) => res.data.items),
 
   create: (tenantId: string, data: CreateFaqInput): Promise<Faq> =>
     api.post(`/tenants/${tenantId}/faqs`, data).then((res) => res.data),
@@ -209,10 +208,13 @@ export const userMessagesApi = {
     tenantId: string,
     page: number,
     pageSize: number,
+    status?: "PENDING" | "PROCESSED",
   ): Promise<{ messages: UserMessage[]; total: number }> =>
     api
-      .get(`/tenants/${tenantId}/user-messages`, { params: { page, pageSize } })
-      .then((res) => res.data),
+      .get(`/tenants/${tenantId}/user-messages`, { params: { page, pageSize, status } })
+      .then((res) => ({ messages: res.data.items, total: res.data.total })),
+  process: (tenantId: string, id: string): Promise<UserMessage> =>
+    api.patch(`/tenants/${tenantId}/user-messages/${id}/process`).then((res) => res.data),
 };
 
 export default api;

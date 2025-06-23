@@ -2,19 +2,27 @@ import { Column, DataTable } from '@/components/DataTable';
 import { useAuth } from '@/contexts/AuthContext';
 import { userMessagesApi } from '@/lib/api';
 import { UserMessage } from '@/types/api';
-import React, { useState } from 'react';
+import { Button } from '@radix-ui/themes';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import * as styles from './UserMessages.css';
+
+type Status = 'PENDING' | 'PROCESSED';
 
 export const UserMessages: React.FC = () => {
   const { currentTenant } = useAuth();
+  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
+  const [status, setStatus] = useState<Status>('PENDING');
 
   const { data, isLoading } = useQuery(
-    ['userMessages', currentTenant?.id, page, pageSize],
-    () => (currentTenant ? userMessagesApi.getAll(currentTenant.id, page, pageSize) : Promise.resolve({ messages: [], total: 0 })),
+    ['userMessages', currentTenant?.id, page, pageSize, status],
+    () =>
+      currentTenant
+        ? userMessagesApi.getAll(currentTenant.id, page, pageSize, status)
+        : Promise.resolve({ messages: [], total: 0 }),
     {
       enabled: !!currentTenant,
       onError: (error: any) => {
@@ -22,6 +30,28 @@ export const UserMessages: React.FC = () => {
       },
     }
   );
+
+  const processMutation = useMutation(
+    (messageId: string) => {
+      if (!currentTenant) {
+        throw new Error('No tenant selected');
+      }
+      return userMessagesApi.process(currentTenant.id, messageId);
+    },
+    {
+      onSuccess: () => {
+        toast.success('处理成功');
+        queryClient.invalidateQueries(['userMessages', currentTenant?.id]);
+      },
+      onError: (error: any) => {
+        toast.error(error.response?.data?.message || '处理失败');
+      },
+    }
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [status]);
 
   const columns: Column<UserMessage>[] = [
     {
@@ -72,6 +102,31 @@ export const UserMessages: React.FC = () => {
         title: '注册时间',
         render: (value: string) => new Date(value).toLocaleString('zh-CN'),
     },
+    {
+      key: 'status',
+      title: '状态',
+      render: (value: string) => (value === 'PROCESSED' ? '已处理' : '待处理'),
+    },
+    {
+      key: 'processedAt',
+      title: '处理时间',
+      render: (value: string) => (value ? new Date(value).toLocaleString('zh-CN') : '-'),
+    },
+    {
+      key: 'processedBy.username',
+      title: '处理人',
+      render: (value: any) => value || '-',
+    },
+    {
+      key: 'actions',
+      title: '操作',
+      render: (_, record) =>
+        record.status === 'PENDING' ? (
+          <Button size="1" onClick={() => processMutation.mutate(record.id)} disabled={processMutation.isLoading}>
+            标记为已处理
+          </Button>
+        ) : null,
+    },
   ];
 
   if (!currentTenant) {
@@ -87,6 +142,14 @@ export const UserMessages: React.FC = () => {
 
   return (
     <div style={{ padding: '24px' }}>
+      <div className={styles.filterGroup}>
+        <Button variant={status === 'PENDING' ? 'solid' : 'soft'} onClick={() => setStatus('PENDING')}>
+          待处理
+        </Button>
+        <Button variant={status === 'PROCESSED' ? 'solid' : 'soft'} onClick={() => setStatus('PROCESSED')}>
+          已处理
+        </Button>
+      </div>
       <DataTable title="用户留言" columns={columns} data={data?.messages || []} loading={isLoading} />
       {totalPages > 1 && (
         <div className={styles.pagination}>
