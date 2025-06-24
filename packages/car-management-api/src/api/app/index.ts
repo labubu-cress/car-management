@@ -7,6 +7,7 @@ import contactUsConfigRoutes from "./features/contact-us-config";
 import faqsRoutes from "./features/faqs";
 import favoritesRoutes from "./features/favorites";
 import homepageConfigRoutes from "./features/homepage-config";
+import resolveTenant from "./features/resolve-tenant";
 import userMessagesRoutes from "./features/user-messages";
 import usersRoutes from "./features/users";
 import vehicleScenariosRoutes from "./features/vehicle-scenarios";
@@ -58,6 +59,12 @@ tenantApp.route("/", authedApp);
 
 // Register tenant app with the main app
 app.route("/tenants/:tenantId", tenantApp);
+
+app.route("/resolve-tenant", resolveTenant);
+
+// Middleware
+app.use("*", tenantMiddleware);
+app.use("/users/me", appAuthMiddleware);
 
 // 后续将在此处聚合所有 app 功能路由
 app.get("/", (c: Context) => c.json({ message: "Welcome to App API" }));
