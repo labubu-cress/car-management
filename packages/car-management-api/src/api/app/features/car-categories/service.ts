@@ -5,7 +5,9 @@ export const getAllCarCategories = async (tenantId: string): Promise<CarCategory
   const categories = await prisma.carCategory.findMany({
     where: { tenantId },
     include: {
-      carTrims: true,
+      carTrims: {
+        where: { isArchived: false },
+      },
     },
     orderBy: {
       displayOrder: "asc",
@@ -14,10 +16,26 @@ export const getAllCarCategories = async (tenantId: string): Promise<CarCategory
 
   return categories
     .map((c) => {
-      const isArchived = c.carTrims.length === 0 || c.carTrims.every((trim) => trim.isArchived);
+      const isArchived = c.carTrims.length === 0;
+
+      if (isArchived) {
+        return {
+          ...c,
+          isArchived,
+          minPrice: null,
+          maxPrice: null,
+        };
+      }
+
+      const prices = c.carTrims.map((trim) => trim.currentPrice.toNumber());
+      const minPrice = Math.min(...prices);
+      const maxPrice = Math.max(...prices);
+
       return {
         ...c,
         isArchived,
+        minPrice,
+        maxPrice,
       };
     })
     .filter((c) => !c.isArchived);
@@ -26,17 +44,32 @@ export const getAllCarCategories = async (tenantId: string): Promise<CarCategory
 export const getCarCategoryById = async (tenantId: string, id: string): Promise<CarCategoryWithIsArchived | null> => {
   const category = await prisma.carCategory.findUnique({
     where: { id, tenantId },
-    include: { carTrims: true },
+    include: { carTrims: { where: { isArchived: false } } },
   });
 
   if (!category) {
     return null;
   }
 
-  const isArchived = category.carTrims.length > 0 && category.carTrims.every((trim) => trim.isArchived);
+  const isArchived = category.carTrims.length === 0;
+
+  if (isArchived) {
+    return {
+      ...category,
+      isArchived,
+      minPrice: null,
+      maxPrice: null,
+    };
+  }
+
+  const prices = category.carTrims.map((trim) => trim.currentPrice.toNumber());
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
 
   return {
     ...category,
     isArchived,
+    minPrice,
+    maxPrice,
   };
 };
