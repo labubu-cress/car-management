@@ -2,7 +2,7 @@ import { Column, DataTable } from '@/components/DataTable';
 import { useAuth } from '@/contexts/AuthContext';
 import { userMessagesApi } from '@/lib/api';
 import { UserMessage } from '@/types/api';
-import { Button } from '@radix-ui/themes';
+import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
@@ -122,9 +122,13 @@ export const UserMessages: React.FC = () => {
       title: '操作',
       render: (_, record) =>
         record.status === 'PENDING' ? (
-          <Button size="1" onClick={() => processMutation.mutate(record.id)} disabled={processMutation.isLoading}>
+          <button
+            className={clsx(styles.button, styles.solidButton)}
+            onClick={() => processMutation.mutate(record.id)}
+            disabled={processMutation.isLoading}
+          >
             标记为已处理
-          </Button>
+          </button>
         ) : null,
     },
   ];
@@ -143,12 +147,18 @@ export const UserMessages: React.FC = () => {
   return (
     <div style={{ padding: '24px' }}>
       <div className={styles.filterGroup}>
-        <Button variant={status === 'PENDING' ? 'solid' : 'soft'} onClick={() => setStatus('PENDING')}>
+        <button
+          className={clsx(styles.button, status === 'PENDING' ? styles.solidButton : styles.softButton)}
+          onClick={() => setStatus('PENDING')}
+        >
           待处理
-        </Button>
-        <Button variant={status === 'PROCESSED' ? 'solid' : 'soft'} onClick={() => setStatus('PROCESSED')}>
+        </button>
+        <button
+          className={clsx(styles.button, status === 'PROCESSED' ? styles.solidButton : styles.softButton)}
+          onClick={() => setStatus('PROCESSED')}
+        >
           已处理
-        </Button>
+        </button>
       </div>
       <DataTable title="用户留言" columns={columns} data={data?.messages || []} loading={isLoading} />
       {totalPages > 1 && (
