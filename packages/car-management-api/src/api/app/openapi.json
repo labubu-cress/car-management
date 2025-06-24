@@ -750,7 +750,9 @@
           "createdAt": { "type": "string", "format": "date-time" },
           "updatedAt": { "type": "string", "format": "date-time" },
           "vehicleScenarioId": { "type": "string" },
-          "isArchived": { "type": "boolean" }
+          "isArchived": { "type": "boolean" },
+          "minPrice": { "type": "number", "nullable": true },
+          "maxPrice": { "type": "number", "nullable": true }
         }
       },
       "CarTrim": {
