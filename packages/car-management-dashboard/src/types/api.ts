@@ -257,18 +257,18 @@ export interface UpdateHomepageConfigInput {
 export interface ContactUsConfig {
   id: string;
   tenantId: string;
-  phoneConsultationDescription?: string;
-  phoneNumber?: string;
-  emailContactDescription?: string;
+  contactPhoneDescription?: string;
+  contactPhoneNumber?: string;
+  contactEmailDescription?: string;
   contactEmail?: string;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface UpdateContactUsConfigInput {
-  phoneConsultationDescription?: string;
-  phoneNumber?: string;
-  emailContactDescription?: string;
+  contactPhoneDescription?: string;
+  contactPhoneNumber?: string;
+  contactEmailDescription?: string;
   contactEmail?: string;
 }
 

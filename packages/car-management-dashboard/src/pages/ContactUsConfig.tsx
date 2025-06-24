@@ -40,9 +40,9 @@ const ContactUsConfigPage = () => {
       reset(config);
     } else {
       reset({
-        phoneConsultationDescription: '',
-        phoneNumber: '',
-        emailContactDescription: '',
+        contactPhoneDescription: '',
+        contactPhoneNumber: '',
+        contactEmailDescription: '',
         contactEmail: '',
       });
     }
@@ -105,14 +105,14 @@ const ContactUsConfigPage = () => {
         onSubmit={handleSubmit(onSubmit)}
         className={contactUsConfigStyles.form}
       >
-        <FormField label="电话咨询描述" error={errors.phoneConsultationDescription?.message}>
-          <input type="text" {...register('phoneConsultationDescription')} />
+        <FormField label="电话咨询描述" error={errors.contactPhoneDescription?.message}>
+          <input type="text" {...register('contactPhoneDescription')} />
         </FormField>
-        <FormField label="电话咨询号码" error={errors.phoneNumber?.message}>
-          <input type="text" {...register('phoneNumber')} />
+        <FormField label="电话咨询号码" error={errors.contactPhoneNumber?.message}>
+          <input type="text" {...register('contactPhoneNumber')} />
         </FormField>
-        <FormField label="邮件联系描述" error={errors.emailContactDescription?.message}>
-          <input type="text" {...register('emailContactDescription')} />
+        <FormField label="邮件联系描述" error={errors.contactEmailDescription?.message}>
+          <input type="text" {...register('contactEmailDescription')} />
         </FormField>
         <FormField label="联系邮箱" error={errors.contactEmail?.message}>
           <input type="text" {...register('contactEmail')} />
