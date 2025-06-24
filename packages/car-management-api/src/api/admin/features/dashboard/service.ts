@@ -25,10 +25,26 @@ export const getDashboardStats = async (tenantId: string) => {
     },
   });
 
+  const pendingUserMessagesCount = await prisma.userMessage.count({
+    where: {
+      tenantId,
+      status: "PENDING",
+    },
+  });
+
+  const processedUserMessagesCount = await prisma.userMessage.count({
+    where: {
+      tenantId,
+      status: "PROCESSED",
+    },
+  });
+
   return {
     usersCount,
     carCategoriesCount,
     carTrimsCount,
     vehicleScenariosCount,
+    pendingUserMessagesCount,
+    processedUserMessagesCount,
   };
 };
