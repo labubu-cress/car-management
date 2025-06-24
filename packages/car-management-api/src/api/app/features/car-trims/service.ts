@@ -2,7 +2,10 @@ import { prisma } from "@/lib/db";
 import { type CarTrim } from "@prisma/client";
 
 export const getAllCarTrims = async (tenantId: string, categoryId: string): Promise<CarTrim[]> => {
-  return prisma.carTrim.findMany({ where: { categoryId, tenantId, isArchived: false } });
+  return prisma.carTrim.findMany({
+    where: { categoryId, tenantId, isArchived: false },
+    orderBy: { displayOrder: "asc" },
+  });
 };
 
 export const getCarTrimById = async (tenantId: string, id: string): Promise<CarTrim | null> => {

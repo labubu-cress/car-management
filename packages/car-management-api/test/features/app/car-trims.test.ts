@@ -48,6 +48,7 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-trims", () => {
         features: [],
         categoryId: categoryId,
         tenantId: tenant.id,
+        displayOrder: 1,
       },
     });
     trimId = trim.id;
@@ -83,6 +84,47 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-trims", () => {
     const trimWithoutConfig = body.find((t) => t.name === "Test Trim App 2");
     expect(trimWithoutConfig).toBeDefined();
     expect(trimWithoutConfig?.configImageUrl).toBeNull();
+  });
+
+  it("should return car trims sorted by displayOrder", async () => {
+    // Create more trims with different display orders
+    await prisma.carTrim.create({
+      data: {
+        name: "Trim Last",
+        subtitle: "Subtitle",
+        image: "https://example.com/image.jpg",
+        originalPrice: 10000,
+        currentPrice: 9000,
+        features: [],
+        categoryId: categoryId,
+        tenantId: tenant.id,
+        displayOrder: 2,
+      },
+    });
+    const firstTrim = await prisma.carTrim.create({
+      data: {
+        name: "Trim First",
+        subtitle: "Subtitle",
+        image: "https://example.com/image.jpg",
+        originalPrice: 10000,
+        currentPrice: 9000,
+        features: [],
+        categoryId: categoryId,
+        tenantId: tenant.id,
+        displayOrder: 0,
+      },
+    });
+
+    const response = await app.request(`/api/v1/app/tenants/${tenant.id}/car-trims?categoryId=${categoryId}`);
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as CarTrim[];
+    expect(Array.isArray(body)).toBe(true);
+    expect(body.length).toBe(3);
+    expect(body[0].name).toBe("Trim First");
+    expect(body[0].id).toBe(firstTrim.id);
+    expect(body[1].name).toBe("Test Trim App");
+    expect(body[1].id).toBe(trimId);
+    expect(body[2].name).toBe("Trim Last");
   });
 
   it("should get a car trim by id for the tenant", async () => {
