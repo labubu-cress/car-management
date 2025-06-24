@@ -62,6 +62,7 @@ export const th = style({
   color: "#666",
   backgroundColor: "#fafafa",
   borderBottom: "1px solid #f0f0f0",
+  whiteSpace: "nowrap",
 });
 
 export const tr = style({
