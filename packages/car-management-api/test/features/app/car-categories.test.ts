@@ -1,13 +1,12 @@
+import type { CarCategoryWithIsArchived } from "@/api/app/features/car-categories/types";
 import app from "@/index";
 import { prisma } from "@/lib/db";
-import type { CarCategory } from "@prisma/client";
 import { beforeEach, describe, expect, it } from "vitest";
 import { clearTestDb, createTestTenant, type TestTenant } from "../../helper";
 
 describe("App API: /api/v1/app/tenants/:tenantId/car-categories", () => {
   let tenant: TestTenant;
   let vehicleScenarioId: string;
-  let categoryId: string;
 
   beforeEach(async () => {
     await clearTestDb(prisma);
@@ -22,39 +21,205 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-categories", () => {
       },
     });
     vehicleScenarioId = scenario.id;
+  });
 
-    const category = await prisma.carCategory.create({
+  it("should return categories sorted by displayOrder and filter out archived ones", async () => {
+    // Category 1: Should be returned, has one active trim
+    const category1 = await prisma.carCategory.create({
       data: {
-        name: "Test Category App",
+        name: "Category 1",
         tenantId: tenant.id,
-        image: "https://example.com/image-app.jpg",
+        image: "img",
+        displayOrder: 2,
+        vehicleScenarioId: vehicleScenarioId,
         tags: [],
         highlights: [],
         interiorImages: [],
         exteriorImages: [],
         offerPictures: [],
-        vehicleScenarioId: vehicleScenarioId,
       },
     });
-    categoryId = category.id;
-  });
+    await prisma.carTrim.create({
+      data: {
+        name: "Trim 1-1 (Active)",
+        tenantId: tenant.id,
+        categoryId: category1.id,
+        isArchived: false,
+        subtitle: "s",
+        image: "i",
+        originalPrice: 1,
+        currentPrice: 1,
+        features: [],
+      },
+    });
 
-  it("should get all car categories for the tenant", async () => {
+    // Category 2: Should be returned, has one active and one archived trim
+    const category2 = await prisma.carCategory.create({
+      data: {
+        name: "Category 2",
+        tenantId: tenant.id,
+        image: "img",
+        displayOrder: 1,
+        vehicleScenarioId: vehicleScenarioId,
+        tags: [],
+        highlights: [],
+        interiorImages: [],
+        exteriorImages: [],
+        offerPictures: [],
+      },
+    });
+    await prisma.carTrim.create({
+      data: {
+        name: "Trim 2-1 (Active)",
+        tenantId: tenant.id,
+        categoryId: category2.id,
+        isArchived: false,
+        subtitle: "s",
+        image: "i",
+        originalPrice: 1,
+        currentPrice: 1,
+        features: [],
+      },
+    });
+    await prisma.carTrim.create({
+      data: {
+        name: "Trim 2-2 (Archived)",
+        tenantId: tenant.id,
+        categoryId: category2.id,
+        isArchived: true,
+        subtitle: "s",
+        image: "i",
+        originalPrice: 1,
+        currentPrice: 1,
+        features: [],
+      },
+    });
+
+    // Category 3: Should be filtered out, all trims are archived
+    const category3 = await prisma.carCategory.create({
+      data: {
+        name: "Category 3",
+        tenantId: tenant.id,
+        image: "img",
+        displayOrder: 3,
+        vehicleScenarioId: vehicleScenarioId,
+        tags: [],
+        highlights: [],
+        interiorImages: [],
+        exteriorImages: [],
+        offerPictures: [],
+      },
+    });
+    await prisma.carTrim.create({
+      data: {
+        name: "Trim 3-1 (Archived)",
+        tenantId: tenant.id,
+        categoryId: category3.id,
+        isArchived: true,
+        subtitle: "s",
+        image: "i",
+        originalPrice: 1,
+        currentPrice: 1,
+        features: [],
+      },
+    });
+
+    // Category 4: Should be filtered out, has no trims
+    await prisma.carCategory.create({
+      data: {
+        name: "Category 4",
+        tenantId: tenant.id,
+        image: "img",
+        displayOrder: 4,
+        vehicleScenarioId: vehicleScenarioId,
+        tags: [],
+        highlights: [],
+        interiorImages: [],
+        exteriorImages: [],
+        offerPictures: [],
+      },
+    });
+
     const response = await app.request(`/api/v1/app/tenants/${tenant.id}/car-categories`);
     expect(response.status).toBe(200);
-    const body = (await response.json()) as CarCategory[];
-    expect(Array.isArray(body)).toBe(true);
-    expect(body.length).toBe(1);
-    expect(body[0].name).toBe("Test Category App");
-    expect(body[0].tenantId).toBe(tenant.id);
+    const body = (await response.json()) as CarCategoryWithIsArchived[];
+
+    expect(body.length).toBe(2);
+    expect(body[0].name).toBe("Category 2"); // displayOrder: 1
+    expect(body[1].name).toBe("Category 1"); // displayOrder: 2
+    expect(body[0].isArchived).toBe(false);
+    expect(body[1].isArchived).toBe(false);
   });
 
-  it("should get a car category by id for the tenant", async () => {
-    const response = await app.request(`/api/v1/app/tenants/${tenant.id}/car-categories/${categoryId}`);
-    expect(response.status).toBe(200);
-    const body = (await response.json()) as CarCategory;
-    expect(body.id).toBe(categoryId);
-    expect(body.name).toBe("Test Category App");
-    expect(body.tenantId).toBe(tenant.id);
+  it("should get a car category by id and compute isArchived", async () => {
+    // Category with active trim
+    const categoryActive = await prisma.carCategory.create({
+      data: {
+        name: "Active Category",
+        tenantId: tenant.id,
+        image: "img",
+        vehicleScenarioId: vehicleScenarioId,
+        tags: [],
+        highlights: [],
+        interiorImages: [],
+        exteriorImages: [],
+        offerPictures: [],
+      },
+    });
+    await prisma.carTrim.create({
+      data: {
+        name: "Trim Active",
+        tenantId: tenant.id,
+        categoryId: categoryActive.id,
+        isArchived: false,
+        subtitle: "s",
+        image: "i",
+        originalPrice: 1,
+        currentPrice: 1,
+        features: [],
+      },
+    });
+
+    // Category with only archived trims
+    const categoryArchived = await prisma.carCategory.create({
+      data: {
+        name: "Archived Category",
+        tenantId: tenant.id,
+        image: "img",
+        vehicleScenarioId: vehicleScenarioId,
+        tags: [],
+        highlights: [],
+        interiorImages: [],
+        exteriorImages: [],
+        offerPictures: [],
+      },
+    });
+    await prisma.carTrim.create({
+      data: {
+        name: "Trim Archived",
+        tenantId: tenant.id,
+        categoryId: categoryArchived.id,
+        isArchived: true,
+        subtitle: "s",
+        image: "i",
+        originalPrice: 1,
+        currentPrice: 1,
+        features: [],
+      },
+    });
+
+    const responseActive = await app.request(`/api/v1/app/tenants/${tenant.id}/car-categories/${categoryActive.id}`);
+    expect(responseActive.status).toBe(200);
+    const bodyActive = (await responseActive.json()) as CarCategoryWithIsArchived;
+    expect(bodyActive.name).toBe("Active Category");
+    expect(bodyActive.isArchived).toBe(false);
+
+    const responseArchived = await app.request(
+      `/api/v1/app/tenants/${tenant.id}/car-categories/${categoryArchived.id}`,
+    );
+    expect(responseArchived.status).toBe(200);
+    const bodyArchived = (await responseArchived.json()) as CarCategoryWithIsArchived;
+    expect(bodyArchived.name).toBe("Archived Category");
+    expect(bodyArchived.isArchived).toBe(true);
   });
 });
