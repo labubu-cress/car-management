@@ -47,8 +47,22 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-categories", () => {
         isArchived: false,
         subtitle: "s",
         image: "i",
-        originalPrice: 1,
-        currentPrice: 1,
+        originalPrice: 100,
+        currentPrice: 100,
+        features: [],
+      },
+    });
+
+    await prisma.carTrim.create({
+      data: {
+        name: "Trim 1-2 (Active)",
+        tenantId: tenant.id,
+        categoryId: category1.id,
+        isArchived: false,
+        subtitle: "s",
+        image: "i",
+        originalPrice: 200,
+        currentPrice: 200,
         features: [],
       },
     });
@@ -76,8 +90,8 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-categories", () => {
         isArchived: false,
         subtitle: "s",
         image: "i",
-        originalPrice: 1,
-        currentPrice: 1,
+        originalPrice: 300,
+        currentPrice: 300,
         features: [],
       },
     });
@@ -89,8 +103,8 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-categories", () => {
         isArchived: true,
         subtitle: "s",
         image: "i",
-        originalPrice: 1,
-        currentPrice: 1,
+        originalPrice: 400,
+        currentPrice: 400,
         features: [],
       },
     });
@@ -118,8 +132,8 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-categories", () => {
         isArchived: true,
         subtitle: "s",
         image: "i",
-        originalPrice: 1,
-        currentPrice: 1,
+        originalPrice: 500,
+        currentPrice: 500,
         features: [],
       },
     });
@@ -146,12 +160,18 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-categories", () => {
 
     expect(body.length).toBe(2);
     expect(body[0].name).toBe("Category 2"); // displayOrder: 1
+    expect(body[0].minPrice).toBe(300);
+    expect(body[0].maxPrice).toBe(300);
+
     expect(body[1].name).toBe("Category 1"); // displayOrder: 2
+    expect(body[1].minPrice).toBe(100);
+    expect(body[1].maxPrice).toBe(200);
+
     expect(body[0].isArchived).toBe(false);
     expect(body[1].isArchived).toBe(false);
   });
 
-  it("should get a car category by id and compute isArchived", async () => {
+  it("should get a car category by id and compute isArchived, minPrice, maxPrice", async () => {
     // Category with active trim
     const categoryActive = await prisma.carCategory.create({
       data: {
@@ -174,8 +194,22 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-categories", () => {
         isArchived: false,
         subtitle: "s",
         image: "i",
-        originalPrice: 1,
-        currentPrice: 1,
+        originalPrice: 100,
+        currentPrice: 100,
+        features: [],
+      },
+    });
+
+    await prisma.carTrim.create({
+      data: {
+        name: "Trim Active 2",
+        tenantId: tenant.id,
+        categoryId: categoryActive.id,
+        isArchived: false,
+        subtitle: "s",
+        image: "i",
+        originalPrice: 200,
+        currentPrice: 200,
         features: [],
       },
     });
@@ -202,8 +236,8 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-categories", () => {
         isArchived: true,
         subtitle: "s",
         image: "i",
-        originalPrice: 1,
-        currentPrice: 1,
+        originalPrice: 300,
+        currentPrice: 300,
         features: [],
       },
     });
@@ -213,6 +247,8 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-categories", () => {
     const bodyActive = (await responseActive.json()) as CarCategoryWithIsArchived;
     expect(bodyActive.name).toBe("Active Category");
     expect(bodyActive.isArchived).toBe(false);
+    expect(bodyActive.minPrice).toBe(100);
+    expect(bodyActive.maxPrice).toBe(200);
 
     const responseArchived = await app.request(
       `/api/v1/app/tenants/${tenant.id}/car-categories/${categoryArchived.id}`,
@@ -221,5 +257,7 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-categories", () => {
     const bodyArchived = (await responseArchived.json()) as CarCategoryWithIsArchived;
     expect(bodyArchived.name).toBe("Archived Category");
     expect(bodyArchived.isArchived).toBe(true);
+    expect(bodyArchived.minPrice).toBe(null);
+    expect(bodyArchived.maxPrice).toBe(null);
   });
 });
