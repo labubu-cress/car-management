@@ -228,6 +228,8 @@ export interface DashboardStats {
   carCategoriesCount: number;
   carTrimsCount: number;
   vehicleScenariosCount: number;
+  pendingUserMessagesCount: number;
+  processedUserMessagesCount: number;
 }
 
 export interface HomepageConfig {

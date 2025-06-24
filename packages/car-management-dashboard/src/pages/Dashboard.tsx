@@ -1,6 +1,14 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { dashboardApi } from '@/lib/api';
-import { faBuilding, faCar, faCubes, faLayerGroup, faUsers } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBuilding,
+  faCar,
+  faCheckCircle,
+  faCubes,
+  faExclamationCircle,
+  faLayerGroup,
+  faUsers,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { useQuery } from 'react-query';
@@ -14,15 +22,27 @@ export const Dashboard: React.FC = () => {
     () => (currentTenant ? dashboardApi.getStats(currentTenant.id) : null),
     {
       enabled: !!currentTenant,
-    }
+    },
   );
 
   const stats = [
     { title: '当前租户', value: currentTenant?.name || '-', icon: faBuilding, color: '#1890ff' },
     { title: '用户总数', value: statsData?.usersCount ?? '0', icon: faUsers, color: '#52c41a' },
-    { title: '车辆分类', value: statsData?.vehicleScenariosCount ?? '0', icon: faCubes, color: '#13c2c2' },
-    { title: '车型', value: statsData?.carCategoriesCount ?? '0', icon: faLayerGroup, color: '#faad14' },
-    { title: '车型参数', value: statsData?.carTrimsCount ?? '0', icon: faCar, color: '#722ed1' },
+    { title: '分类总数', value: statsData?.vehicleScenariosCount ?? '0', icon: faCubes, color: '#13c2c2' },
+    { title: '车型总数', value: statsData?.carCategoriesCount ?? '0', icon: faLayerGroup, color: '#faad14' },
+    { title: '参数总数', value: statsData?.carTrimsCount ?? '0', icon: faCar, color: '#722ed1' },
+    {
+      title: '待处理留言',
+      value: statsData?.pendingUserMessagesCount ?? '0',
+      icon: faExclamationCircle,
+      color: '#f5222d',
+    },
+    {
+      title: '已处理留言',
+      value: statsData?.processedUserMessagesCount ?? '0',
+      icon: faCheckCircle,
+      color: '#52c41a',
+    },
   ];
 
   return (
