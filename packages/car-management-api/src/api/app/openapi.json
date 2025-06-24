@@ -708,7 +708,8 @@
           "displayOrder": { "type": "integer" },
           "createdAt": { "type": "string", "format": "date-time" },
           "updatedAt": { "type": "string", "format": "date-time" },
-          "vehicleScenarioId": { "type": "string" }
+          "vehicleScenarioId": { "type": "string" },
+          "isArchived": { "type": "boolean" }
         }
       },
       "CarTrim": {
@@ -719,12 +720,14 @@
           "name": { "type": "string" },
           "subtitle": { "type": "string" },
           "image": { "type": "string" },
+          "configImageUrl": { "type": "string", "nullable": true },
           "badge": { "type": "string", "nullable": true },
           "originalPrice": { "type": "number" },
           "currentPrice": { "type": "number" },
           "features": { "type": "array", "items": { "$ref": "#/components/schemas/CarFeature" } },
           "categoryId": { "type": "string" },
           "displayOrder": { "type": "integer" },
+          "isArchived": { "type": "boolean" },
           "createdAt": { "type": "string", "format": "date-time" },
           "updatedAt": { "type": "string", "format": "date-time" }
         }
@@ -732,7 +735,7 @@
       "CarTrimWithDetails": {
         "allOf": [
           { "$ref": "#/components/schemas/CarTrim" },
-          { 
+          {
             "type": "object",
             "properties": {
               "category": { "$ref": "#/components/schemas/CarCategory" }
@@ -745,8 +748,10 @@
         "properties": {
           "id": { "type": "string" },
           "tenantId": { "type": "string" },
-          "welcomeTitle": { "type": "string", "nullable": true },
-          "welcomeDescription": { "type": "string", "nullable": true },
+          "firstTitle": { "type": "string" },
+          "firstTitleIcon": { "type": "string" },
+          "secondTitle": { "type": "string" },
+          "secondTitleIcon": { "type": "string" },
           "bannerImage": { "type": "string" },
           "benefitsImage": { "type": "string" },
           "createdAt": { "type": "string", "format": "date-time" },
@@ -772,6 +777,7 @@
           "id": { "type": "string" },
           "question": { "type": "string" },
           "answer": { "type": "string" },
+          "icon": { "type": "string" },
           "tenantId": { "type": "string" },
           "createdAt": { "type": "string", "format": "date-time" },
           "updatedAt": { "type": "string", "format": "date-time" }
@@ -781,19 +787,25 @@
         "type": "object",
         "properties": {
           "name": { "type": "string" },
-          "contact": { "type": "string" },
-          "content": { "type": "string" }
+          "phone": { "type": "string" },
+          "message": { "type": "string" }
         },
-        "required": ["name", "contact", "content"]
+        "required": ["name", "phone", "message"]
       },
       "UserMessage": {
         "type": "object",
         "properties": {
           "id": { "type": "string" },
           "name": { "type": "string" },
-          "contact": { "type": "string" },
-          "content": { "type": "string" },
-          "userId": { "type": "string", "nullable": true },
+          "phone": { "type": "string" },
+          "message": { "type": "string" },
+          "status": {
+            "type": "string",
+            "enum": ["PENDING", "PROCESSED"]
+          },
+          "processedAt": { "type": "string", "format": "date-time", "nullable": true },
+          "processedById": { "type": "string", "nullable": true },
+          "userId": { "type": "string" },
           "tenantId": { "type": "string" },
           "createdAt": { "type": "string", "format": "date-time" },
           "updatedAt": { "type": "string", "format": "date-time" }
