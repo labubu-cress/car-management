@@ -1,6 +1,7 @@
 import { Column, DataTable } from '@/components/DataTable';
 import { useAuth } from '@/contexts/AuthContext';
 import { userMessagesApi } from '@/lib/api';
+import { buttonPrimary, buttonSecondary } from '@/styles/theme.css';
 import { UserMessage } from '@/types/api';
 import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
@@ -123,7 +124,7 @@ export const UserMessages: React.FC = () => {
       render: (_, record) =>
         record.status === 'PENDING' ? (
           <button
-            className={clsx(styles.button, styles.solidButton)}
+            className={buttonPrimary}
             onClick={() => processMutation.mutate(record.id)}
             disabled={processMutation.isLoading}
           >
@@ -148,13 +149,13 @@ export const UserMessages: React.FC = () => {
     <div style={{ padding: '24px' }}>
       <div className={styles.filterGroup}>
         <button
-          className={clsx(styles.button, status === 'PENDING' ? styles.solidButton : styles.softButton)}
+          className={clsx(status === 'PENDING' ? buttonPrimary : buttonSecondary)}
           onClick={() => setStatus('PENDING')}
         >
           待处理
         </button>
         <button
-          className={clsx(styles.button, status === 'PROCESSED' ? styles.solidButton : styles.softButton)}
+          className={clsx(status === 'PROCESSED' ? buttonPrimary : buttonSecondary)}
           onClick={() => setStatus('PROCESSED')}
         >
           已处理
@@ -163,13 +164,21 @@ export const UserMessages: React.FC = () => {
       <DataTable title="用户留言" columns={columns} data={data?.messages || []} loading={isLoading} />
       {totalPages > 1 && (
         <div className={styles.pagination}>
-          <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}>
+          <button
+            className={buttonSecondary}
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
             上一页
           </button>
           <span>
             第 {page} / {totalPages} 页
           </span>
-          <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}>
+          <button
+            className={buttonSecondary}
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+          >
             下一页
           </button>
         </div>
