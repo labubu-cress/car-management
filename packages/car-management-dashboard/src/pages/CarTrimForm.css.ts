@@ -1,4 +1,4 @@
-import { style } from "@vanilla-extract/css";
+import { globalStyle, style } from "@vanilla-extract/css";
 
 export const carTrimFormStyles = {
   container: style({
@@ -226,13 +226,6 @@ export const carTrimFormStyles = {
     display: "inline-block",
     width: "44px",
     height: "24px",
-    selectors: {
-      "& input": {
-        opacity: 0,
-        width: 0,
-        height: 0,
-      },
-    },
   }),
 
   slider: style({
@@ -266,3 +259,9 @@ export const carTrimFormStyles = {
     },
   }),
 };
+
+globalStyle(`${carTrimFormStyles.switch} input`, {
+  opacity: 0,
+  width: 0,
+  height: 0,
+});
