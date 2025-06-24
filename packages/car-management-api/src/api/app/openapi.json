@@ -11,6 +11,47 @@
     }
   ],
   "paths": {
+    "/resolve-tenant": {
+      "get": {
+        "summary": "Resolve Tenant ID by App ID",
+        "tags": ["Tenants"],
+        "parameters": [
+          {
+            "name": "appId",
+            "in": "query",
+            "required": true,
+            "description": "The WeChat Mini-program App ID.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tenant ID resolved successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tenantId": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["tenantId"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "appId is required."
+          },
+          "404": {
+            "description": "Tenant not found for the given appId."
+          }
+        }
+      }
+    },
     "/tenants/{tenantId}/auth/login": {
       "post": {
         "summary": "User Login or Register",

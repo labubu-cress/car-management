@@ -12,6 +12,6 @@ export class AppService {
       throw new HTTPException(404, { message: "Tenant not found" });
     }
 
-    return { tenantId: tenant.id };
+    return { tenantId: tenant.id.toString() };
   }
 }

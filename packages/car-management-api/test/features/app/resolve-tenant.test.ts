@@ -27,8 +27,8 @@ describe("GET /api/v1/app/resolve-tenant", () => {
   it("should resolve tenant id with correct appId", async () => {
     const res = await app.request(`/api/v1/app/resolve-tenant?appId=${tenant.appId}`);
     expect(res.status).toBe(200);
-    const body = (await res.json()) as { tenantId: number };
-    expect(body.tenantId).toBe(tenant.id);
+    const body = (await res.json()) as { tenantId: string };
+    expect(body.tenantId).toBe(tenant.id.toString());
   });
 
   it("should return 404 if tenant not found", async () => {
