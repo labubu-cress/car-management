@@ -180,7 +180,7 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-categories", () => {
         image: "img",
         vehicleScenarioId: vehicleScenarioId,
         tags: [],
-        highlights: [],
+        highlights: [{ title: "Test Highlight", icon: "test_icon.jpg" }],
         interiorImages: [],
         exteriorImages: [],
         offerPictures: [],
@@ -249,6 +249,7 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-categories", () => {
     expect(bodyActive.isArchived).toBe(false);
     expect(bodyActive.minPrice).toBe(100);
     expect(bodyActive.maxPrice).toBe(200);
+    expect(bodyActive.highlights).toEqual([{ title: "Test Highlight", icon: "test_icon.jpg" }]);
 
     const responseArchived = await app.request(
       `/api/v1/app/tenants/${tenant.id}/car-categories/${categoryArchived.id}`,

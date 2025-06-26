@@ -45,7 +45,7 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-trims", () => {
         configImageUrl: "https://example.com/config-image-app.jpg",
         originalPrice: 100000,
         currentPrice: 90000,
-        features: [],
+        features: [{ title: "Test Feature", icon: "test_icon.jpg" }],
         categoryId: categoryId,
         tenantId: tenant.id,
         displayOrder: 1,
@@ -136,6 +136,7 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-trims", () => {
     expect(body.configImageUrl).toBe("https://example.com/config-image-app.jpg");
     expect(body.categoryId).toBe(categoryId);
     expect(body.tenantId).toBe(tenant.id);
+    expect(body.features).toEqual([{ title: "Test Feature", icon: "test_icon.jpg" }]);
   });
 
   it("should not get archived car trims in the list", async () => {

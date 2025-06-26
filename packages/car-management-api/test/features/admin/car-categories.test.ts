@@ -46,9 +46,9 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-categories", () => {
       image: "https://example.com/new_image.jpg",
       tags: ["豪华", "舒适", "智能驾驶"],
       highlights: [
-        { title: "动力系统", value: "2.0T涡轮增压" },
-        { title: "燃油经济性", value: "7.5L/100km" },
-        { title: "最大功率", value: "245马力" },
+        { title: "动力系统", icon: "https://example.com/icon1.jpg" },
+        { title: "燃油经济性", icon: "https://example.com/icon2.jpg" },
+        { title: "最大功率", icon: "https://example.com/icon3.jpg" },
       ],
       interiorImages: [
         "https://example.com/interior1.jpg",
@@ -90,9 +90,9 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-categories", () => {
     expect(body.highlights).toBeDefined();
     expect(Array.isArray(body.highlights)).toBe(true);
     expect(body.highlights.length).toBe(3);
-    expect(body.highlights[0]).toMatchObject({ title: "动力系统", value: "2.0T涡轮增压" });
-    expect(body.highlights[1]).toMatchObject({ title: "燃油经济性", value: "7.5L/100km" });
-    expect(body.highlights[2]).toMatchObject({ title: "最大功率", value: "245马力" });
+    expect(body.highlights[0]).toMatchObject({ title: "动力系统", icon: "https://example.com/icon1.jpg" });
+    expect(body.highlights[1]).toMatchObject({ title: "燃油经济性", icon: "https://example.com/icon2.jpg" });
+    expect(body.highlights[2]).toMatchObject({ title: "最大功率", icon: "https://example.com/icon3.jpg" });
 
     // 验证 vehicleScenario
     expect(body.vehicleScenario).toBeDefined();

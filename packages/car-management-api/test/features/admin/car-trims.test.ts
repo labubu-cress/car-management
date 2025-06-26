@@ -47,11 +47,11 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
       originalPrice: 580000,
       currentPrice: 548000,
       features: [
-        { title: "座椅配置", value: "真皮座椅，前排座椅加热/通风" },
-        { title: "科技配置", value: "12.3英寸中控屏，无线充电" },
-        { title: "安全配置", value: "主动刹车，车道偏离预警" },
-        { title: "动力系统", value: "2.0T发动机+8AT变速箱" },
-        { title: "悬挂系统", value: "前麦弗逊后多连杆独立悬挂" },
+        { title: "座椅配置", icon: "https://example.com/icon1.jpg" },
+        { title: "科技配置", icon: "https://example.com/icon2.jpg" },
+        { title: "安全配置", icon: "https://example.com/icon3.jpg" },
+        { title: "动力系统", icon: "https://example.com/icon4.jpg" },
+        { title: "悬挂系统", icon: "https://example.com/icon5.jpg" },
       ],
       categoryId: categoryId,
     };
@@ -87,11 +87,11 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
     expect(body.features).toBeDefined();
     expect(Array.isArray(body.features)).toBe(true);
     expect(body.features.length).toBe(5);
-    expect(body.features[0]).toMatchObject({ title: "座椅配置", value: "真皮座椅，前排座椅加热/通风" });
-    expect(body.features[1]).toMatchObject({ title: "科技配置", value: "12.3英寸中控屏，无线充电" });
-    expect(body.features[2]).toMatchObject({ title: "安全配置", value: "主动刹车，车道偏离预警" });
-    expect(body.features[3]).toMatchObject({ title: "动力系统", value: "2.0T发动机+8AT变速箱" });
-    expect(body.features[4]).toMatchObject({ title: "悬挂系统", value: "前麦弗逊后多连杆独立悬挂" });
+    expect(body.features[0]).toMatchObject({ title: "座椅配置", icon: "https://example.com/icon1.jpg" });
+    expect(body.features[1]).toMatchObject({ title: "科技配置", icon: "https://example.com/icon2.jpg" });
+    expect(body.features[2]).toMatchObject({ title: "安全配置", icon: "https://example.com/icon3.jpg" });
+    expect(body.features[3]).toMatchObject({ title: "动力系统", icon: "https://example.com/icon4.jpg" });
+    expect(body.features[4]).toMatchObject({ title: "悬挂系统", icon: "https://example.com/icon5.jpg" });
 
     // 验证关联关系
     expect(body.categoryId).toBe(categoryId);
