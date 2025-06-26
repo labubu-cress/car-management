@@ -1,37 +1,40 @@
 import { faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 import { highlightInputStyles } from './HighlightInput.css';
+import { ImageUpload } from './ImageUpload';
 
 export interface Highlight {
   title: string;
-  value: string;
+  icon: string;
 }
 
 interface HighlightInputProps {
   value: Highlight[];
   onChange: (value: Highlight[]) => void;
-  placeholder?: { title: string; value: string };
+  placeholder?: { title: string; icon: string };
 }
 
-export const HighlightInput: React.FC<HighlightInputProps> = ({ 
-  value, 
-  onChange, 
-  placeholder = { title: '特色标题', value: '特色内容' }
+export const HighlightInput: React.FC<HighlightInputProps> = ({
+  value,
+  onChange,
+  placeholder = { title: '特色标题', icon: '特色图标' },
 }) => {
+  const { currentTenant } = useAuth();
   const [inputTitle, setInputTitle] = useState('');
-  const [inputValue, setInputValue] = useState('');
+  const [inputIcon, setInputIcon] = useState('');
 
   const addHighlight = () => {
     const trimmedTitle = inputTitle.trim();
-    const trimmedValue = inputValue.trim();
-    
-    if (trimmedTitle && trimmedValue) {
+    const trimmedIcon = inputIcon.trim();
+
+    if (trimmedTitle && trimmedIcon) {
       const exists = value.some(h => h.title === trimmedTitle);
       if (!exists) {
-        onChange([...value, { title: trimmedTitle, value: trimmedValue }]);
+        onChange([...value, { title: trimmedTitle, icon: trimmedIcon }]);
         setInputTitle('');
-        setInputValue('');
+        setInputIcon('');
       }
     }
   };
@@ -53,7 +56,8 @@ export const HighlightInput: React.FC<HighlightInputProps> = ({
       {value.map((highlight, index) => (
         <div key={index} className={highlightInputStyles.highlight}>
           <div className={highlightInputStyles.highlightContent}>
-            <strong>{highlight.title}:</strong> {highlight.value}
+            <img src={highlight.icon} alt={highlight.title} className={highlightInputStyles.icon} />
+            <strong>{highlight.title}</strong>
           </div>
           <button
             type="button"
@@ -74,19 +78,18 @@ export const HighlightInput: React.FC<HighlightInputProps> = ({
           placeholder={placeholder.title}
           className={highlightInputStyles.titleInput}
         />
-        <input
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder.value}
-          className={highlightInputStyles.valueInput}
-        />
+        <div className={highlightInputStyles.valueInput}>
+          <ImageUpload
+            value={inputIcon}
+            onChange={(url) => setInputIcon(url)}
+            tenantId={currentTenant!.id}
+          />
+        </div>
         <button
           type="button"
           onClick={addHighlight}
           className={highlightInputStyles.addButton}
-          disabled={!inputTitle.trim() || !inputValue.trim()}
+          disabled={!inputTitle.trim() || !inputIcon.trim()}
         >
           <FontAwesomeIcon icon={faPlus} />
         </button>
