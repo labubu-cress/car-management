@@ -117,6 +117,20 @@ export const CarCategories: React.FC = () => {
       width: '200px',
     },
     {
+      key: 'minPrice',
+      title: '最低价格',
+      width: '120px',
+      render: (value?: number) =>
+        value ? `¥${value.toLocaleString()}` : '-',
+    },
+    {
+      key: 'maxPrice',
+      title: '最高价格',
+      width: '120px',
+      render: (value?: number) =>
+        value ? `¥${value.toLocaleString()}` : '-',
+    },
+    {
       key: 'vehicleScenario.name',
       title: '所属分类',
       width: '150px',

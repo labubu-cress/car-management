@@ -30,6 +30,8 @@ export const CarCategoryForm: React.FC = () => {
     exteriorImages: [] as string[],
     offerPictures: [] as string[],
     vehicleScenarioId: '',
+    minPrice: 0,
+    maxPrice: 0,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -61,11 +63,13 @@ export const CarCategoryForm: React.FC = () => {
             image: data.image,
             badge: data.badge || '',
             tags: data.tags || [],
-            highlights: data.highlights || [],
+            highlights: data.highlights?.map(h => ({ title: h.title, icon: h.value as string })) || [],
             interiorImages: data.interiorImages || [],
             exteriorImages: data.exteriorImages || [],
             offerPictures: data.offerPictures || [],
             vehicleScenarioId: data.vehicleScenario?.id || '',
+            minPrice: data.minPrice || 0,
+            maxPrice: data.maxPrice || 0,
           });
         }
       },
@@ -141,11 +145,13 @@ export const CarCategoryForm: React.FC = () => {
         image: formData.image.trim(),
         badge: formData.badge.trim() || undefined,
         tags: formData.tags.length > 0 ? formData.tags : undefined,
-        highlights: formData.highlights.length > 0 ? formData.highlights : undefined,
+        highlights: formData.highlights.length > 0 ? formData.highlights.map(h => ({ title: h.title, value: h.icon })) : undefined,
         interiorImages: formData.interiorImages.length > 0 ? formData.interiorImages : undefined,
         exteriorImages: formData.exteriorImages.length > 0 ? formData.exteriorImages : undefined,
         offerPictures: formData.offerPictures.length > 0 ? formData.offerPictures : undefined,
         vehicleScenarioId: formData.vehicleScenarioId,
+        minPrice: Number(formData.minPrice) || undefined,
+        maxPrice: Number(formData.maxPrice) || undefined,
       };
       updateMutation.mutate({ id, data: updateData });
     } else {
@@ -154,11 +160,13 @@ export const CarCategoryForm: React.FC = () => {
         image: formData.image.trim(),
         badge: formData.badge.trim() || undefined,
         tags: formData.tags.length > 0 ? formData.tags : undefined,
-        highlights: formData.highlights.length > 0 ? formData.highlights : undefined,
+        highlights: formData.highlights.length > 0 ? formData.highlights.map(h => ({ title: h.title, value: h.icon })) : undefined,
         interiorImages: formData.interiorImages.length > 0 ? formData.interiorImages : undefined,
         exteriorImages: formData.exteriorImages.length > 0 ? formData.exteriorImages : undefined,
         offerPictures: formData.offerPictures.length > 0 ? formData.offerPictures : undefined,
         vehicleScenarioId: formData.vehicleScenarioId,
+        minPrice: Number(formData.minPrice) || undefined,
+        maxPrice: Number(formData.maxPrice) || undefined,
       };
       createMutation.mutate(createData);
     }
@@ -236,6 +244,26 @@ export const CarCategoryForm: React.FC = () => {
             />
           </FormField>
 
+          <FormField label="最低价格">
+            <input
+              type="number"
+              value={formData.minPrice}
+              onChange={(e) => setFormData({ ...formData, minPrice: Number(e.target.value) })}
+              className={formFieldStyles.input}
+              placeholder="请输入最低价格"
+            />
+          </FormField>
+
+          <FormField label="最高价格">
+            <input
+              type="number"
+              value={formData.maxPrice}
+              onChange={(e) => setFormData({ ...formData, maxPrice: Number(e.target.value) })}
+              className={formFieldStyles.input}
+              placeholder="请输入最高价格"
+            />
+          </FormField>
+
           <FormField label="车型图片" required error={errors.image}>
             <ImageUpload
               value={formData.image}
@@ -272,7 +300,7 @@ export const CarCategoryForm: React.FC = () => {
             <HighlightInput
               value={formData.highlights}
               onChange={(highlights) => setFormData({ ...formData, highlights })}
-              placeholder={{ title: '亮点标题', value: '亮点描述' }}
+              placeholder={{ title: '如：百公里加速', icon: '特色图标' }}
             />
           </FormField>
         </div>

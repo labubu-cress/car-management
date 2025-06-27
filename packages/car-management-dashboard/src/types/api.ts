@@ -87,6 +87,8 @@ export interface CarCategory {
   updatedAt: string;
   vehicleScenario?: VehicleScenario;
   isArchived: boolean;
+  minPrice?: number;
+  maxPrice?: number;
 }
 
 export interface CreateCarCategoryInput {
@@ -99,6 +101,8 @@ export interface CreateCarCategoryInput {
   exteriorImages?: string[];
   offerPictures?: string[];
   vehicleScenarioId: string;
+  minPrice?: number;
+  maxPrice?: number;
 }
 
 export interface UpdateCarCategoryInput {
@@ -112,6 +116,8 @@ export interface UpdateCarCategoryInput {
   offerPictures?: string[];
   vehicleScenarioId?: string;
   isArchived?: boolean;
+  minPrice?: number;
+  maxPrice?: number;
 }
 
 export interface Feature {
