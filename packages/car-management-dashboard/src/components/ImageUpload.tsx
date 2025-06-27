@@ -9,6 +9,7 @@ interface ImageUploadProps {
   onChange: (url: string) => void;
   tenantId: string; // To construct the upload path
   size?: number;
+  placeholder?: string;
 }
 
 async function calculateSHA256(file: File): Promise<string> {
@@ -19,7 +20,13 @@ async function calculateSHA256(file: File): Promise<string> {
   return hashHex;
 }
 
-export const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, tenantId, size = 150 }) => {
+export const ImageUpload: React.FC<ImageUploadProps> = ({
+  value,
+  onChange,
+  tenantId,
+  size = 150,
+  placeholder = '点击上传图片',
+}) => {
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -109,7 +116,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, tenan
         <img src={value} alt="preview" className={uploadStyles.imagePreview} />
       ) : (
         <div className={uploadStyles.placeholder}>
-          <span>点击上传图片</span>
+          <span>{placeholder}</span>
         </div>
       )}
     </div>

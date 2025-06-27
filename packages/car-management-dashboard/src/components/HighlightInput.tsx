@@ -76,6 +76,7 @@ export const HighlightInput: React.FC<HighlightInputProps> = ({
             onChange={(url) => setInputIcon(url)}
             tenantId={currentTenant!.id}
             size={40}
+            placeholder="图标"
           />
         </div>
         <input

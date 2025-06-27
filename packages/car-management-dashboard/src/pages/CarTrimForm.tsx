@@ -62,7 +62,7 @@ export const CarTrimForm: React.FC = () => {
             originalPrice: data.originalPrice,
             currentPrice: data.currentPrice,
             badge: data.badge || '',
-            features: data.features?.map(f => ({ title: f.title, icon: f.value as string })) || [],
+            features: data.features || [],
             categoryId: data.categoryId,
           });
         }
@@ -154,7 +154,7 @@ export const CarTrimForm: React.FC = () => {
         originalPrice: formData.originalPrice.trim(),
         currentPrice: formData.currentPrice.trim(),
         badge: formData.badge.trim() || undefined,
-        features: formData.features.length > 0 ? formData.features.map(f => ({ title: f.title, value: f.icon })) : undefined,
+        features: formData.features.length > 0 ? formData.features : undefined,
         categoryId: formData.categoryId,
       };
       const updateData: UpdateCarTrimInput = commonData;
@@ -168,7 +168,7 @@ export const CarTrimForm: React.FC = () => {
         originalPrice: formData.originalPrice.trim(),
         currentPrice: formData.currentPrice.trim(),
         badge: formData.badge.trim() || undefined,
-        features: formData.features.length > 0 ? formData.features.map(f => ({ title: f.title, value: f.icon })) : undefined,
+        features: formData.features.length > 0 ? formData.features : undefined,
         categoryId: formData.categoryId,
       };
       const createData: CreateCarTrimInput = commonData;
