@@ -11,7 +11,7 @@ interface AuthContextType {
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   selectTenant: (tenant: Tenant) => void;
-  refreshTenants: () => Promise<void>;
+  refreshTenants: (currentUser?: AdminUser | null) => Promise<void>;
   isViewer: boolean;
   isSuperAdmin: boolean;
   isAdmin: boolean;
@@ -38,7 +38,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [needsFirstTenant, setNeedsFirstTenant] = useState(false);
 
-  const refreshTenants = async () => {
+  const refreshTenants = async (currentUser: AdminUser | null = user) => {
     try {
       const tenantsData = await tenantsApi.getAll();
       setTenants(tenantsData);
@@ -53,6 +53,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       setNeedsFirstTenant(false);
       
+      // 如果是 tenant_viewer, 自动选择其所属的 tenant
+      if (currentUser?.role === 'tenant_viewer' && currentUser.tenantId) {
+        const viewerTenant = tenantsData.find(t => t.id === currentUser.tenantId);
+        if (viewerTenant) {
+          setCurrentTenant(viewerTenant);
+          localStorage.setItem('current_tenant', JSON.stringify(viewerTenant));
+          return;
+        }
+      }
+
       // 恢复或选择当前租户
       const savedTenant = localStorage.getItem('current_tenant');
       if (savedTenant) {
@@ -82,8 +92,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (token && savedUser) {
         try {
-          setUser(JSON.parse(savedUser));
-          await refreshTenants();
+          const parsedUser = JSON.parse(savedUser);
+          setUser(parsedUser);
+          await refreshTenants(parsedUser);
         } catch (error) {
           console.error('Failed to initialize auth:', error);
           logout();
@@ -104,7 +115,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(response.user);
 
       // 加载租户列表并检查是否需要创建第一个租户
-      await refreshTenants();
+      await refreshTenants(response.user);
     } catch (error) {
       throw error;
     }
