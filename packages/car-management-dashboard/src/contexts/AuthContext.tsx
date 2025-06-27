@@ -8,7 +8,7 @@ interface AuthContextType {
   tenants: Tenant[];
   isLoading: boolean;
   needsFirstTenant: boolean;
-  login: (username: string, password: string) => Promise<void>;
+  login: (username: string, password: string, keepLoggedIn: boolean) => Promise<void>;
   logout: () => void;
   selectTenant: (tenant: Tenant) => void;
   refreshTenants: (currentUser?: AdminUser | null) => Promise<void>;
@@ -47,7 +47,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (tenantsData.length === 0) {
         setNeedsFirstTenant(true);
         setCurrentTenant(null);
-        localStorage.removeItem('current_tenant');
+        sessionStorage.removeItem('current_tenant');
         return;
       }
       
@@ -58,13 +58,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const viewerTenant = tenantsData.find(t => t.id === currentUser.tenantId);
         if (viewerTenant) {
           setCurrentTenant(viewerTenant);
-          localStorage.setItem('current_tenant', JSON.stringify(viewerTenant));
+          sessionStorage.setItem('current_tenant', JSON.stringify(viewerTenant));
           return;
         }
       }
 
       // 恢复或选择当前租户
-      const savedTenant = localStorage.getItem('current_tenant');
+      const savedTenant = sessionStorage.getItem('current_tenant');
       if (savedTenant) {
         const tenant = JSON.parse(savedTenant);
         const validTenant = tenantsData.find(t => t.id === tenant.id);
@@ -77,7 +77,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // 如果没有选择租户，自动选择第一个活跃的租户
       const activeTenant = tenantsData.find(t => t.status === 'active') || tenantsData[0];
       setCurrentTenant(activeTenant);
-      localStorage.setItem('current_tenant', JSON.stringify(activeTenant));
+      sessionStorage.setItem('current_tenant', JSON.stringify(activeTenant));
     } catch (error) {
       console.error('Failed to load tenants:', error);
       throw error;
@@ -87,8 +87,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // 初始化认证状态
   useEffect(() => {
     const initAuth = async () => {
-      const token = localStorage.getItem('admin_token');
-      const savedUser = localStorage.getItem('admin_user');
+      // 优先从 localStorage 获取，实现"保持登录"
+      let token = localStorage.getItem('admin_token');
+      let savedUser = localStorage.getItem('admin_user');
+
+      // 如果 localStorage 没有，再从 sessionStorage 获取，用于单次会话
+      if (!token || !savedUser) {
+        token = sessionStorage.getItem('admin_token');
+        savedUser = sessionStorage.getItem('admin_user');
+      }
 
       if (token && savedUser) {
         try {
@@ -106,12 +113,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initAuth();
   }, []);
 
-  const login = async (username: string, password: string) => {
+  const login = async (username: string, password: string, keepLoggedIn: boolean) => {
     try {
       const response = await authApi.login({ username, password });
       
-      localStorage.setItem('admin_token', response.token);
-      localStorage.setItem('admin_user', JSON.stringify(response.user));
+      const storage = keepLoggedIn ? localStorage : sessionStorage;
+      storage.setItem('admin_token', response.token);
+      storage.setItem('admin_user', JSON.stringify(response.user));
       setUser(response.user);
 
       // 加载租户列表并检查是否需要创建第一个租户
@@ -122,9 +130,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
+    // 清除所有可能的登录信息
     localStorage.removeItem('admin_token');
     localStorage.removeItem('admin_user');
-    localStorage.removeItem('current_tenant');
+    sessionStorage.removeItem('admin_token');
+    sessionStorage.removeItem('admin_user');
+
+    // 租户信息只在 sessionStorage 中
+    sessionStorage.removeItem('current_tenant');
     setUser(null);
     setCurrentTenant(null);
     setTenants([]);
@@ -133,7 +146,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const selectTenant = (tenant: Tenant) => {
     setCurrentTenant(tenant);
-    localStorage.setItem('current_tenant', JSON.stringify(tenant));
+    sessionStorage.setItem('current_tenant', JSON.stringify(tenant));
   };
 
   const isViewer = user?.role === 'tenant_viewer';

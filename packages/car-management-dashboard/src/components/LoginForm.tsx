@@ -8,6 +8,7 @@ import * as styles from './LoginForm.css';
 export const LoginForm: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [keepLoggedIn, setKeepLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ export const LoginForm: React.FC = () => {
     setError('');
 
     try {
-      await login(username, password);
+      await login(username, password, keepLoggedIn);
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.message || '登录失败，请检查用户名和密码');
@@ -68,6 +69,18 @@ export const LoginForm: React.FC = () => {
                 disabled={isLoading}
               />
             </div>
+          </div>
+
+          <div className={styles.options}>
+            <label className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={keepLoggedIn}
+                onChange={(e) => setKeepLoggedIn(e.target.checked)}
+                className={styles.checkbox}
+              />
+              保持登录
+            </label>
           </div>
 
           {error && <div className={styles.error}>{error}</div>}
