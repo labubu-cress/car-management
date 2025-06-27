@@ -69,7 +69,7 @@ export interface UpdateVehicleScenarioInput {
 
 export interface Highlight {
   title: string;
-  value: string;
+  icon: string;
 }
 
 export interface CarCategory {
@@ -122,7 +122,7 @@ export interface UpdateCarCategoryInput {
 
 export interface Feature {
   title: string;
-  value: string;
+  icon: string;
 }
 
 export interface CarTrim {
