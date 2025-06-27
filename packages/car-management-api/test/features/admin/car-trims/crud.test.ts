@@ -2,9 +2,9 @@ import type { CarTrim, CarTrimWithFavorites, CreateCarTrimInput } from "@/api/ad
 import app from "@/index";
 import { prisma } from "@/lib/db";
 import { beforeEach, describe, expect, it } from "vitest";
-import { clearTestDb, createTestTenantAndAdminUsers, type TestAdminUserWithToken } from "../../helper";
+import { clearTestDb, createTestTenantAndAdminUsers, type TestAdminUserWithToken } from "../../../helper";
 
-describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
+describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims CRUD", () => {
   let adminUser: TestAdminUserWithToken;
   let tenantId: string;
   let categoryId: string;
@@ -323,7 +323,7 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
     expect(findResponse.status).toBe(404);
   });
 
-  it("should update a car trim, including archiving and unarchiving", async () => {
+  it("should update a car trim's basic information", async () => {
     const trim = await prisma.carTrim.create({
       data: {
         name: "Test Trim for Update",
@@ -339,7 +339,7 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
 
     // Update name and configImageUrl
     const updateData = { name: "Updated Trim Name", configImageUrl: "https://example.com/updated-config.jpg" };
-    let response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims/${trim.id}`, {
+    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims/${trim.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -348,180 +348,10 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims", () => {
       body: JSON.stringify(updateData),
     });
     expect(response.status).toBe(200);
-    let body = (await response.json()) as CarTrim;
+    const body = (await response.json()) as CarTrim;
     expect(body.name).toBe(updateData.name);
     expect(body.configImageUrl).toBe(updateData.configImageUrl);
-    let updatedTrimInDb = await prisma.carTrim.findUnique({ where: { id: trim.id } });
+    const updatedTrimInDb = await prisma.carTrim.findUnique({ where: { id: trim.id } });
     expect(updatedTrimInDb?.configImageUrl).toBe(updateData.configImageUrl);
-
-    // Archive the car trim
-    const archiveUpdateData = { isArchived: true };
-    response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims/${trim.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${adminUser.token}`,
-      },
-      body: JSON.stringify(archiveUpdateData),
-    });
-    expect(response.status).toBe(200);
-    body = (await response.json()) as CarTrim;
-    expect(body.isArchived).toBe(true);
-
-    // Verify it's archived in the DB
-    let updatedTrim = await prisma.carTrim.findUnique({ where: { id: trim.id } });
-    expect(updatedTrim?.isArchived).toBe(true);
-
-    // Unarchive the car trim
-    const unarchiveUpdateData = { isArchived: false };
-    response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims/${trim.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${adminUser.token}`,
-      },
-      body: JSON.stringify(unarchiveUpdateData),
-    });
-    expect(response.status).toBe(200);
-    body = (await response.json()) as CarTrim;
-    expect(body.isArchived).toBe(false);
-
-    // Verify it's unarchived in the DB
-    updatedTrim = await prisma.carTrim.findUnique({ where: { id: trim.id } });
-    expect(updatedTrim?.isArchived).toBe(false);
-  });
-
-  it("should return isArchived status when getting a single trim", async () => {
-    const trim = await prisma.carTrim.create({
-      data: {
-        name: "Test Trim",
-        subtitle: "A nice trim",
-        image: "https://example.com/image.jpg",
-        originalPrice: 50000,
-        currentPrice: 48000,
-        features: [],
-        categoryId,
-        tenantId,
-        isArchived: true,
-      },
-    });
-    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims/${trim.id}`, {
-      headers: { Authorization: `Bearer ${adminUser.token}` },
-    });
-    const body = (await response.json()) as CarTrimWithFavorites;
-    expect(body.isArchived).toBe(true);
-  });
-});
-
-describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims for TENANT_VIEWER", () => {
-  let tenantViewerUser: TestAdminUserWithToken;
-  let tenantId: string;
-  let categoryId: string;
-  let trimId: string;
-
-  beforeEach(async () => {
-    await clearTestDb(prisma);
-    const result = await createTestTenantAndAdminUsers(prisma);
-    tenantId = result.tenantId;
-    tenantViewerUser = result.tenantViewerUser;
-
-    const scenario = await prisma.vehicleScenario.create({
-      data: {
-        name: "Test Scenario",
-        description: "Test Scenario Description",
-        image: "https://example.com/scenario.jpg",
-        tenantId,
-      },
-    });
-    const category = await prisma.carCategory.create({
-      data: {
-        name: "Test Category",
-        image: "https://example.com/image.jpg",
-        tags: [],
-        highlights: [],
-        interiorImages: [],
-        exteriorImages: [],
-        offerPictures: [],
-        tenantId,
-        vehicleScenarioId: scenario.id,
-      },
-    });
-    categoryId = category.id;
-    const trim = await prisma.carTrim.create({
-      data: {
-        name: "Test Trim",
-        subtitle: "A nice trim",
-        image: "https://example.com/image.jpg",
-        originalPrice: 50000,
-        currentPrice: 48000,
-        features: [],
-        categoryId,
-        tenantId,
-      },
-    });
-    trimId = trim.id;
-  });
-
-  it("should allow getting all car trims for a category", async () => {
-    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims?categoryId=${categoryId}`, {
-      headers: { Authorization: `Bearer ${tenantViewerUser.token}` },
-    });
-    expect(response.status).toBe(200);
-    const body = (await response.json()) as CarTrim[];
-    expect(body.length).toBe(1);
-    expect(body[0].id).toBe(trimId);
-  });
-
-  it("should allow getting a car trim by id", async () => {
-    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims/${trimId}`, {
-      headers: { Authorization: `Bearer ${tenantViewerUser.token}` },
-    });
-    expect(response.status).toBe(200);
-    const body = (await response.json()) as CarTrim;
-    expect(body.id).toBe(trimId);
-  });
-
-  it("should forbid creating a new car trim", async () => {
-    const newTrim: CreateCarTrimInput = {
-      name: "Forbidden Trim",
-      subtitle: "subtitle",
-      image: "https://example.com/image.jpg",
-      originalPrice: 1,
-      currentPrice: 1,
-      features: [],
-      categoryId,
-    };
-    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${tenantViewerUser.token}` },
-      body: JSON.stringify(newTrim),
-    });
-    expect(response.status).toBe(403);
-  });
-
-  it("should forbid updating a car trim", async () => {
-    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims/${trimId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${tenantViewerUser.token}` },
-      body: JSON.stringify({ name: "New Name" }),
-    });
-    expect(response.status).toBe(403);
-  });
-
-  it("should forbid reordering car trims", async () => {
-    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims/reorder`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${tenantViewerUser.token}` },
-      body: JSON.stringify({ categoryId, trimIds: [trimId] }),
-    });
-    expect(response.status).toBe(403);
-  });
-
-  it("should forbid deleting a car trim", async () => {
-    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims/${trimId}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${tenantViewerUser.token}` },
-    });
-    expect(response.status).toBe(403);
   });
 });
