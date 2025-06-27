@@ -8,7 +8,7 @@ export interface LoginInput {
 export interface AdminUser {
   id: string;
   username: string;
-  role: "super_admin" | "admin";
+  role: "super_admin" | "admin" | "viewer";
   tenantId: string | null;
   createdAt: string;
   updatedAt: string;
@@ -208,14 +208,14 @@ export interface UserWithFavorites extends User {
 export interface CreateAdminUserInput {
   username: string;
   password: string;
-  role: "super_admin" | "admin";
+  role: "super_admin" | "admin" | "viewer";
   tenantId?: string;
 }
 
 export interface UpdateAdminUserInput {
   username?: string;
   password?: string;
-  role?: "super_admin" | "admin";
+  role?: "super_admin" | "admin" | "viewer";
   tenantId?: string;
 }
 

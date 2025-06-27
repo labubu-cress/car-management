@@ -11,7 +11,7 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 
 export const CarTrims: React.FC = () => {
-  const { currentTenant } = useAuth();
+  const { currentTenant, isViewer } = useAuth();
   const navigate = useNavigate();
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
   const queryClient = useQueryClient();
@@ -275,16 +275,14 @@ export const CarTrims: React.FC = () => {
 
       <DataTable
         title="车型参数管理"
-        data={filteredTrims}
         columns={columns}
+        data={filteredTrims}
         loading={isLoading}
-        onAdd={selectedCategoryId ? handleAdd : undefined}
-        onReorder={handleReorder}
-        getActions={(trim: CarTrim) => [
-          { label: '编辑', onClick: () => handleEdit(trim) },
-          { label: trim.isArchived ? '上架' : '下架', onClick: () => handleArchiveToggle(trim) },
-          { label: '删除', onClick: () => handleDelete(trim), isDanger: true },
-        ]}
+        onAdd={selectedCategoryId && !isViewer ? handleAdd : undefined}
+        onEdit={!isViewer ? handleEdit : undefined}
+        onDelete={!isViewer ? handleDelete : undefined}
+        onArchiveToggle={!isViewer ? handleArchiveToggle : undefined}
+        onReorder={!isViewer ? handleReorder : undefined}
         addButtonText="创建车型参数"
       />
     </div>

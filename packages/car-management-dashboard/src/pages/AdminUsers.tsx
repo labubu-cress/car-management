@@ -13,7 +13,7 @@ import * as styles from './AdminUsers.css';
 interface AdminUserFormData {
   username: string;
   password: string;
-  role: 'super_admin' | 'admin';
+  role: 'super_admin' | 'admin' | 'viewer';
   tenantId?: string;
 }
 
@@ -90,11 +90,15 @@ export const AdminUsers: React.FC = () => {
       key: 'role',
       title: '角色',
       width: '120px',
-      render: (value: string) => (
-        <span className={value === 'super_admin' ? styles.superAdminRole : styles.adminRole}>
-          {value === 'super_admin' ? '超级管理员' : '管理员'}
-        </span>
-      ),
+      render: (value: 'super_admin' | 'admin' | 'viewer') => {
+        const roleMap = {
+          super_admin: { text: '超级管理员', className: styles.superAdminRole },
+          admin: { text: '管理员', className: styles.adminRole },
+          viewer: { text: '查看员', className: styles.viewerRole },
+        };
+        const { text, className } = roleMap[value] || roleMap.admin;
+        return <span className={className}>{text}</span>;
+      },
     },
     {
       key: 'tenantId',
@@ -170,15 +174,19 @@ export const AdminUsers: React.FC = () => {
       return;
     }
 
-    const submitData: CreateAdminUserInput | UpdateAdminUserInput = {
+    if (formData.role !== 'super_admin' && !formData.tenantId) {
+      toast.error('请为管理员或查看员选择一个租户');
+      return;
+    }
+
+    const submitData: Partial<CreateAdminUserInput | UpdateAdminUserInput> = {
       username: formData.username.trim(),
       role: formData.role,
-      // 根据新的需求，管理员不分配到特定租户，所以 tenantId 始终为 undefined
-      tenantId: undefined,
+      tenantId: formData.role === 'super_admin' ? undefined : formData.tenantId,
     };
 
     if (formData.password) {
-      (submitData as any).password = formData.password;
+      submitData.password = formData.password;
     }
 
     if (editingUser) {
@@ -281,49 +289,36 @@ export const AdminUsers: React.FC = () => {
             )}
           </div>
 
-          {/* 根据新需求，创建管理员时不需要选择角色和租户 */}
-          {!editingUser ? (
+          <div className={styles.formGroup}>
+            <label className={styles.label}>角色</label>
+            <select
+              value={formData.role}
+              onChange={(e) => handleInputChange('role', e.target.value as 'super_admin' | 'admin' | 'viewer')}
+              className={styles.select}
+              disabled={isSubmitting}
+            >
+              <option value="super_admin">超级管理员</option>
+              <option value="admin">管理员</option>
+              <option value="viewer">查看员</option>
+            </select>
+          </div>
+
+          {formData.role !== 'super_admin' && (
             <div className={styles.formGroup}>
-              <label className={styles.label}>角色</label>
+              <label className={styles.label}>所属租户</label>
               <input
                 type="text"
-                value="管理员"
+                value={formData.tenantId || '全局（所有租户）'}
+                onChange={(e) => handleInputChange('tenantId', e.target.value)}
                 className={styles.input}
-                disabled
-                style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
+                placeholder="请输入租户ID或选择全局"
+                disabled={isSubmitting}
               />
               <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
-                新创建的用户默认为管理员角色
+                管理员用户不分配到特定租户，可以管理所有租户
               </small>
             </div>
-          ) : (
-            <div className={styles.formGroup}>
-              <label className={styles.label}>角色</label>
-              <select
-                value={formData.role}
-                onChange={(e) => handleInputChange('role', e.target.value as 'super_admin' | 'admin')}
-                className={styles.select}
-                disabled={isSubmitting}
-              >
-                <option value="admin">管理员</option>
-                <option value="super_admin">超级管理员</option>
-              </select>
-            </div>
           )}
-
-          <div className={styles.formGroup}>
-            <label className={styles.label}>所属租户</label>
-            <input
-              type="text"
-              value="全局（所有租户）"
-              className={styles.input}
-              disabled
-              style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
-            />
-            <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
-              管理员用户不分配到特定租户，可以管理所有租户
-            </small>
-          </div>
         </form>
       </Modal>
     </div>

@@ -18,6 +18,14 @@ export const uploadStyles = {
       borderColor: "#888",
     },
   }),
+  disabled: style({
+    cursor: "not-allowed",
+    backgroundColor: "#f5f5f5",
+    borderColor: "#ddd",
+    ":hover": {
+      borderColor: "#ddd",
+    },
+  }),
   imagePreview: style({
     width: "100%",
     height: "100%",

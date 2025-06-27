@@ -22,7 +22,7 @@ const days = [
 ];
 
 const ContactUsConfigPage = () => {
-  const { currentTenant } = useAuth();
+  const { currentTenant, isViewer } = useAuth();
   const queryClient = useQueryClient();
   const [isCreating, setIsCreating] = useState(false);
 
@@ -94,6 +94,10 @@ const ContactUsConfigPage = () => {
       toast.error('No tenant selected');
       return;
     }
+    if (isViewer) {
+      toast.error('您没有权限执行此操作');
+      return;
+    }
     updateMutation.mutate(data);
   };
 
@@ -110,8 +114,7 @@ const ContactUsConfigPage = () => {
       <EmptyState
         title='尚未创建"联系我们"页面配置'
         description='请填写以下信息来完成"联系我们"页面配置。'
-        actionLabel="开始创建"
-        onAction={() => setIsCreating(true)}
+        {...(!isViewer && { actionLabel: "开始创建", onAction: () => setIsCreating(true) })}
         icon={<FontAwesomeIcon icon={faPhone} />}
       />
     );
@@ -131,97 +134,98 @@ const ContactUsConfigPage = () => {
         onSubmit={handleSubmit(onSubmit)}
         className={contactUsConfigStyles.form}
       >
-        <FormField label="电话咨询描述" error={errors.contactPhoneDescription?.message}>
-          <input type="text" {...register('contactPhoneDescription')} />
-        </FormField>
-        <FormField label="电话咨询号码" error={errors.contactPhoneNumber?.message}>
-          <input type="text" {...register('contactPhoneNumber')} />
-        </FormField>
-        <FormField label="邮件联系描述" error={errors.contactEmailDescription?.message}>
-          <input type="text" {...register('contactEmailDescription')} />
-        </FormField>
-        <FormField label="联系邮箱" error={errors.contactEmail?.message}>
-          <input type="text" {...register('contactEmail')} />
-        </FormField>
+        <fieldset disabled={isViewer}>
+          <FormField label="电话咨询描述" error={errors.contactPhoneDescription?.message}>
+            <input type="text" {...register('contactPhoneDescription')} />
+          </FormField>
+          <FormField label="电话咨询号码" error={errors.contactPhoneNumber?.message}>
+            <input type="text" {...register('contactPhoneNumber')} />
+          </FormField>
+          <FormField label="邮件联系描述" error={errors.contactEmailDescription?.message}>
+            <input type="text" {...register('contactEmailDescription')} />
+          </FormField>
+          <FormField label="联系邮箱" error={errors.contactEmail?.message}>
+            <input type="text" {...register('contactEmail')} />
+          </FormField>
 
-        <FormField label="工作日" error={errors.workdays?.message}>
-          <Controller
-            name="workdays"
-            control={control}
-            render={({ field }) => (
-              <div className={contactUsConfigStyles.workdaysContainer}>
-                {days.map((day) => (
-                  <div key={day.value} className={contactUsConfigStyles.workdayItem}>
-                    <input
-                      type="checkbox"
-                      id={`day-${day.value}`}
-                      checked={field.value?.includes(day.value)}
-                      onChange={(e) => {
-                        const selectedDays = field.value ? [...field.value] : [];
-                        if (e.target.checked) {
-                          selectedDays.push(day.value);
-                        } else {
-                          const index = selectedDays.indexOf(day.value);
-                          if (index > -1) {
-                            selectedDays.splice(index, 1);
+          <FormField label="工作日" error={errors.workdays?.message}>
+            <Controller
+              name="workdays"
+              control={control}
+              render={({ field }) => (
+                <div className={contactUsConfigStyles.workdaysContainer}>
+                  {days.map((day) => (
+                    <div key={day.value} className={contactUsConfigStyles.workdayItem}>
+                      <input
+                        type="checkbox"
+                        id={`day-${day.value}`}
+                        checked={field.value?.includes(day.value)}
+                        onChange={(e) => {
+                          const selectedDays = field.value ? [...field.value] : [];
+                          if (e.target.checked) {
+                            selectedDays.push(day.value);
+                          } else {
+                            const index = selectedDays.indexOf(day.value);
+                            if (index > -1) {
+                              selectedDays.splice(index, 1);
+                            }
                           }
-                        }
-                        field.onChange(selectedDays);
-                      }}
-                    />
-                    <label
-                      htmlFor={`day-${day.value}`}
-                      className={contactUsConfigStyles.workdayLabel}
-                    >
-                      {day.label}
-                    </label>
-                  </div>
+                          field.onChange(selectedDays);
+                        }}
+                      />
+                      <label
+                        htmlFor={`day-${day.value}`}
+                        className={contactUsConfigStyles.workdayLabel}
+                      >
+                        {day.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              )}
+            />
+          </FormField>
+
+          <FormField label="工作时间" error={errors.workStartTime?.message || errors.workEndTime?.message}>
+            <div className={contactUsConfigStyles.timeContainer}>
+              <select
+                {...register('workStartTime', {
+                  setValueAs: (v) => (v === '' ? null : Number(v)),
+                })}
+              >
+                <option value="">开始时间</option>
+                {Array.from({ length: 24 }, (_, i) => (
+                  <option key={i} value={i}>
+                    {i}:00
+                  </option>
                 ))}
-              </div>
-            )}
-          />
-        </FormField>
-
-        <FormField label="工作时间" error={errors.workStartTime?.message || errors.workEndTime?.message}>
-          <div className={contactUsConfigStyles.timeContainer}>
-            <select
-              {...register('workStartTime', {
-                setValueAs: (v) => (v === '' ? null : Number(v)),
-              })}
-            >
-              <option value="">开始时间</option>
-              {Array.from({ length: 24 }, (_, i) => (
-                <option key={i} value={i}>
-                  {i}:00
-                </option>
-              ))}
-            </select>
-            <span>-</span>
-            <select
-              {...register('workEndTime', {
-                setValueAs: (v) => (v === '' ? null : Number(v)),
-                validate: (value) => {
-                  if (value == null || workStartTime == null) return true;
-                  return (
-                    value > workStartTime || '结束时间必须晚于开始时间'
-                  );
-                },
-              })}
-            >
-              <option value="">结束时间</option>
-              {Array.from({ length: 24 }, (_, i) => (
-                <option key={i} value={i}>
-                  {i}:00
-                </option>
-              ))}
-            </select>
-          </div>
-        </FormField>
-
+              </select>
+              <span>-</span>
+              <select
+                {...register('workEndTime', {
+                  setValueAs: (v) => (v === '' ? null : Number(v)),
+                  validate: (value) => {
+                    if (value == null || workStartTime == null) return true;
+                    return (
+                      value > workStartTime || '结束时间必须晚于开始时间'
+                    );
+                  },
+                })}
+              >
+                <option value="">结束时间</option>
+                {Array.from({ length: 24 }, (_, i) => (
+                  <option key={i} value={i}>
+                    {i}:00
+                  </option>
+                ))}
+              </select>
+            </div>
+          </FormField>
+        </fieldset>
         <div className={contactUsConfigStyles.actions}>
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isViewer}
             className={contactUsConfigStyles.submitButton}
           >
             {isSubmitting ? '保存中...' : '保存'}

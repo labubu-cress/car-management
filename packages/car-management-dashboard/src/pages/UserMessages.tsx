@@ -12,7 +12,7 @@ import * as styles from './UserMessages.css';
 type Status = 'PENDING' | 'PROCESSED';
 
 export const UserMessages: React.FC = () => {
-  const { currentTenant } = useAuth();
+  const { currentTenant, isViewer } = useAuth();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
@@ -118,7 +118,12 @@ export const UserMessages: React.FC = () => {
       title: '处理人',
       render: (value: any) => value || '-',
     },
-    {
+  ];
+
+  const hasActionableItems = data?.messages.some(msg => msg.status === 'PENDING');
+
+  if (!isViewer && hasActionableItems) {
+    columns.push({
       key: 'actions',
       title: '操作',
       render: (_, record) =>
@@ -131,8 +136,8 @@ export const UserMessages: React.FC = () => {
             标记为已处理
           </button>
         ) : null,
-    },
-  ];
+    });
+  }
 
   if (!currentTenant) {
     return (

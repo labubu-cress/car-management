@@ -12,6 +12,9 @@ interface AuthContextType {
   logout: () => void;
   selectTenant: (tenant: Tenant) => void;
   refreshTenants: () => Promise<void>;
+  isViewer: boolean;
+  isSuperAdmin: boolean;
+  isAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -122,6 +125,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.setItem('current_tenant', JSON.stringify(tenant));
   };
 
+  const isViewer = user?.role === 'viewer';
+  const isSuperAdmin = user?.role === 'super_admin';
+  const isAdmin = user?.role === 'admin';
+
   const value: AuthContextType = {
     user,
     currentTenant,
@@ -132,6 +139,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     logout,
     selectTenant,
     refreshTenants,
+    isViewer,
+    isSuperAdmin,
+    isAdmin,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

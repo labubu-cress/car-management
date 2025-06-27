@@ -7,7 +7,7 @@ import { TagInput } from '@/components/TagInput';
 import { useAuth } from '@/contexts/AuthContext';
 import { carCategoriesApi, vehicleScenariosApi } from '@/lib/api';
 import { CreateCarCategoryInput, UpdateCarCategoryInput } from '@/types/api';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -16,7 +16,7 @@ import { carCategoryFormStyles } from './CarCategoryForm.css';
 export const CarCategoryForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { currentTenant } = useAuth();
+  const { currentTenant, isViewer } = useAuth();
   const queryClient = useQueryClient();
   const isEdit = !!id;
 
@@ -36,15 +36,22 @@ export const CarCategoryForm: React.FC = () => {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  useEffect(() => {
+    if (isViewer && !isEdit) {
+      toast.error('您没有权限创建新的车型。');
+      navigate('/car-categories');
+    }
+  }, [isViewer, isEdit, navigate]);
+
   // 获取场景列表
   const { data: scenarios = [] } = useQuery(
     ['vehicle-scenarios', currentTenant?.id],
-    () => currentTenant ? vehicleScenariosApi.getAll(currentTenant.id) : Promise.resolve([]),
+    () => (currentTenant ? vehicleScenariosApi.getAll(currentTenant.id) : Promise.resolve([])),
     {
       enabled: !!currentTenant,
       onSuccess: (data) => {
         if (data.length > 0 && !formData.vehicleScenarioId && !isEdit) {
-          setFormData(prev => ({ ...prev, vehicleScenarioId: data[0].id }));
+          setFormData((prev) => ({ ...prev, vehicleScenarioId: data[0].id }));
         }
       },
     }
@@ -53,7 +60,7 @@ export const CarCategoryForm: React.FC = () => {
   // 获取分类详情（编辑模式）
   const { isLoading } = useQuery(
     ['car-category', currentTenant?.id, id],
-    () => currentTenant && id ? carCategoriesApi.getById(currentTenant.id, id) : null,
+    () => (currentTenant && id ? carCategoriesApi.getById(currentTenant.id, id) : null),
     {
       enabled: !!currentTenant && !!id,
       onSuccess: (data) => {
@@ -115,11 +122,11 @@ export const CarCategoryForm: React.FC = () => {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.name.trim()) {
       newErrors.name = '请输入车型名称';
     }
-    
+
     if (!formData.image.trim()) {
       newErrors.image = '请上传车型图片';
     }
@@ -134,7 +141,12 @@ export const CarCategoryForm: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    if (isViewer) {
+      toast.error('您没有权限执行此操作');
+      return;
+    }
+
     if (!validateForm()) {
       return;
     }
@@ -180,6 +192,10 @@ export const CarCategoryForm: React.FC = () => {
     return <div>加载租户信息...</div>;
   }
 
+  if (isViewer && !isEdit) {
+    return null;
+  }
+
   // 如果没有场景，显示引导
   if (scenarios.length === 0) {
     return (
@@ -207,9 +223,7 @@ export const CarCategoryForm: React.FC = () => {
   return (
     <div className={carCategoryFormStyles.container}>
       <div className={carCategoryFormStyles.header}>
-        <h1 className={carCategoryFormStyles.title}>
-          {isEdit ? '编辑车型' : '创建车型'}
-        </h1>
+        <h1 className={carCategoryFormStyles.title}>{isEdit ? '编辑车型' : '创建车型'}</h1>
         <button onClick={handleBack} className={carCategoryFormStyles.backButton}>
           返回车型列表
         </button>
@@ -218,22 +232,25 @@ export const CarCategoryForm: React.FC = () => {
       <form onSubmit={handleSubmit} className={carCategoryFormStyles.form}>
         <div className={carCategoryFormStyles.section}>
           <h2 className={carCategoryFormStyles.sectionTitle}>基本信息</h2>
-          
+
           <FormField label="所属分类" required error={errors.vehicleScenarioId}>
             <select
               value={formData.vehicleScenarioId}
               onChange={(e) => setFormData({ ...formData, vehicleScenarioId: e.target.value })}
               className={formFieldStyles.select}
+              disabled={isSubmitting || isViewer}
             >
-              <option value="" disabled>请选择车辆分类</option>
-              {scenarios.map(scenario => (
+              <option value="" disabled>
+                请选择车辆分类
+              </option>
+              {scenarios.map((scenario) => (
                 <option key={scenario.id} value={scenario.id}>
                   {scenario.name}
                 </option>
               ))}
             </select>
           </FormField>
-          
+
           <FormField label="车型名称" required error={errors.name}>
             <input
               type="text"
@@ -241,6 +258,7 @@ export const CarCategoryForm: React.FC = () => {
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className={formFieldStyles.input}
               placeholder="请输入车型名称"
+              disabled={isSubmitting || isViewer}
             />
           </FormField>
 
@@ -251,6 +269,7 @@ export const CarCategoryForm: React.FC = () => {
               onChange={(e) => setFormData({ ...formData, minPrice: Number(e.target.value) })}
               className={formFieldStyles.input}
               placeholder="请输入最低价格"
+              disabled={isSubmitting || isViewer}
             />
           </FormField>
 
@@ -261,74 +280,73 @@ export const CarCategoryForm: React.FC = () => {
               onChange={(e) => setFormData({ ...formData, maxPrice: Number(e.target.value) })}
               className={formFieldStyles.input}
               placeholder="请输入最高价格"
+              disabled={isSubmitting || isViewer}
             />
           </FormField>
 
-          <FormField label="车型图片" required error={errors.image}>
-            <ImageUpload
-              value={formData.image}
-              onChange={(url) => setFormData({ ...formData, image: url })}
-              tenantId={currentTenant.id}
-            />
-          </FormField>
-
-          <FormField label="标签徽章">
+          <FormField label="角标 (Badge)">
             <input
               type="text"
               value={formData.badge}
               onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
               className={formFieldStyles.input}
-              placeholder="请输入标签徽章"
+              placeholder="例如：热门推荐"
+              disabled={isSubmitting || isViewer}
             />
           </FormField>
-        </div>
 
-        <div className={carCategoryFormStyles.section}>
-          <h2 className={carCategoryFormStyles.sectionTitle}>标签组</h2>
-          <FormField label="标签列表">
+          <FormField label="标签组 (Tags)">
             <TagInput
               value={formData.tags}
               onChange={(tags) => setFormData({ ...formData, tags })}
-              placeholder="输入标签后按回车添加"
+              disabled={isSubmitting || isViewer}
             />
           </FormField>
-        </div>
 
-        <div className={carCategoryFormStyles.section}>
-          <h2 className={carCategoryFormStyles.sectionTitle}>特色亮点</h2>
-          <FormField label="亮点列表">
+          <FormField label="亮点 (Highlights)">
             <HighlightInput
               value={formData.highlights}
               onChange={(highlights) => setFormData({ ...formData, highlights })}
-              placeholder={{ title: '如：百公里加速', icon: '特色图标' }}
+              disabled={isSubmitting || isViewer}
             />
           </FormField>
         </div>
 
         <div className={carCategoryFormStyles.section}>
           <h2 className={carCategoryFormStyles.sectionTitle}>图片资源</h2>
-          
-          <FormField label="内饰图片">
+          <FormField label="车型主图" required error={errors.image}>
+            <ImageUpload
+              value={formData.image}
+              onChange={(url) => setFormData({ ...formData, image: url })}
+              tenantId={currentTenant.id}
+              disabled={isSubmitting || isViewer}
+            />
+          </FormField>
+
+          <FormField label="内部图片">
             <MultiImageUpload
               values={formData.interiorImages}
               onChange={(urls) => setFormData({ ...formData, interiorImages: urls })}
               tenantId={currentTenant.id}
+              disabled={isSubmitting || isViewer}
             />
           </FormField>
 
-          <FormField label="外观图片">
+          <FormField label="外部图片">
             <MultiImageUpload
               values={formData.exteriorImages}
               onChange={(urls) => setFormData({ ...formData, exteriorImages: urls })}
               tenantId={currentTenant.id}
+              disabled={isSubmitting || isViewer}
             />
           </FormField>
 
-          <FormField label="优惠图片">
+          <FormField label="报价图">
             <MultiImageUpload
               values={formData.offerPictures}
               onChange={(urls) => setFormData({ ...formData, offerPictures: urls })}
               tenantId={currentTenant.id}
+              disabled={isSubmitting || isViewer}
             />
           </FormField>
         </div>
@@ -345,9 +363,9 @@ export const CarCategoryForm: React.FC = () => {
           <button
             type="submit"
             className={carCategoryFormStyles.submitButton}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isViewer}
           >
-            {isSubmitting ? '保存中...' : (isEdit ? '更新分类' : '创建分类')}
+            {isSubmitting ? '保存中...' : isEdit ? '更新车型' : '创建车型'}
           </button>
         </div>
       </form>

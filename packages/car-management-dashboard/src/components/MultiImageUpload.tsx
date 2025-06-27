@@ -1,18 +1,18 @@
 import {
-  closestCenter,
-  DndContext,
-  DragEndEvent,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
+    closestCenter,
+    DndContext,
+    DragEndEvent,
+    KeyboardSensor,
+    PointerSensor,
+    useSensor,
+    useSensors,
 } from '@dnd-kit/core';
 import {
-  arrayMove,
-  rectSortingStrategy,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
+    arrayMove,
+    rectSortingStrategy,
+    SortableContext,
+    sortableKeyboardCoordinates,
+    useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import React from 'react';
@@ -25,9 +25,10 @@ interface SortableImageItemProps {
   url: string;
   tenantId: string;
   onRemove: (url: string) => void;
+  disabled?: boolean;
 }
 
-const SortableImageItem: React.FC<SortableImageItemProps> = ({ url, tenantId, onRemove }) => {
+const SortableImageItem: React.FC<SortableImageItemProps> = ({ url, tenantId, onRemove, disabled }) => {
   const {
     attributes,
     listeners,
@@ -35,7 +36,7 @@ const SortableImageItem: React.FC<SortableImageItemProps> = ({ url, tenantId, on
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: url });
+  } = useSortable({ id: url, disabled });
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -46,7 +47,7 @@ const SortableImageItem: React.FC<SortableImageItemProps> = ({ url, tenantId, on
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners} className={multiUploadStyles.item}>
-      <ImageUpload value={url} onChange={() => {}} tenantId={tenantId} />
+      <ImageUpload value={url} onChange={() => {}} tenantId={tenantId} disabled />
       <button
         type="button"
         className={multiUploadStyles.deleteButton}
@@ -54,6 +55,8 @@ const SortableImageItem: React.FC<SortableImageItemProps> = ({ url, tenantId, on
           e.stopPropagation(); // Prevent dnd listeners from firing
           onRemove(url);
         }}
+        disabled={disabled}
+        style={{ display: disabled ? 'none' : 'block' }}
       >
         &times;
       </button>
@@ -67,9 +70,10 @@ interface MultiImageUploadProps {
   values: string[];
   onChange: (urls: string[]) => void;
   tenantId: string;
+  disabled?: boolean;
 }
 
-export const MultiImageUpload: React.FC<MultiImageUploadProps> = ({ values, onChange, tenantId }) => {
+export const MultiImageUpload: React.FC<MultiImageUploadProps> = ({ values, onChange, tenantId, disabled = false }) => {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -112,11 +116,13 @@ export const MultiImageUpload: React.FC<MultiImageUploadProps> = ({ values, onCh
       <SortableContext items={values} strategy={rectSortingStrategy}>
         <div className={multiUploadStyles.container}>
           {values.map((url) => (
-            <SortableImageItem key={url} url={url} tenantId={tenantId} onRemove={handleRemoveImage} />
+            <SortableImageItem key={url} url={url} tenantId={tenantId} onRemove={handleRemoveImage} disabled={disabled} />
           ))}
-          <div className={multiUploadStyles.addButton}>
-            <ImageUpload value={null} onChange={handleAddImage} tenantId={tenantId} />
-          </div>
+          {!disabled && (
+            <div className={multiUploadStyles.addButton}>
+              <ImageUpload value={null} onChange={handleAddImage} tenantId={tenantId} />
+            </div>
+          )}
         </div>
       </SortableContext>
     </DndContext>

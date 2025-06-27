@@ -6,8 +6,8 @@ import { emptyStateStyles } from './EmptyState.css';
 interface EmptyStateProps {
   title: string;
   description: string;
-  actionLabel: string;
-  onAction: () => void;
+  actionLabel?: string;
+  onAction?: () => void;
   icon?: React.ReactNode;
 }
 
@@ -24,10 +24,12 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         {icon && <div className={emptyStateStyles.icon}>{icon}</div>}
         <h3 className={emptyStateStyles.title}>{title}</h3>
         <p className={emptyStateStyles.description}>{description}</p>
-        <button onClick={onAction} className={emptyStateStyles.button}>
-          <FontAwesomeIcon icon={faPlus} />
-          {actionLabel}
-        </button>
+        {onAction && actionLabel && (
+          <button onClick={onAction} className={emptyStateStyles.button}>
+            <FontAwesomeIcon icon={faPlus} />
+            {actionLabel}
+          </button>
+        )}
       </div>
     </div>
   );

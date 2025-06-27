@@ -11,7 +11,7 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 
 export const CarCategories: React.FC = () => {
-  const { currentTenant } = useAuth();
+  const { currentTenant, isViewer } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [selectedScenarioId, setSelectedScenarioId] = useState<string>('');
@@ -240,11 +240,11 @@ export const CarCategories: React.FC = () => {
         data={localCategories}
         columns={columns}
         loading={isLoading}
-        onAdd={selectedScenarioId ? handleAdd : undefined}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        onArchiveToggle={handleArchiveToggle}
-        onReorder={handleReorder}
+        onAdd={selectedScenarioId && !isViewer ? handleAdd : undefined}
+        onEdit={!isViewer ? handleEdit : undefined}
+        onDelete={!isViewer ? handleDelete : undefined}
+        onArchiveToggle={!isViewer ? handleArchiveToggle : undefined}
+        onReorder={!isViewer ? handleReorder : undefined}
         addButtonText="创建车型"
       />
     </div>

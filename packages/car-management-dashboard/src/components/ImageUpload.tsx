@@ -10,6 +10,7 @@ interface ImageUploadProps {
   tenantId: string; // To construct the upload path
   size?: number;
   placeholder?: string;
+  disabled?: boolean;
 }
 
 async function calculateSHA256(file: File): Promise<string> {
@@ -26,13 +27,14 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   tenantId,
   size = 150,
   placeholder = '点击上传图片',
+  disabled = false,
 }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleContainerClick = () => {
-    if (!isUploading) {
+    if (!isUploading && !disabled) {
       fileInputRef.current?.click();
     }
   };
@@ -101,14 +103,18 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   const containerStyle = size ? { width: `${size}px`, height: `${size}px` } : {};
 
   return (
-    <div className={uploadStyles.container} style={containerStyle} onClick={handleContainerClick}>
+    <div
+      className={`${uploadStyles.container} ${disabled ? uploadStyles.disabled : ''}`}
+      style={containerStyle}
+      onClick={handleContainerClick}
+    >
       <input
         type="file"
         accept="image/*"
         ref={fileInputRef}
         onChange={handleFileChange}
         className={uploadStyles.input}
-        disabled={isUploading}
+        disabled={isUploading || disabled}
       />
       {isUploading ? (
         <div className={uploadStyles.progressOverlay}>{progress}%</div>

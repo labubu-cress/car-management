@@ -14,18 +14,21 @@ interface HighlightInputProps {
   value: Highlight[];
   onChange: (value: Highlight[]) => void;
   placeholder?: { title: string; icon: string };
+  disabled?: boolean;
 }
 
 export const HighlightInput: React.FC<HighlightInputProps> = ({
   value,
   onChange,
   placeholder = { title: '特色标题', icon: '特色图标' },
+  disabled = false,
 }) => {
   const { currentTenant } = useAuth();
   const [inputTitle, setInputTitle] = useState('');
   const [inputIcon, setInputIcon] = useState('');
 
   const addHighlight = () => {
+    if (disabled) return;
     const trimmedTitle = inputTitle.trim();
     const trimmedIcon = inputIcon.trim();
 
@@ -40,6 +43,7 @@ export const HighlightInput: React.FC<HighlightInputProps> = ({
   };
 
   const removeHighlight = (index: number) => {
+    if (disabled) return;
     const newHighlights = value.filter((_, i) => i !== index);
     onChange(newHighlights);
   };
@@ -63,6 +67,7 @@ export const HighlightInput: React.FC<HighlightInputProps> = ({
             type="button"
             onClick={() => removeHighlight(index)}
             className={highlightInputStyles.removeButton}
+            disabled={disabled}
           >
             <FontAwesomeIcon icon={faTimes} />
           </button>
@@ -77,6 +82,7 @@ export const HighlightInput: React.FC<HighlightInputProps> = ({
             tenantId={currentTenant!.id}
             size={40}
             placeholder="图标"
+            disabled={disabled}
           />
         </div>
         <input
@@ -86,12 +92,13 @@ export const HighlightInput: React.FC<HighlightInputProps> = ({
           onKeyDown={handleKeyDown}
           placeholder={placeholder.title}
           className={highlightInputStyles.titleInput}
+          disabled={disabled}
         />
         <button
           type="button"
           onClick={addHighlight}
           className={highlightInputStyles.addButton}
-          disabled={!inputTitle.trim() || !inputIcon.trim()}
+          disabled={disabled || !inputTitle.trim() || !inputIcon.trim()}
         >
           <FontAwesomeIcon icon={faPlus} />
         </button>

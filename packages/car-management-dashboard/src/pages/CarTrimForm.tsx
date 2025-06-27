@@ -5,7 +5,7 @@ import { ImageUpload } from '@/components/ImageUpload';
 import { useAuth } from '@/contexts/AuthContext';
 import { carCategoriesApi, carTrimsApi } from '@/lib/api';
 import { CreateCarTrimInput, UpdateCarTrimInput } from '@/types/api';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -14,7 +14,7 @@ import { carTrimFormStyles } from './CarTrimForm.css';
 export const CarTrimForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { currentTenant } = useAuth();
+  const { currentTenant, isViewer } = useAuth();
   const queryClient = useQueryClient();
   const isEdit = !!id;
 
@@ -31,6 +31,13 @@ export const CarTrimForm: React.FC = () => {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (isViewer && !isEdit) {
+      toast.error('您没有权限创建新的车型参数。');
+      navigate('/car-trims');
+    }
+  }, [isViewer, isEdit, navigate]);
 
   // 获取分类列表
   const { data: categories = [] } = useQuery(
@@ -49,7 +56,7 @@ export const CarTrimForm: React.FC = () => {
   // 获取车型参数详情（编辑模式）
   const { data: carTrimDetails, isLoading } = useQuery(
     ['car-trim', currentTenant?.id, id],
-    () => currentTenant && id ? carTrimsApi.getById(currentTenant.id, id) : null,
+    () => (currentTenant && id ? carTrimsApi.getById(currentTenant.id, id) : null),
     {
       enabled: !!currentTenant && !!id,
       onSuccess: (data) => {
@@ -141,6 +148,11 @@ export const CarTrimForm: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (isViewer) {
+      toast.error('您没有权限执行此操作');
+      return;
+    }
+
     if (!validateForm()) {
       return;
     }
@@ -182,6 +194,10 @@ export const CarTrimForm: React.FC = () => {
 
   if (!currentTenant) {
     return <div>加载租户信息...</div>;
+  }
+
+  if (isViewer && !isEdit) {
+    return null;
   }
 
   // 如果没有分类，显示引导
@@ -230,6 +246,7 @@ export const CarTrimForm: React.FC = () => {
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className={formFieldStyles.input}
               placeholder="请输入车型参数名称"
+              disabled={isSubmitting || isViewer}
             />
           </FormField>
 
@@ -240,6 +257,7 @@ export const CarTrimForm: React.FC = () => {
               onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
               className={formFieldStyles.input}
               placeholder="请输入副标题"
+              disabled={isSubmitting || isViewer}
             />
           </FormField>
 
@@ -248,6 +266,7 @@ export const CarTrimForm: React.FC = () => {
               value={formData.image}
               onChange={(url) => setFormData({ ...formData, image: url })}
               tenantId={currentTenant.id}
+              disabled={isSubmitting || isViewer}
             />
           </FormField>
 
@@ -256,6 +275,7 @@ export const CarTrimForm: React.FC = () => {
               value={formData.configImageUrl}
               onChange={(url) => setFormData({ ...formData, configImageUrl: url })}
               tenantId={currentTenant.id}
+              disabled={isSubmitting || isViewer}
             />
           </FormField>
 
@@ -264,9 +284,9 @@ export const CarTrimForm: React.FC = () => {
               value={formData.categoryId}
               onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
               className={formFieldStyles.select}
-              disabled={categories.length <= 1}
+              disabled={isSubmitting || isViewer}
             >
-              {categories.length > 1 && <option value="">请选择车型</option>}
+              <option value="" disabled>请选择车型</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
@@ -282,6 +302,7 @@ export const CarTrimForm: React.FC = () => {
               onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
               className={formFieldStyles.input}
               placeholder="请输入优惠政策亮点，例如：金融贴息至高8000元"
+              disabled={isSubmitting || isViewer}
             />
           </FormField>
         </div>
@@ -296,6 +317,7 @@ export const CarTrimForm: React.FC = () => {
               onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value })}
               className={formFieldStyles.input}
               placeholder="如: 299800"
+              disabled={isSubmitting || isViewer}
             />
           </FormField>
 
@@ -306,6 +328,7 @@ export const CarTrimForm: React.FC = () => {
               onChange={(e) => setFormData({ ...formData, currentPrice: e.target.value })}
               className={formFieldStyles.input}
               placeholder="如: 259800"
+              disabled={isSubmitting || isViewer}
             />
           </FormField>
         </div>
@@ -317,6 +340,7 @@ export const CarTrimForm: React.FC = () => {
               value={formData.features}
               onChange={(features) => setFormData({ ...formData, features })}
               placeholder={{ title: '功能名称', icon: '功能描述' }}
+              disabled={isSubmitting || isViewer}
             />
           </FormField>
         </div>
@@ -333,7 +357,7 @@ export const CarTrimForm: React.FC = () => {
           <button
             type="submit"
             className={carTrimFormStyles.submitButton}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isViewer}
           >
             {isSubmitting ? '保存中...' : (isEdit ? '更新配置' : '创建配置')}
           </button>

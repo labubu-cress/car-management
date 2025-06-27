@@ -25,7 +25,7 @@ export const Faqs: React.FC = () => {
     icon: '',
   });
 
-  const { currentTenant } = useAuth();
+  const { currentTenant, isViewer } = useAuth();
   const tenantId = currentTenant?.id;
   const queryClient = useQueryClient();
 
@@ -130,6 +130,10 @@ export const Faqs: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isViewer) {
+      toast.error('您没有权限执行此操作');
+      return;
+    }
     if (editingFaq) {
       updateMutation.mutate({ id: editingFaq.id, data: formData });
     } else {
@@ -153,9 +157,9 @@ export const Faqs: React.FC = () => {
         columns={columns}
         data={faqs}
         loading={isLoading}
-        onAdd={handleAdd}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
+        onAdd={!isViewer ? handleAdd : undefined}
+        onEdit={!isViewer ? handleEdit : undefined}
+        onDelete={!isViewer ? handleDelete : undefined}
         addButtonText="添加问题"
       />
 
@@ -165,32 +169,35 @@ export const Faqs: React.FC = () => {
         title={editingFaq ? '编辑问题' : '添加问题'}
       >
         <form onSubmit={handleSubmit}>
-          <FormField label="问题">
-            <input
-              type="text"
-              value={formData.question}
-              onChange={(e) => handleInputChange('question', e.target.value)}
-              required
-            />
-          </FormField>
-          <FormField label="答案">
-            <textarea
-              value={formData.answer}
-              onChange={(e) => handleInputChange('answer', e.target.value)}
-              rows={5}
-              required
-            />
-          </FormField>
-          <FormField label="图标">
-            <ImageUpload
-              value={formData.icon}
-              onChange={(url) => handleInputChange('icon', url)}
-              tenantId={tenantId!}
-            />
-          </FormField>
+          <fieldset disabled={isViewer}>
+            <FormField label="问题">
+              <input
+                type="text"
+                value={formData.question}
+                onChange={(e) => handleInputChange('question', e.target.value)}
+                required
+              />
+            </FormField>
+            <FormField label="答案">
+              <textarea
+                value={formData.answer}
+                onChange={(e) => handleInputChange('answer', e.target.value)}
+                rows={5}
+                required
+              />
+            </FormField>
+            <FormField label="图标">
+              <ImageUpload
+                value={formData.icon}
+                onChange={(url) => handleInputChange('icon', url)}
+                tenantId={tenantId!}
+                disabled={isViewer}
+              />
+            </FormField>
+          </fieldset>
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isViewer}
             className={formStyles.submitButton}
           >
             {isSubmitting ? '提交中...' : '提交'}

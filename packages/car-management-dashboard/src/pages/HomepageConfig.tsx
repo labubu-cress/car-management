@@ -13,7 +13,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { homepageConfigStyles } from './HomepageConfig.css';
 
 const HomepageConfigPage = () => {
-  const { currentTenant } = useAuth();
+  const { currentTenant, isViewer } = useAuth();
   const queryClient = useQueryClient();
   const [isCreating, setIsCreating] = useState(false);
 
@@ -72,6 +72,10 @@ const HomepageConfigPage = () => {
       toast.error('No tenant selected');
       return;
     }
+    if (isViewer) {
+      toast.error('您没有权限执行此操作');
+      return;
+    }
     updateMutation.mutate(data);
   };
 
@@ -88,8 +92,7 @@ const HomepageConfigPage = () => {
       <EmptyState
         title="尚未创建小程序首页配置"
         description="请填写以下信息来完成首页配置。"
-        actionLabel="开始创建"
-        onAction={() => setIsCreating(true)}
+        {...(!isViewer && { actionLabel: "开始创建", onAction: () => setIsCreating(true) })}
         icon={<FontAwesomeIcon icon={faFileAlt} />}
       />
     );
@@ -109,75 +112,77 @@ const HomepageConfigPage = () => {
         onSubmit={handleSubmit(onSubmit)}
         className={homepageConfigStyles.form}
       >
-        <FormField label="第一行标题" error={errors.firstTitle?.message}>
-          <input type="text" {...register('firstTitle', { required: '第一行标题不能为空' })} />
-        </FormField>
-        <FormField label="第一行标题图标" error={errors.firstTitleIcon?.message}>
-          <Controller
-            name="firstTitleIcon"
-            control={control}
-            rules={{ required: '第一行标题图标不能为空' }}
-            render={({ field }) => (
-              <ImageUpload
-                value={field.value ?? null}
-                onChange={field.onChange}
-                tenantId={currentTenant.id}
-              />
-            )}
-          />
-        </FormField>
-        <FormField label="第二行标题" error={errors.secondTitle?.message}>
-          <input type="text" {...register('secondTitle', { required: '第二行标题不能为空' })} />
-        </FormField>
-        <FormField label="第二行标题图标" error={errors.secondTitleIcon?.message}>
-          <Controller
-            name="secondTitleIcon"
-            control={control}
-            rules={{ required: '第二行标题图标不能为空' }}
-            render={({ field }) => (
-              <ImageUpload
-                value={field.value ?? null}
-                onChange={field.onChange}
-                tenantId={currentTenant.id}
-              />
-            )}
-          />
-        </FormField>
+        <fieldset disabled={isViewer}>
+          <FormField label="第一行标题" error={errors.firstTitle?.message}>
+            <input type="text" {...register('firstTitle', { required: '第一行标题不能为空' })} />
+          </FormField>
+          <FormField label="第一行标题图标" error={errors.firstTitleIcon?.message}>
+            <Controller
+              name="firstTitleIcon"
+              control={control}
+              rules={{ required: '第一行标题图标不能为空' }}
+              render={({ field }) => (
+                <ImageUpload
+                  value={field.value ?? null}
+                  onChange={field.onChange}
+                  tenantId={currentTenant.id}
+                />
+              )}
+            />
+          </FormField>
+          <FormField label="第二行标题" error={errors.secondTitle?.message}>
+            <input type="text" {...register('secondTitle', { required: '第二行标题不能为空' })} />
+          </FormField>
+          <FormField label="第二行标题图标" error={errors.secondTitleIcon?.message}>
+            <Controller
+              name="secondTitleIcon"
+              control={control}
+              rules={{ required: '第二行标题图标不能为空' }}
+              render={({ field }) => (
+                <ImageUpload
+                  value={field.value ?? null}
+                  onChange={field.onChange}
+                  tenantId={currentTenant.id}
+                />
+              )}
+            />
+          </FormField>
 
-        <FormField label="主 Banner 图" error={errors.bannerImage?.message}>
-          <Controller
-            name="bannerImage"
-            control={control}
-            rules={{ required: "主 Banner 图不能为空" }}
-            render={({ field }) => (
-              <ImageUpload
-                value={field.value ?? null}
-                onChange={field.onChange}
-                tenantId={currentTenant.id}
-              />
-            )}
-          />
-        </FormField>
+          <FormField label="主 Banner 图" error={errors.bannerImage?.message}>
+            <Controller
+              name="bannerImage"
+              control={control}
+              rules={{ required: "主 Banner 图不能为空" }}
+              render={({ field }) => (
+                <ImageUpload
+                  value={field.value ?? null}
+                  onChange={field.onChange}
+                  tenantId={currentTenant.id}
+                />
+              )}
+            />
+          </FormField>
 
-        <FormField label="权益图" error={errors.benefitsImage?.message}>
-          <Controller
-            name="benefitsImage"
-            control={control}
-            rules={{ required: "权益图不能为空" }}
-            render={({ field }) => (
-              <ImageUpload
-                value={field.value ?? null}
-                onChange={field.onChange}
-                tenantId={currentTenant.id}
-              />
-            )}
-          />
-        </FormField>
+          <FormField label="权益图" error={errors.benefitsImage?.message}>
+            <Controller
+              name="benefitsImage"
+              control={control}
+              rules={{ required: "权益图不能为空" }}
+              render={({ field }) => (
+                <ImageUpload
+                  value={field.value ?? null}
+                  onChange={field.onChange}
+                  tenantId={currentTenant.id}
+                />
+              )}
+            />
+          </FormField>
+        </fieldset>
 
         <div className={homepageConfigStyles.actions}>
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isViewer}
             className={homepageConfigStyles.submitButton}
           >
             {isSubmitting ? '保存中...' : '保存'}

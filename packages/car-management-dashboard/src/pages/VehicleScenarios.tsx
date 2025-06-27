@@ -26,7 +26,7 @@ export const VehicleScenarios: React.FC = () => {
     image: '',
   });
 
-  const { currentTenant } = useAuth();
+  const { currentTenant, isViewer } = useAuth();
   const queryClient = useQueryClient();
 
   // 获取车辆分类列表
@@ -206,9 +206,9 @@ export const VehicleScenarios: React.FC = () => {
         columns={columns}
         data={scenarios}
         loading={isLoading}
-        onAdd={handleAdd}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
+        onAdd={!isViewer ? handleAdd : undefined}
+        onEdit={!isViewer ? handleEdit : undefined}
+        onDelete={!isViewer ? handleDelete : undefined}
         addButtonText="添加分类"
       />
 

@@ -8,13 +8,15 @@ interface TagInputProps {
   onChange: (value: string[]) => void;
   placeholder?: string;
   maxTags?: number;
+  disabled?: boolean;
 }
 
 export const TagInput: React.FC<TagInputProps> = ({ 
   value, 
   onChange, 
   placeholder = '输入后按回车添加',
-  maxTags
+  maxTags,
+  disabled = false,
 }) => {
   const [inputValue, setInputValue] = useState('');
 
@@ -28,6 +30,7 @@ export const TagInput: React.FC<TagInputProps> = ({
   };
 
   const addTag = () => {
+    if (disabled) return;
     const trimmedValue = inputValue.trim();
     if (trimmedValue && !value.includes(trimmedValue)) {
       if (!maxTags || value.length < maxTags) {
@@ -38,6 +41,7 @@ export const TagInput: React.FC<TagInputProps> = ({
   };
 
   const removeTag = (index: number) => {
+    if (disabled) return;
     const newTags = value.filter((_, i) => i !== index);
     onChange(newTags);
   };
@@ -52,6 +56,7 @@ export const TagInput: React.FC<TagInputProps> = ({
               type="button"
               onClick={() => removeTag(index)}
               className={tagInputStyles.removeButton}
+              disabled={disabled}
             >
               <FontAwesomeIcon icon={faTimes} />
             </button>
@@ -65,7 +70,7 @@ export const TagInput: React.FC<TagInputProps> = ({
           onBlur={addTag}
           placeholder={value.length === 0 ? placeholder : ''}
           className={tagInputStyles.input}
-          disabled={maxTags ? value.length >= maxTags : false}
+          disabled={disabled || (maxTags ? value.length >= maxTags : false)}
         />
       </div>
     </div>
