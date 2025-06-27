@@ -1,8 +1,8 @@
-import type { CarCategory } from "@prisma/client";
+import type { CarCategory as PrismaCarCategory } from "@prisma/client";
 
-export type CarCategory = CarCategory;
+export type CarCategory = PrismaCarCategory;
 
-export type CarCategoryWithIsArchived = CarCategory & {
+export type CarCategoryWithIsArchived = Omit<PrismaCarCategory, "minPrice" | "maxPrice"> & {
   isArchived: boolean;
   minPrice: number | null;
   maxPrice: number | null;

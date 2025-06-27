@@ -7,6 +7,8 @@ export const carCategorySchema = z.object({
   id: z.string(),
   tenantId: z.string(),
   name: z.string(),
+  minPrice: z.coerce.number(),
+  maxPrice: z.coerce.number(),
   image: z.string().url(),
   badge: z.string().nullable(),
   tags: z.array(z.string()), // 之前是 z.any() 或未定义
@@ -27,6 +29,8 @@ export type CarCategory = z.infer<typeof carCategorySchema>;
 // API 输入的 Schema
 export const createCarCategorySchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
+  minPrice: z.coerce.number().min(0).optional().default(0),
+  maxPrice: z.coerce.number().min(0).optional().default(0),
   image: z.string().url({ message: "Image must be a valid URL" }),
   badge: z.string().optional(),
   tags: z.array(z.string()).optional().default([]),

@@ -32,6 +32,8 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-categories", () => {
         image: "img",
         displayOrder: 2,
         vehicleScenarioId: vehicleScenarioId,
+        minPrice: 90,
+        maxPrice: 210,
         tags: [],
         highlights: [],
         interiorImages: [],
@@ -75,6 +77,8 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-categories", () => {
         image: "img",
         displayOrder: 1,
         vehicleScenarioId: vehicleScenarioId,
+        minPrice: 290,
+        maxPrice: 310,
         tags: [],
         highlights: [],
         interiorImages: [],
@@ -160,12 +164,12 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-categories", () => {
 
     expect(body.length).toBe(2);
     expect(body[0].name).toBe("Category 2"); // displayOrder: 1
-    expect(body[0].minPrice).toBe(300);
-    expect(body[0].maxPrice).toBe(300);
+    expect(body[0].minPrice).toBe(290);
+    expect(body[0].maxPrice).toBe(310);
 
     expect(body[1].name).toBe("Category 1"); // displayOrder: 2
-    expect(body[1].minPrice).toBe(100);
-    expect(body[1].maxPrice).toBe(200);
+    expect(body[1].minPrice).toBe(90);
+    expect(body[1].maxPrice).toBe(210);
 
     expect(body[0].isArchived).toBe(false);
     expect(body[1].isArchived).toBe(false);
@@ -179,6 +183,8 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-categories", () => {
         tenantId: tenant.id,
         image: "img",
         vehicleScenarioId: vehicleScenarioId,
+        minPrice: 95,
+        maxPrice: 205,
         tags: [],
         highlights: [{ title: "Test Highlight", icon: "test_icon.jpg" }],
         interiorImages: [],
@@ -247,8 +253,9 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-categories", () => {
     const bodyActive = (await responseActive.json()) as CarCategoryWithIsArchived;
     expect(bodyActive.name).toBe("Active Category");
     expect(bodyActive.isArchived).toBe(false);
-    expect(bodyActive.minPrice).toBe(100);
-    expect(bodyActive.maxPrice).toBe(200);
+    expect(bodyActive.minPrice).toBe(95);
+    expect(bodyActive.maxPrice).toBe(205);
+    expect(bodyActive.tags).toEqual([]);
     expect(bodyActive.highlights).toEqual([{ title: "Test Highlight", icon: "test_icon.jpg" }]);
 
     const responseArchived = await app.request(

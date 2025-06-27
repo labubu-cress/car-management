@@ -27,15 +27,11 @@ export const getAllCarCategories = async (tenantId: string): Promise<CarCategory
         };
       }
 
-      const prices = c.carTrims.map((trim) => trim.currentPrice.toNumber());
-      const minPrice = Math.min(...prices);
-      const maxPrice = Math.max(...prices);
-
       return {
         ...c,
         isArchived,
-        minPrice,
-        maxPrice,
+        minPrice: c.minPrice.toNumber(),
+        maxPrice: c.maxPrice.toNumber(),
       };
     })
     .filter((c) => !c.isArchived);
@@ -62,14 +58,10 @@ export const getCarCategoryById = async (tenantId: string, id: string): Promise<
     };
   }
 
-  const prices = category.carTrims.map((trim) => trim.currentPrice.toNumber());
-  const minPrice = Math.min(...prices);
-  const maxPrice = Math.max(...prices);
-
   return {
     ...category,
     isArchived,
-    minPrice,
-    maxPrice,
+    minPrice: category.minPrice.toNumber(),
+    maxPrice: category.maxPrice.toNumber(),
   };
 };

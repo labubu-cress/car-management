@@ -98,6 +98,8 @@ model CarCategory {
   tenantId          String
   tenant            Tenant          @relation(fields: [tenantId], references: [id])
   name              String
+  minPrice          Decimal         @default(0)
+  maxPrice          Decimal         @default(0)
   image             String
   badge             String?
   tags              Json // String[]

@@ -44,6 +44,8 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-categories", () => {
     const newCategory: CreateCarCategoryInput = {
       name: "New Test Category",
       image: "https://example.com/new_image.jpg",
+      minPrice: 100000,
+      maxPrice: 200000,
       tags: ["豪华", "舒适", "智能驾驶"],
       highlights: [
         { title: "动力系统", icon: "https://example.com/icon1.jpg" },
@@ -75,6 +77,8 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-categories", () => {
       name: newCategory.name,
       image: newCategory.image,
       tenantId: tenantId,
+      minPrice: 100000,
+      maxPrice: 200000,
     });
 
     // 验证 tags 数组
@@ -137,6 +141,8 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-categories", () => {
     expect(Array.isArray(body)).toBe(true);
     expect(body.length).toBe(1);
     expect(body[0].name).toBe("Test Category");
+    expect(body[0].minPrice).toBe(0);
+    expect(body[0].maxPrice).toBe(0);
   });
 
   it("should get a car category by id", async () => {
@@ -149,6 +155,8 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-categories", () => {
     const body = (await response.json()) as CarCategory;
     expect(body.id).toBe(categoryId);
     expect(body.name).toBe("Test Category");
+    expect(body.minPrice).toBe(0);
+    expect(body.maxPrice).toBe(0);
   });
 
   it("should delete a car category", async () => {
@@ -184,6 +192,28 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-categories", () => {
       },
     });
     expect(findResponse.status).toBe(404);
+  });
+
+  it("should update a car category's prices", async () => {
+    const updatePayload = {
+      minPrice: 150000,
+      maxPrice: 250000,
+    };
+
+    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-categories/${categoryId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${adminUser.token}`,
+      },
+      body: JSON.stringify(updatePayload),
+    });
+
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as CarCategory;
+
+    expect(body.minPrice).toBe(150000);
+    expect(body.maxPrice).toBe(250000);
   });
 
   it("should update a car category's vehicle scenario", async () => {
