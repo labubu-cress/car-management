@@ -49,11 +49,22 @@ export const tenantSelect = style({
   color: colors.text,
   cursor: "pointer",
   outline: "none",
+  WebkitAppearance: "none",
+  MozAppearance: "none",
   appearance: "none",
-  paddingRight: "40px",
+  paddingRight: "20px",
+
+  selectors: {
+    "&:disabled": {
+      cursor: "not-allowed",
+      color: colors.textSecondary,
+    },
+  },
 });
 
 export const chevronIcon = style({
+  position: "absolute",
+  right: "12px",
   color: colors.textSecondary,
   fontSize: "12px",
   pointerEvents: "none",
