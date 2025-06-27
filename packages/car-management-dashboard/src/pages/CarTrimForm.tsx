@@ -62,7 +62,7 @@ export const CarTrimForm: React.FC = () => {
             originalPrice: data.originalPrice,
             currentPrice: data.currentPrice,
             badge: data.badge || '',
-            features: data.features || [],
+            features: data.features?.map(f => ({ title: f.title, icon: f.value as string })) || [],
             categoryId: data.categoryId,
           });
         }
@@ -145,22 +145,32 @@ export const CarTrimForm: React.FC = () => {
       return;
     }
 
-    const commonData = {
-      name: formData.name.trim(),
-      subtitle: formData.subtitle.trim(),
-      image: formData.image.trim(),
-      configImageUrl: formData.configImageUrl?.trim() || undefined,
-      originalPrice: formData.originalPrice.trim(),
-      currentPrice: formData.currentPrice.trim(),
-      badge: formData.badge.trim() || undefined,
-      features: formData.features.length > 0 ? formData.features : undefined,
-      categoryId: formData.categoryId,
-    };
-
     if (isEdit && id) {
+      const commonData = {
+        name: formData.name.trim(),
+        subtitle: formData.subtitle.trim(),
+        image: formData.image.trim(),
+        configImageUrl: formData.configImageUrl?.trim() || undefined,
+        originalPrice: formData.originalPrice.trim(),
+        currentPrice: formData.currentPrice.trim(),
+        badge: formData.badge.trim() || undefined,
+        features: formData.features.length > 0 ? formData.features.map(f => ({ title: f.title, value: f.icon })) : undefined,
+        categoryId: formData.categoryId,
+      };
       const updateData: UpdateCarTrimInput = commonData;
       updateMutation.mutate({ id, data: updateData });
     } else {
+      const commonData = {
+        name: formData.name.trim(),
+        subtitle: formData.subtitle.trim(),
+        image: formData.image.trim(),
+        configImageUrl: formData.configImageUrl?.trim() || undefined,
+        originalPrice: formData.originalPrice.trim(),
+        currentPrice: formData.currentPrice.trim(),
+        badge: formData.badge.trim() || undefined,
+        features: formData.features.length > 0 ? formData.features.map(f => ({ title: f.title, value: f.icon })) : undefined,
+        categoryId: formData.categoryId,
+      };
       const createData: CreateCarTrimInput = commonData;
       createMutation.mutate(createData);
     }
@@ -306,7 +316,7 @@ export const CarTrimForm: React.FC = () => {
             <HighlightInput
               value={formData.features}
               onChange={(features) => setFormData({ ...formData, features })}
-              placeholder={{ title: '功能名称', value: '功能描述' }}
+              placeholder={{ title: '功能名称', icon: '功能描述' }}
             />
           </FormField>
         </div>

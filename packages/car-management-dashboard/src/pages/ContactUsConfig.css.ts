@@ -67,4 +67,27 @@ export const contactUsConfigStyles = {
       backgroundColor: "#d1d5db",
     },
   }),
-}; 
+
+  timeContainer: style({
+    display: "flex",
+    gap: "1rem",
+    alignItems: "center",
+  }),
+
+  workdaysContainer: style({
+    display: "flex",
+    gap: "1rem",
+    flexWrap: "wrap",
+    alignItems: "center",
+  }),
+
+  workdayItem: style({
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+  }),
+
+  workdayLabel: style({
+    whiteSpace: "nowrap",
+  }),
+};

@@ -267,6 +267,9 @@ export interface ContactUsConfig {
   contactPhoneNumber?: string;
   contactEmailDescription?: string;
   contactEmail?: string;
+  workdays?: number[];
+  workStartTime?: number | null;
+  workEndTime?: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -276,6 +279,9 @@ export interface UpdateContactUsConfigInput {
   contactPhoneNumber?: string;
   contactEmailDescription?: string;
   contactEmail?: string;
+  workdays?: number[];
+  workStartTime?: number | null;
+  workEndTime?: number | null;
 }
 
 export interface Faq {
