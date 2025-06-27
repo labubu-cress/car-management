@@ -75,7 +75,7 @@ export const HighlightInput: React.FC<HighlightInputProps> = ({
             value={inputIcon}
             onChange={(url) => setInputIcon(url)}
             tenantId={currentTenant!.id}
-            size={60}
+            size={40}
           />
         </div>
         <input

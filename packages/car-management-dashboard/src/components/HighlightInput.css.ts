@@ -56,7 +56,7 @@ export const highlightInputStyles = {
   }),
 
   titleInput: style({
-    flex: "2",
+    flex: "1",
     padding: "6px 8px",
     border: "1px solid #d1d5db",
     borderRadius: "4px",
@@ -68,7 +68,6 @@ export const highlightInputStyles = {
   }),
 
   valueInput: style({
-    flex: "1",
     display: "flex",
     alignItems: "center",
   }),
