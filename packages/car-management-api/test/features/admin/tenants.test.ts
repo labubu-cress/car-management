@@ -125,22 +125,27 @@ describe("Admin API: /api/v1/admin/tenants", () => {
       expect(response.status).toBe(401);
     });
 
-    it("should not get all tenants", async () => {
+    it("should get all tenants", async () => {
       const response = await app.request("/api/v1/admin/tenants", {
         headers: {
           Authorization: `Bearer ${adminUser.token}`,
         },
       });
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(200);
+      const body = (await response.json()) as Tenant[];
+      expect(Array.isArray(body)).toBe(true);
+      expect(body.length).toBeGreaterThan(0);
     });
 
-    it("should not get a tenant by id", async () => {
+    it("should get a tenant by id", async () => {
       const response = await app.request(`/api/v1/admin/tenants/${tenantId}`, {
         headers: {
           Authorization: `Bearer ${adminUser.token}`,
         },
       });
-      expect(response.status).toBe(401);
+      expect(response.status).toBe(200);
+      const body = (await response.json()) as Tenant;
+      expect(body.id).toBe(tenantId);
     });
 
     it("should not update a tenant", async () => {
