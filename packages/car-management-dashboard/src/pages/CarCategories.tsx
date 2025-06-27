@@ -5,7 +5,7 @@ import { carCategoriesApi, vehicleScenariosApi } from '@/lib/api';
 import { CarCategory } from '@/types/api';
 import { faStream } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
@@ -29,7 +29,7 @@ export const CarCategories: React.FC = () => {
     }
   );
 
-  const { data: categories = [], isLoading } = useQuery(
+  const { data: fetchedCategories, isLoading } = useQuery(
     ['car-categories', currentTenant?.id, selectedScenarioId],
     () =>
       currentTenant && selectedScenarioId
@@ -45,6 +45,8 @@ export const CarCategories: React.FC = () => {
       },
     }
   );
+
+  const categories = useMemo(() => fetchedCategories || [], [fetchedCategories]);
 
   const [localCategories, setLocalCategories] = useState(categories);
 
