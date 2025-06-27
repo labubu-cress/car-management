@@ -125,7 +125,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.setItem('current_tenant', JSON.stringify(tenant));
   };
 
-  const isViewer = user?.role === 'viewer';
+  const isViewer = user?.role === 'tenant_viewer';
   const isSuperAdmin = user?.role === 'super_admin';
   const isAdmin = user?.role === 'admin';
 

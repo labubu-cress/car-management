@@ -2,7 +2,11 @@ import { Column, DataTable } from '@/components/DataTable';
 import { Modal } from '@/components/Modal';
 import { useAuth } from '@/contexts/AuthContext';
 import { adminUsersApi } from '@/lib/api';
-import { AdminUser, CreateAdminUserInput, UpdateAdminUserInput } from '@/types/api';
+import {
+  AdminUser,
+  CreateAdminUserInput,
+  UpdateAdminUserInput,
+} from '@/types/api';
 import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
@@ -13,7 +17,7 @@ import * as styles from './AdminUsers.css';
 interface AdminUserFormData {
   username: string;
   password: string;
-  role: 'super_admin' | 'admin' | 'viewer';
+  role: 'super_admin' | 'admin' | 'tenant_viewer';
   tenantId?: string;
 }
 
@@ -90,11 +94,11 @@ export const AdminUsers: React.FC = () => {
       key: 'role',
       title: '角色',
       width: '120px',
-      render: (value: 'super_admin' | 'admin' | 'viewer') => {
+      render: (value: 'super_admin' | 'admin' | 'tenant_viewer') => {
         const roleMap = {
           super_admin: { text: '超级管理员', className: styles.superAdminRole },
           admin: { text: '管理员', className: styles.adminRole },
-          viewer: { text: '查看员', className: styles.viewerRole },
+          tenant_viewer: { text: '查看员', className: styles.viewerRole },
         };
         const { text, className } = roleMap[value] || roleMap.admin;
         return <span className={className}>{text}</span>;
@@ -174,7 +178,7 @@ export const AdminUsers: React.FC = () => {
       return;
     }
 
-    if (formData.role === 'viewer' && !formData.tenantId) {
+    if (formData.role === 'tenant_viewer' && !formData.tenantId) {
       toast.error('请为查看员选择一个租户');
       return;
     }
@@ -182,7 +186,7 @@ export const AdminUsers: React.FC = () => {
     const submitData: Partial<CreateAdminUserInput | UpdateAdminUserInput> = {
       username: formData.username.trim(),
       role: formData.role,
-      tenantId: formData.role === 'viewer' ? formData.tenantId : undefined,
+      tenantId: formData.role === 'tenant_viewer' ? formData.tenantId : undefined,
     };
 
     if (formData.password) {
@@ -202,7 +206,7 @@ export const AdminUsers: React.FC = () => {
   const handleInputChange = (field: keyof AdminUserFormData, value: string) => {
     setFormData((prev) => {
       const newFormData = { ...prev, [field]: value };
-      if (field === 'role' && value !== 'viewer') {
+      if (field === 'role' && value !== 'tenant_viewer') {
         newFormData.tenantId = '';
       }
       return newFormData;
@@ -299,17 +303,22 @@ export const AdminUsers: React.FC = () => {
             <label className={styles.label}>角色</label>
             <select
               value={formData.role}
-              onChange={(e) => handleInputChange('role', e.target.value as 'super_admin' | 'admin' | 'viewer')}
+              onChange={(e) =>
+                handleInputChange(
+                  'role',
+                  e.target.value as 'super_admin' | 'admin' | 'tenant_viewer'
+                )
+              }
               className={styles.select}
               disabled={isSubmitting}
             >
               <option value="super_admin">超级管理员</option>
               <option value="admin">管理员</option>
-              <option value="viewer">查看员</option>
+              <option value="tenant_viewer">查看员</option>
             </select>
           </div>
 
-          {formData.role === 'viewer' && (
+          {formData.role === 'tenant_viewer' && (
             <div className={styles.formGroup}>
               <label className={styles.label}>所属租户 *</label>
               <select

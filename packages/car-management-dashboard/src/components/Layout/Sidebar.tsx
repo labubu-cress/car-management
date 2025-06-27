@@ -43,7 +43,7 @@ export const Sidebar: React.FC = () => {
   const { user } = useAuth();
 
   const filteredMenuItems =
-    user?.role === 'admin' || user?.role === 'viewer'
+    user?.role === 'admin' || user?.role === 'tenant_viewer'
       ? menuItems.filter(
           (item) => item.label !== '租户管理' && item.label !== '管理员'
         )
