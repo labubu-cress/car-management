@@ -174,15 +174,15 @@ export const AdminUsers: React.FC = () => {
       return;
     }
 
-    if (formData.role !== 'super_admin' && !formData.tenantId) {
-      toast.error('请为管理员或查看员选择一个租户');
+    if (formData.role === 'viewer' && !formData.tenantId) {
+      toast.error('请为查看员选择一个租户');
       return;
     }
 
     const submitData: Partial<CreateAdminUserInput | UpdateAdminUserInput> = {
       username: formData.username.trim(),
       role: formData.role,
-      tenantId: formData.role === 'super_admin' ? undefined : formData.tenantId,
+      tenantId: formData.role === 'viewer' ? formData.tenantId : undefined,
     };
 
     if (formData.password) {
@@ -200,7 +200,13 @@ export const AdminUsers: React.FC = () => {
   };
 
   const handleInputChange = (field: keyof AdminUserFormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => {
+      const newFormData = { ...prev, [field]: value };
+      if (field === 'role' && value !== 'viewer') {
+        newFormData.tenantId = '';
+      }
+      return newFormData;
+    });
   };
 
   const isSubmitting = createMutation.isLoading || updateMutation.isLoading;
@@ -303,20 +309,24 @@ export const AdminUsers: React.FC = () => {
             </select>
           </div>
 
-          {formData.role !== 'super_admin' && (
+          {formData.role === 'viewer' && (
             <div className={styles.formGroup}>
-              <label className={styles.label}>所属租户</label>
-              <input
-                type="text"
-                value={formData.tenantId || '全局（所有租户）'}
+              <label className={styles.label}>所属租户 *</label>
+              <select
+                value={formData.tenantId || ''}
                 onChange={(e) => handleInputChange('tenantId', e.target.value)}
-                className={styles.input}
-                placeholder="请输入租户ID或选择全局"
+                className={styles.select}
                 disabled={isSubmitting}
-              />
-              <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
-                管理员用户不分配到特定租户，可以管理所有租户
-              </small>
+              >
+                <option value="" disabled>
+                  请选择一个租户
+                </option>
+                {tenants.map((tenant) => (
+                  <option key={tenant.id} value={tenant.id}>
+                    {tenant.name}
+                  </option>
+                ))}
+              </select>
             </div>
           )}
         </form>
