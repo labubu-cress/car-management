@@ -4,10 +4,10 @@
 2. 该角色只有只读权限
 3. 该角色的权限肯定要小于 admin
 
-# taskA （completed)
+# taskA (completed)
 修改 schema.prisma, 并运行 migrate dev
 
-# task B (partail)
+# task B (completed)
 修改 admin 的后端代码与相关测试 
 
 # task C
