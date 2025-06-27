@@ -203,9 +203,9 @@ export const CarTrims: React.FC = () => {
     return (
       <EmptyState
         title="还没有车型"
-        description="创建车型参数前，需要先创建车型。车型参数必须归属于某个车型。"
-        actionLabel="创建车型"
-        onAction={() => navigate('/car-categories')}
+        description={isViewer ? '请联系管理员创建车型' : '创建车型参数前，需要先创建车型。车型参数必须归属于某个车型。'}
+        actionLabel={isViewer ? undefined : '创建车型'}
+        onAction={isViewer ? undefined : () => navigate('/car-categories')}
         icon={<FontAwesomeIcon icon={faCar} />}
       />
     );

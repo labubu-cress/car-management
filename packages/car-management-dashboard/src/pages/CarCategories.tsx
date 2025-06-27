@@ -202,9 +202,9 @@ export const CarCategories: React.FC = () => {
     return (
       <EmptyState
         title="还没有车辆分类"
-        description="创建车型前，需要先创建车辆分类。车型必须归属于某个分类。"
-        actionLabel="创建车辆分类"
-        onAction={() => navigate('/vehicle-scenarios')}
+        description={isViewer ? "请联系管理员创建车辆分类" : "创建车型前，需要先创建车辆分类。车型必须归属于某个分类。"}
+        actionLabel={isViewer ? undefined : "创建车辆分类"}
+        onAction={isViewer ? undefined : () => navigate('/vehicle-scenarios')}
         icon={<FontAwesomeIcon icon={faStream} />}
       />
     );
