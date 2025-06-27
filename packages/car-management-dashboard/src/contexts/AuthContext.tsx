@@ -111,6 +111,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     initAuth();
+
+    const handleAuthError = () => {
+      logout();
+    };
+    window.addEventListener("auth-error", handleAuthError);
+
+    return () => {
+      window.removeEventListener("auth-error", handleAuthError);
+    };
   }, []);
 
   const login = async (username: string, password: string, keepLoggedIn: boolean) => {
@@ -142,6 +151,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setCurrentTenant(null);
     setTenants([]);
     setNeedsFirstTenant(false);
+    
+    // 重定向到登录页
+    const loginPath = "/#/login";
+    if (window.location.pathname !== loginPath) {
+      window.location.href = import.meta.env.BASE_URL
+        ? `${import.meta.env.BASE_URL.replace(/\/$/, "")}${loginPath}`
+        : loginPath;
+    }
   };
 
   const selectTenant = (tenant: Tenant) => {

@@ -40,7 +40,7 @@ const api = axios.create({
 
 // 请求拦截器 - 添加认证token
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("admin_token");
+  const token = localStorage.getItem("admin_token") || sessionStorage.getItem("admin_token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -52,11 +52,11 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem("admin_token");
-      const loginPath = "/#/login";
-      window.location.href = import.meta.env.BASE_URL
-        ? `${import.meta.env.BASE_URL.replace(/\/$/, "")}${loginPath}`
-        : loginPath;
+      // 确保在 AuthContext 中执行 logout, 以更新UI状态
+      // 避免直接操作 window.location 导致状态不一致
+      // 注意: 这里不能直接调用 useAuth().logout(), 因为此文件不是 React 组件
+      // 我们将触发一个自定义事件, 让 AuthProvider 监听并处理
+      window.dispatchEvent(new CustomEvent("auth-error"));
     }
     return Promise.reject(error);
   },
