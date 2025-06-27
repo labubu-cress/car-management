@@ -11,6 +11,7 @@ generator client {
 enum AdminRole {
   super_admin
   admin
+  tenant_viewer
 }
 
 enum TenantStatus {
