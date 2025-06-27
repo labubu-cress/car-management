@@ -8,6 +8,7 @@ interface ImageUploadProps {
   value: string | null;
   onChange: (url: string) => void;
   tenantId: string; // To construct the upload path
+  size?: number;
 }
 
 async function calculateSHA256(file: File): Promise<string> {
@@ -18,7 +19,7 @@ async function calculateSHA256(file: File): Promise<string> {
   return hashHex;
 }
 
-export const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, tenantId }) => {
+export const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, tenantId, size = 150 }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -90,8 +91,10 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({ value, onChange, tenan
     }
   };
 
+  const containerStyle = size ? { width: `${size}px`, height: `${size}px` } : {};
+
   return (
-    <div className={uploadStyles.container} onClick={handleContainerClick}>
+    <div className={uploadStyles.container} style={containerStyle} onClick={handleContainerClick}>
       <input
         type="file"
         accept="image/*"

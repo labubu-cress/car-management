@@ -70,6 +70,14 @@ export const HighlightInput: React.FC<HighlightInputProps> = ({
       ))}
       
       <div className={highlightInputStyles.inputRow}>
+        <div className={highlightInputStyles.valueInput}>
+          <ImageUpload
+            value={inputIcon}
+            onChange={(url) => setInputIcon(url)}
+            tenantId={currentTenant!.id}
+            size={60}
+          />
+        </div>
         <input
           type="text"
           value={inputTitle}
@@ -78,13 +86,6 @@ export const HighlightInput: React.FC<HighlightInputProps> = ({
           placeholder={placeholder.title}
           className={highlightInputStyles.titleInput}
         />
-        <div className={highlightInputStyles.valueInput}>
-          <ImageUpload
-            value={inputIcon}
-            onChange={(url) => setInputIcon(url)}
-            tenantId={currentTenant!.id}
-          />
-        </div>
         <button
           type="button"
           onClick={addHighlight}

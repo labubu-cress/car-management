@@ -3,8 +3,9 @@ import { style } from "@vanilla-extract/css";
 export const uploadStyles = {
   container: style({
     position: "relative",
-    width: "150px",
-    height: "150px",
+    aspectRatio: "1 / 1",
+    width: "100%",
+    height: "auto",
     border: "2px dashed #ccc",
     borderRadius: "8px",
     display: "flex",
