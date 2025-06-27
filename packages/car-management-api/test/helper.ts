@@ -58,7 +58,7 @@ export const createTestAdminUser = async (
   role: AdminRole,
   tenantId?: string,
 ): Promise<TestAdminUserWithToken> => {
-  const username = `${role}-test-user`;
+  const username = `${role}-test-user-${tenantId ?? "super"}`;
   const password = "test-secret-password";
   const passwordHash = password2hash(password);
   await client.adminUser.create({
@@ -66,7 +66,7 @@ export const createTestAdminUser = async (
       username,
       passwordHash,
       role,
-      tenantId: role === "super_admin" || role === "admin" ? undefined : tenantId,
+      tenantId: role === "super_admin" ? undefined : tenantId,
     },
   });
   const loginResult = await login(username, password);
@@ -110,11 +110,15 @@ export const createTestTenantAndAdminUsers = async (client: PrismaClient) => {
   const superAdminUser = await createTestAdminUser(client, "super_admin");
 
   // create a admin user
-  const adminUser = await createTestAdminUser(client, "admin");
+  const adminUser = await createTestAdminUser(client, "admin", tenantId);
+
+  // create a tenant viewer user
+  const tenantViewerUser = await createTestAdminUser(client, "tenant_viewer", tenantId);
 
   return {
     tenantId,
     superAdminUser,
     adminUser,
+    tenantViewerUser,
   };
 };

@@ -7,6 +7,8 @@ import { createTenant, deleteTenant, getAllTenants, getTenantById, updateTenant 
 
 const app = new Hono<AdminAuthEnv>();
 
+app.use("*", superAdminMiddleware);
+
 app.get("/", async (c) => {
   const tenants = await getAllTenants();
   return c.json(tenants);
@@ -21,13 +23,13 @@ app.get("/:id", async (c) => {
   return c.json(tenant);
 });
 
-app.post("/", superAdminMiddleware, zValidator("json", createTenantSchema), async (c) => {
+app.post("/", zValidator("json", createTenantSchema), async (c) => {
   const body = c.req.valid("json");
   const newTenant = await createTenant(body);
   return c.json(newTenant, 201);
 });
 
-app.put("/:id", superAdminMiddleware, zValidator("json", updateTenantSchema), async (c) => {
+app.put("/:id", zValidator("json", updateTenantSchema), async (c) => {
   const { id } = c.req.param();
   const body = c.req.valid("json");
   const updatedTenant = await updateTenant(id, body);
@@ -37,7 +39,7 @@ app.put("/:id", superAdminMiddleware, zValidator("json", updateTenantSchema), as
   return c.json(updatedTenant);
 });
 
-app.delete("/:id", superAdminMiddleware, async (c) => {
+app.delete("/:id", async (c) => {
   const { id } = c.req.param();
   await deleteTenant(id);
   return c.body(null, 204);

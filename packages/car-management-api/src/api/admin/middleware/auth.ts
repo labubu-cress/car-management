@@ -39,6 +39,14 @@ export const authMiddleware = createMiddleware<AdminAuthEnv>(async (c, next: Nex
   await next();
 });
 
+export const writeAccessMiddleware = createMiddleware<AdminAuthEnv>(async (c, next: Next) => {
+  const adminUser = c.get("adminUser");
+  if (adminUser.role === "tenant_viewer") {
+    throw new HTTPException(403, { message: "You do not have permission to perform this action." });
+  }
+  await next();
+});
+
 export type AdminAuthTenantEnv = AdminAuthEnv & {
   Variables: {
     tenantId: string;

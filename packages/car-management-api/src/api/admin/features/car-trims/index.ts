@@ -23,7 +23,10 @@ app.use("*", async (c, next) => {
 });
 
 app.post("/", zValidator("json", createCarTrimSchema), async (c) => {
-  const { tenantId } = c.var;
+  const { tenantId, adminUser } = c.var;
+  if (adminUser.role === "tenant_viewer") {
+    throw new HTTPException(403, { message: "You do not have permission to perform this action." });
+  }
   const body = c.req.valid("json");
   const newTrim = await createCarTrim(tenantId as string, body);
   return c.json(newTrim, 201);
@@ -40,7 +43,10 @@ app.get("/", async (c) => {
 });
 
 app.put("/reorder", zValidator("json", reorderCarTrimsSchema), async (c) => {
-  const { tenantId } = c.var;
+  const { tenantId, adminUser } = c.var;
+  if (adminUser.role === "tenant_viewer") {
+    throw new HTTPException(403, { message: "You do not have permission to perform this action." });
+  }
   const { categoryId, trimIds } = c.req.valid("json");
   await reorderCarTrims(tenantId as string, categoryId, trimIds);
   return c.body(null, 204);
@@ -57,7 +63,10 @@ app.get("/:id", async (c) => {
 });
 
 app.put("/:id", zValidator("json", updateCarTrimSchema), async (c) => {
-  const { tenantId } = c.var;
+  const { tenantId, adminUser } = c.var;
+  if (adminUser.role === "tenant_viewer") {
+    throw new HTTPException(403, { message: "You do not have permission to perform this action." });
+  }
   const { id } = c.req.param();
   const body = c.req.valid("json");
 
@@ -69,7 +78,10 @@ app.put("/:id", zValidator("json", updateCarTrimSchema), async (c) => {
 });
 
 app.delete("/:id", async (c) => {
-  const { tenantId } = c.var;
+  const { tenantId, adminUser } = c.var;
+  if (adminUser.role === "tenant_viewer") {
+    throw new HTTPException(403, { message: "You do not have permission to perform this action." });
+  }
   const { id } = c.req.param();
   await deleteCarTrim(tenantId as string, id);
   return c.body(null, 204);

@@ -22,7 +22,10 @@ app.use("*", async (c, next) => {
 });
 
 app.post("/", zValidator("json", createVehicleScenarioSchema), async (c) => {
-  const { tenantId } = c.var;
+  const { tenantId, adminUser } = c.var;
+  if (adminUser.role === "tenant_viewer") {
+    throw new HTTPException(403, { message: "You do not have permission to perform this action." });
+  }
   const body = c.req.valid("json");
   const newScenario = await createVehicleScenario(tenantId as string, body);
   return c.json(newScenario, 201);
@@ -45,7 +48,10 @@ app.get("/:id", async (c) => {
 });
 
 app.put("/:id", zValidator("json", updateVehicleScenarioSchema), async (c) => {
-  const { tenantId } = c.var;
+  const { tenantId, adminUser } = c.var;
+  if (adminUser.role === "tenant_viewer") {
+    throw new HTTPException(403, { message: "You do not have permission to perform this action." });
+  }
   const { id } = c.req.param();
   const body = c.req.valid("json");
 
@@ -57,7 +63,10 @@ app.put("/:id", zValidator("json", updateVehicleScenarioSchema), async (c) => {
 });
 
 app.delete("/:id", async (c) => {
-  const { tenantId } = c.var;
+  const { tenantId, adminUser } = c.var;
+  if (adminUser.role === "tenant_viewer") {
+    throw new HTTPException(403, { message: "You do not have permission to perform this action." });
+  }
   const { id } = c.req.param();
   await deleteVehicleScenario(tenantId as string, id);
   return c.body(null, 204);
