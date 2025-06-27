@@ -177,6 +177,9 @@ model ContactUsConfig {
   contactPhoneNumber      String?
   contactEmailDescription String?
   contactEmail            String?
+  workdays                Json? // array of numbers from 0 (Sunday) to 6 (Saturday)
+  workStartTime           Int?
+  workEndTime             Int?
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
 }

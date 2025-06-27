@@ -34,6 +34,9 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/contact-us-config", () => {
       contactPhoneNumber: "123-456-7890",
       contactEmailDescription: "Email us for any inquiries",
       contactEmail: "contact@example.com",
+      workdays: [1, 2, 3, 4, 5],
+      workStartTime: 9,
+      workEndTime: 18,
     };
     const createResponse = await app.request(`/api/v1/admin/tenants/${tenantId}/contact-us-config`, {
       method: "PUT",
@@ -62,6 +65,9 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/contact-us-config", () => {
     const updateData = {
       contactPhoneNumber: "098-765-4321",
       contactEmail: "support@example.com",
+      workdays: [0, 1, 2, 3, 4, 5, 6],
+      workStartTime: 8,
+      workEndTime: 20,
     };
     const updateResponse = await app.request(`/api/v1/admin/tenants/${tenantId}/contact-us-config`, {
       method: "PUT",
@@ -90,4 +96,4 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/contact-us-config", () => {
       ...updateData,
     });
   });
-}); 
+});
