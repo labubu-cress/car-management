@@ -1,12 +1,14 @@
 import { zValidator } from "@hono/zod-validator";
 import type { AdminUser } from "@prisma/client";
 import { Hono } from "hono";
+import { createFactory } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import type { AdminAuthEnv } from "../../middleware/auth";
 import { createAdminUserSchema, updateAdminUserSchema } from "./schema";
 import { createAdminUser, deleteAdminUser, getAdminUserById, getAllAdminUsers, updateAdminUser } from "./service";
 
 type LoggedInUser = AdminAuthEnv["Variables"]["adminUser"];
+const factory = createFactory<AdminAuthEnv>();
 
 const hasAdminManipulationPermission = (user: LoggedInUser, targetUser: Partial<AdminUser>): boolean => {
   switch (user.role) {
@@ -32,9 +34,14 @@ const hasReadPermission = (user: LoggedInUser, targetUser: Partial<AdminUser>): 
   return user.tenantId === targetUser.tenantId;
 };
 
-const app = new Hono<AdminAuthEnv>();
+const checkTenantViewer = factory.createMiddleware(async (c, next) => {
+  if (c.var.adminUser?.role === "tenant_viewer") {
+    throw new HTTPException(403, { message: "Forbidden" });
+  }
+  await next();
+});
 
-// TODO: add writeAccessMiddleware to POST, PUT, DELETE routes
+const app = new Hono<AdminAuthEnv>();
 
 app.get("/", async (c) => {
   const { adminUser } = c.var;
@@ -52,7 +59,7 @@ app.get("/", async (c) => {
   return c.json([]);
 });
 
-app.post("/", zValidator("json", createAdminUserSchema), async (c) => {
+app.post("/", checkTenantViewer, zValidator("json", createAdminUserSchema), async (c) => {
   const { adminUser } = c.var;
   const body = c.req.valid("json");
 
@@ -80,7 +87,7 @@ app.get("/:id", async (c) => {
   return c.json(user);
 });
 
-app.put("/:id", zValidator("json", updateAdminUserSchema), async (c) => {
+app.put("/:id", checkTenantViewer, zValidator("json", updateAdminUserSchema), async (c) => {
   const { id } = c.req.param();
   const { adminUser } = c.var;
   const body = c.req.valid("json");
@@ -98,7 +105,7 @@ app.put("/:id", zValidator("json", updateAdminUserSchema), async (c) => {
   return c.json(updatedUser);
 });
 
-app.delete("/:id", async (c) => {
+app.delete("/:id", checkTenantViewer, async (c) => {
   const { id } = c.req.param();
   const { adminUser } = c.var;
 

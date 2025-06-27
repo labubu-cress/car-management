@@ -6,12 +6,16 @@ import { clearTestDb, createTestTenantAndAdminUsers, type TestAdminUserWithToken
 
 describe("Admin API: /api/v1/admin/tenants/:tenantId/user-messages", () => {
   let adminUser: TestAdminUserWithToken;
+  let tenantViewerUser: TestAdminUserWithToken;
   let tenantId: string;
   let user: User;
 
   beforeEach(async () => {
     await clearTestDb(prisma);
-    ({ tenantId, adminUser } = await createTestTenantAndAdminUsers(prisma));
+    const setup = await createTestTenantAndAdminUsers(prisma);
+    adminUser = setup.adminUser;
+    tenantViewerUser = setup.tenantViewerUser;
+    tenantId = setup.tenantId;
     user = await prisma.user.create({
       data: {
         nickname: "test user",
@@ -94,5 +98,29 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/user-messages", () => {
       headers: { Authorization: `Bearer ${adminUser.token}` },
     });
     expect(response.status).toBe(400);
+  });
+
+  describe("as tenant_viewer", () => {
+    it("should get all user messages", async () => {
+      await createUserMessage();
+
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/user-messages`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${tenantViewerUser.token}` },
+      });
+      expect(response.status).toBe(200);
+      const body: any = await response.json();
+      expect(body.total).toBe(1);
+    });
+
+    it("should return 403 when trying to process a user message", async () => {
+      const message = await createUserMessage("PENDING");
+
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/user-messages/${message.id}/process`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${tenantViewerUser.token}` },
+      });
+      expect(response.status).toBe(403);
+    });
   });
 });

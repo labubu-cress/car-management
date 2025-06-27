@@ -7,7 +7,7 @@
 # taskA （completed)
 修改 schema.prisma, 并运行 migrate dev
 
-# task B
+# task B (partail)
 修改 admin 的后端代码与相关测试 
 
 # task C

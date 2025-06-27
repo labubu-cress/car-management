@@ -7,11 +7,15 @@ import { clearTestDb, createTestTenantAndAdminUsers, type TestAdminUserWithToken
 
 describe("Admin API: /api/v1/admin/tenants/:tenantId/users", () => {
   let adminUser: TestAdminUserWithToken;
+  let tenantViewerUser: TestAdminUserWithToken;
   let tenantId: string;
 
   beforeEach(async () => {
     await clearTestDb(prisma);
-    ({ tenantId, adminUser } = await createTestTenantAndAdminUsers(prisma));
+    const setup = await createTestTenantAndAdminUsers(prisma);
+    adminUser = setup.adminUser;
+    tenantViewerUser = setup.tenantViewerUser;
+    tenantId = setup.tenantId;
   });
 
   it("should get all users for the tenant", async () => {
@@ -127,5 +131,51 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/users", () => {
     expect(body.favoriteCarTrims.length).toBe(1);
     expect(body.favoriteCarTrims[0].carTrimId).toBe(trim.id);
     expect(body.favoriteCarTrims[0].carTrim.name).toBe("Test Trim");
+  });
+
+  describe("as tenant_viewer", () => {
+    it("should get all users for the tenant", async () => {
+      await prisma.user.create({
+        data: {
+          openId: "test-user-openid-for-viewer",
+          nickname: "Test User",
+          avatarUrl: "avatar.jpg",
+          phoneNumber: "12345678901",
+          tenantId: tenantId,
+        },
+      });
+
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/users`, {
+        headers: {
+          Authorization: `Bearer ${tenantViewerUser.token}`,
+        },
+      });
+
+      expect(response.status).toBe(200);
+      const body = (await response.json()) as User[];
+      expect(body.length).toBe(1);
+    });
+
+    it("should get a user by id", async () => {
+      const user = await prisma.user.create({
+        data: {
+          openId: "test-user-openid-for-viewer-get-by-id",
+          nickname: "Test User for Get By Id",
+          avatarUrl: "avatar.jpg",
+          phoneNumber: "12345678902",
+          tenantId: tenantId,
+        },
+      });
+
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/users/${user.id}`, {
+        headers: {
+          Authorization: `Bearer ${tenantViewerUser.token}`,
+        },
+      });
+
+      expect(response.status).toBe(200);
+      const body = (await response.json()) as UserWithFavorites;
+      expect(body.id).toBe(user.id);
+    });
   });
 });

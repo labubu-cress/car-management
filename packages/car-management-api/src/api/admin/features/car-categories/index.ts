@@ -1,5 +1,6 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { createFactory } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import type { AdminAuthTenantEnv } from "../../middleware/auth";
 import {
@@ -17,6 +18,15 @@ import {
   updateCarCategory,
 } from "./service";
 
+const factory = createFactory<AdminAuthTenantEnv>();
+
+const checkWritePermission = factory.createMiddleware(async (c, next) => {
+  if (c.var.adminUser?.role === "tenant_viewer") {
+    throw new HTTPException(403, { message: "You do not have permission to perform this action." });
+  }
+  await next();
+});
+
 const app = new Hono<AdminAuthTenantEnv>();
 
 // Middleware to check for tenantId
@@ -27,11 +37,8 @@ app.use("*", async (c, next) => {
   await next();
 });
 
-app.post("/", zValidator("json", createCarCategorySchema), async (c) => {
-  const { tenantId, adminUser } = c.var;
-  if (adminUser.role === "tenant_viewer") {
-    throw new HTTPException(403, { message: "You do not have permission to perform this action." });
-  }
+app.post("/", checkWritePermission, zValidator("json", createCarCategorySchema), async (c) => {
+  const { tenantId } = c.var;
   const body = c.req.valid("json");
   const newCategory = await createCarCategory(tenantId as string, body);
   return c.json(newCategory, 201);
@@ -54,21 +61,15 @@ app.get("/:id", async (c) => {
   return c.json({ message: "Car category not found" }, 404);
 });
 
-app.put("/reorder", zValidator("json", reorderCarCategoriesSchema), async (c) => {
-  const { tenantId, adminUser } = c.var;
-  if (adminUser.role === "tenant_viewer") {
-    throw new HTTPException(403, { message: "You do not have permission to perform this action." });
-  }
+app.put("/reorder", checkWritePermission, zValidator("json", reorderCarCategoriesSchema), async (c) => {
+  const { tenantId } = c.var;
   const { vehicleScenarioId, categoryIds } = c.req.valid("json");
   await reorderCarCategories(tenantId as string, vehicleScenarioId, categoryIds);
   return c.body(null, 204);
 });
 
-app.put("/:id", zValidator("json", updateCarCategorySchema), async (c) => {
-  const { tenantId, adminUser } = c.var;
-  if (adminUser.role === "tenant_viewer") {
-    throw new HTTPException(403, { message: "You do not have permission to perform this action." });
-  }
+app.put("/:id", checkWritePermission, zValidator("json", updateCarCategorySchema), async (c) => {
+  const { tenantId } = c.var;
   const { id } = c.req.param();
   const body = c.req.valid("json");
 
@@ -79,11 +80,8 @@ app.put("/:id", zValidator("json", updateCarCategorySchema), async (c) => {
   return c.json({ message: "Car category not found" }, 404);
 });
 
-app.delete("/:id", async (c) => {
-  const { tenantId, adminUser } = c.var;
-  if (adminUser.role === "tenant_viewer") {
-    throw new HTTPException(403, { message: "You do not have permission to perform this action." });
-  }
+app.delete("/:id", checkWritePermission, async (c) => {
+  const { tenantId } = c.var;
   const { id } = c.req.param();
   await deleteCarCategory(tenantId as string, id);
   return c.body(null, 204);

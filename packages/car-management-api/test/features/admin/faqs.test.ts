@@ -127,3 +127,81 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/faqs", () => {
     expect(findResponse.status).toBe(404);
   });
 });
+
+describe("Admin API: /api/v1/admin/tenants/:tenantId/faqs for TENANT_VIEWER", () => {
+  let tenantViewerUser: TestAdminUserWithToken;
+  let tenantId: string;
+  let faqId: string;
+
+  beforeEach(async () => {
+    await clearTestDb(prisma);
+    const setup = await createTestTenantAndAdminUsers(prisma);
+    tenantViewerUser = setup.tenantViewerUser;
+    tenantId = setup.tenantId;
+
+    const faq = await prisma.faq.create({
+      data: {
+        question: "Readable Question",
+        answer: "Readable Answer",
+        icon: "readable-icon",
+        tenantId,
+      },
+    });
+    faqId = faq.id;
+  });
+
+  it("should allow getting all faqs", async () => {
+    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/faqs`, {
+      headers: { Authorization: `Bearer ${tenantViewerUser.token}` },
+    });
+    expect(response.status).toBe(200);
+    const body: any = await response.json();
+    expect(body.total).toBe(1);
+    expect(body.items[0].id).toBe(faqId);
+  });
+
+  it("should allow getting a faq by id", async () => {
+    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/faqs/${faqId}`, {
+      headers: { Authorization: `Bearer ${tenantViewerUser.token}` },
+    });
+    expect(response.status).toBe(200);
+    const body: any = await response.json();
+    expect(body.id).toBe(faqId);
+  });
+
+  it("should forbid creating a new faq", async () => {
+    const newFaq: z.infer<typeof CreateFaqSchema> = {
+      question: "Forbidden Question",
+      answer: "Forbidden Answer",
+      icon: "forbidden-icon",
+    };
+    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/faqs`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${tenantViewerUser.token}` },
+      body: JSON.stringify(newFaq),
+    });
+    expect(response.status).toBe(403);
+  });
+
+  it("should forbid updating a faq", async () => {
+    const updatedFaqData: z.infer<typeof UpdateFaqSchema> = {
+      question: "Forbidden Update",
+      answer: "Forbidden Answer",
+      icon: "forbidden-icon",
+    };
+    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/faqs/${faqId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${tenantViewerUser.token}` },
+      body: JSON.stringify(updatedFaqData),
+    });
+    expect(response.status).toBe(403);
+  });
+
+  it("should forbid deleting a faq", async () => {
+    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/faqs/${faqId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${tenantViewerUser.token}` },
+    });
+    expect(response.status).toBe(403);
+  });
+});

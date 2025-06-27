@@ -97,3 +97,40 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/contact-us-config", () => {
     });
   });
 });
+
+describe("Admin API: /api/v1/admin/tenants/:tenantId/contact-us-config for TENANT_VIEWER", () => {
+  let tenantViewerUser: TestAdminUserWithToken;
+  let tenantId: string;
+
+  beforeEach(async () => {
+    await clearTestDb(prisma);
+    const setup = await createTestTenantAndAdminUsers(prisma);
+    tenantViewerUser = setup.tenantViewerUser;
+    tenantId = setup.tenantId;
+  });
+
+  it("should allow getting contact us config", async () => {
+    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/contact-us-config`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${tenantViewerUser.token}`,
+      },
+    });
+    expect(response.status).toBe(200);
+  });
+
+  it("should forbid updating contact us config", async () => {
+    const updateData = {
+      contactPhoneNumber: "098-765-4321",
+    };
+    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/contact-us-config`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tenantViewerUser.token}`,
+      },
+      body: JSON.stringify(updateData),
+    });
+    expect(response.status).toBe(403);
+  });
+});

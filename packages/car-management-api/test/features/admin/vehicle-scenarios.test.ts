@@ -7,11 +7,15 @@ import { clearTestDb, createTestTenantAndAdminUsers, type TestAdminUserWithToken
 
 describe("Admin API: /api/v1/admin/tenants/:tenantId/vehicle-scenarios", () => {
   let adminUser: TestAdminUserWithToken;
+  let tenantViewerUser: TestAdminUserWithToken;
   let tenantId: string;
 
   beforeEach(async () => {
     await clearTestDb(prisma);
-    ({ tenantId, adminUser } = await createTestTenantAndAdminUsers(prisma));
+    const setup = await createTestTenantAndAdminUsers(prisma);
+    adminUser = setup.adminUser;
+    tenantViewerUser = setup.tenantViewerUser;
+    tenantId = setup.tenantId;
   });
 
   it("should create a new vehicle scenario", async () => {
@@ -101,5 +105,77 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/vehicle-scenarios", () => {
       },
     );
     expect(findResponse.status).toBe(404);
+  });
+
+  describe("as tenant_viewer", () => {
+    let scenario: VehicleScenario;
+
+    beforeEach(async () => {
+      scenario = await prisma.vehicleScenario.create({
+        data: {
+          name: "Existing Scenario",
+          image: "existing.jpg",
+          description: "An existing scenario",
+          tenantId: tenantId,
+        },
+      });
+    });
+
+    it("should get all vehicle scenarios", async () => {
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/vehicle-scenarios`, {
+        headers: { Authorization: `Bearer ${tenantViewerUser.token}` },
+      });
+      expect(response.status).toBe(200);
+      const body = (await response.json()) as any[];
+      expect(body.length).toBe(1);
+    });
+
+    it("should get a vehicle scenario by id", async () => {
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/vehicle-scenarios/${scenario.id}`, {
+        headers: {
+          Authorization: `Bearer ${tenantViewerUser.token}`,
+        },
+      });
+      expect(response.status).toBe(200);
+    });
+
+    it("should not create a new vehicle scenario", async () => {
+      const newScenario: CreateVehicleScenarioInput = {
+        name: "Test Drive",
+        image: "https://example.com/test_drive.jpg",
+        description: "A test drive scenario",
+      };
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/vehicle-scenarios`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tenantViewerUser.token}`,
+        },
+        body: JSON.stringify(newScenario),
+      });
+      expect(response.status).toBe(403);
+    });
+
+    it("should not update a vehicle scenario", async () => {
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/vehicle-scenarios/${scenario.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tenantViewerUser.token}`,
+        },
+        body: JSON.stringify({ name: "updated" }),
+      });
+      expect(response.status).toBe(403);
+    });
+
+    it("should not delete a vehicle scenario", async () => {
+      const response = await app.request(`/api/v1/admin/tenants/${tenantId}/vehicle-scenarios/${scenario.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${tenantViewerUser.token}`,
+        },
+      });
+      expect(response.status).toBe(403);
+    });
   });
 });

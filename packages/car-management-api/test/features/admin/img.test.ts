@@ -6,6 +6,7 @@ import { clearTestDb, createTestTenantAndAdminUsers, type TestAdminUserWithToken
 
 describe("Admin API: /api/v1/admin/tenants/:tenantId/img", () => {
   let adminUser: TestAdminUserWithToken;
+  let tenantViewerUser: TestAdminUserWithToken;
   let tenantId: string;
 
   const mockToken = {
@@ -20,7 +21,7 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/img", () => {
 
   beforeEach(async () => {
     await clearTestDb(prisma);
-    ({ tenantId, adminUser } = await createTestTenantAndAdminUsers(prisma));
+    ({ tenantId, adminUser, tenantViewerUser } = await createTestTenantAndAdminUsers(prisma));
     vi.spyOn(ossSts, "createQcloudImgUploadToken").mockResolvedValue(mockToken);
   });
 
@@ -39,5 +40,15 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/img", () => {
     const body = await response.json();
     expect(body).toEqual(mockToken);
     expect(ossSts.createQcloudImgUploadToken).toHaveBeenCalledWith(tenantId);
+  });
+
+  it("should return 403 for tenant_viewer", async () => {
+    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/img/upload-token`, {
+      headers: {
+        Authorization: `Bearer ${tenantViewerUser.token}`,
+      },
+    });
+
+    expect(response.status).toBe(403);
   });
 });

@@ -1,9 +1,19 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { createFactory } from "hono/factory";
 import { HTTPException } from "hono/http-exception";
 import type { AdminAuthTenantEnv } from "../../middleware/auth";
 import { CreateFaqSchema, ListFaqSchema, UpdateFaqSchema } from "./schema";
 import * as faqService from "./service";
+
+const factory = createFactory<AdminAuthTenantEnv>();
+
+const checkWritePermission = factory.createMiddleware(async (c, next) => {
+  if (c.var.adminUser?.role === "tenant_viewer") {
+    throw new HTTPException(403, { message: "You do not have permission to perform this action." });
+  }
+  await next();
+});
 
 const faqs = new Hono<AdminAuthTenantEnv>();
 
@@ -17,11 +27,8 @@ faqs.get("/", zValidator("query", ListFaqSchema), async (c) => {
   });
 });
 
-faqs.post("/", zValidator("json", CreateFaqSchema), async (c) => {
-  const { tenantId, adminUser } = c.var;
-  if (adminUser.role === "tenant_viewer") {
-    throw new HTTPException(403, { message: "You do not have permission to perform this action." });
-  }
+faqs.post("/", checkWritePermission, zValidator("json", CreateFaqSchema), async (c) => {
+  const { tenantId } = c.var;
   const data = c.req.valid("json");
   const faq = await faqService.create(tenantId, data);
   return c.json(faq, 201);
@@ -37,22 +44,16 @@ faqs.get("/:id", async (c) => {
   return c.json(faq);
 });
 
-faqs.put("/:id", zValidator("json", UpdateFaqSchema), async (c) => {
-  const { tenantId, adminUser } = c.var;
-  if (adminUser.role === "tenant_viewer") {
-    throw new HTTPException(403, { message: "You do not have permission to perform this action." });
-  }
+faqs.put("/:id", checkWritePermission, zValidator("json", UpdateFaqSchema), async (c) => {
+  const { tenantId } = c.var;
   const id = c.req.param("id");
   const data = c.req.valid("json");
   const faq = await faqService.update(tenantId, id, data);
   return c.json(faq);
 });
 
-faqs.delete("/:id", async (c) => {
-  const { tenantId, adminUser } = c.var;
-  if (adminUser.role === "tenant_viewer") {
-    throw new HTTPException(403, { message: "You do not have permission to perform this action." });
-  }
+faqs.delete("/:id", checkWritePermission, async (c) => {
+  const { tenantId } = c.var;
   const id = c.req.param("id");
   await faqService.remove(tenantId, id);
   return c.body(null, 204);

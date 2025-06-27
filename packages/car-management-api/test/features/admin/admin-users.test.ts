@@ -149,5 +149,16 @@ describe("Admin API: /api/v1/admin/admin-users", () => {
       const body = (await response.json()) as AdminUser[];
       expect(body.length).toBe(2); // admin and tenant_viewer
     });
+
+    it("should get a user by id in the same tenant", async () => {
+      const response = await app.request(`/api/v1/admin/admin-users/${adminUser.id}`, {
+        headers: {
+          Authorization: `Bearer ${tenantViewerUser.token}`,
+        },
+      });
+      expect(response.status).toBe(200);
+      const body = (await response.json()) as AdminUser;
+      expect(body.id).toBe(adminUser.id);
+    });
   });
 });
