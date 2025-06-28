@@ -169,7 +169,7 @@ export const Faqs: React.FC = () => {
         title={editingFaq ? '编辑问题' : '添加问题'}
       >
         <form onSubmit={handleSubmit}>
-          <fieldset disabled={isViewer}>
+          <fieldset disabled={isViewer} className={formStyles.fieldset}>
             <FormField label="问题">
               <input
                 type="text"

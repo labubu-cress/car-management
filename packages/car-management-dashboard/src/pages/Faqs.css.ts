@@ -12,6 +12,11 @@ export const header = style({
 });
 
 export const formStyles = {
+  fieldset: style({
+    border: "none",
+    padding: 0,
+    margin: 0,
+  }),
   submitButton: style({
     padding: "10px 20px",
     backgroundColor: "#3b82f6",
