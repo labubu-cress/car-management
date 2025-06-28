@@ -1,4 +1,5 @@
-import { wechatClient } from "@/lib/wechat";
+import { prisma } from "@/lib/db";
+import { WeChatClient } from "@/lib/wechat";
 import { zValidator } from "@hono/zod-validator";
 import type { User } from "@prisma/client";
 import { Hono } from "hono";
@@ -22,11 +23,18 @@ app.post("/current/phone-number", zValidator("json", updatePhoneNumberSchema), a
   const user = c.get("user") as User;
   const { code } = c.req.valid("json");
 
-  const { phoneNumber } = (await wechatClient.getPhoneNumber(code)) ?? {};
-  if (!phoneNumber) {
+  const tenant = await prisma.tenant.findUnique({ where: { id: user.tenantId } });
+  if (!tenant || !tenant.appId || !tenant.appSecret) {
+    return c.json({ message: "Tenant WeChat configuration is missing or invalid." }, 400);
+  }
+
+  const wechatClient = new WeChatClient(tenant.appId, tenant.appSecret);
+  const phoneInfo = await wechatClient.getPhoneNumber(code);
+
+  if (!phoneInfo?.phoneNumber) {
     throw new HTTPException(400, { message: "Invalid code from wechat" });
   }
-  const updatedUser = await updateUserPhoneNumber(user.tenantId, user.openId, phoneNumber);
+  const updatedUser = await updateUserPhoneNumber(user.tenantId, user.openId, phoneInfo.phoneNumber);
   return c.json(updatedUser);
 });
 
