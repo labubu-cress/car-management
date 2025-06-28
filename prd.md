@@ -1,15 +1,12 @@
 # goal
-后台管理系统需要增加一个角色，该角色创建的时候，会绑定到某个租户，并且：
-1. 该角色只能查看所属租户下的东西
-2. 该角色只有只读权限
-3. 该角色的权限肯定要小于 admin
 
-# taskA (completed)
-修改 schema.prisma, 并运行 migrate dev
+微信小程序的 appid 与 appsecret 之前是从环境变量读的，只支持一个小程序，这个设计并不合理。
+每个租户创建的时候，都会填写 appid 与 appsecret ，所以应该从数据库去读，并且要支持多个小程序。
 
-# task B (completed)
-修改 admin 的后端代码与相关测试 
+# task A （completed）
 
-# task C
-更新 管理后台前端
-(viewer 没有权限操作的按钮，不要显示；表格中操作列，如果没有可操作的项，不要显示)
+先整理一个修改计划。放到 plan.md
+
+# task B
+
+按照 plan.md 修改后端代码与相关测试

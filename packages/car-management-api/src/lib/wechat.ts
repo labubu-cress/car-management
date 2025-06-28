@@ -56,10 +56,22 @@ export class WeChatClient {
   /** 内存中的 access_token 缓存 */
   private accessToken: AccessToken | null = null;
 
-  constructor(appId: string, appSecret: string, tokenFilePath: string) {
+  constructor(appId: string, appSecret: string, tokenFilePath?: string) {
+    if (!appId || !appSecret) {
+      throw new Error("WeChat AppID and AppSecret are required.");
+    }
     this.appId = appId;
     this.appSecret = appSecret;
-    this.tokenFilePath = tokenFilePath;
+
+    if (tokenFilePath) {
+      this.tokenFilePath = tokenFilePath;
+    } else {
+      // 向上查找 package.json，找到项目根目录
+      const packageJsonPath = findUpSync("package.json");
+      const projectRoot = packageJsonPath ? path.dirname(packageJsonPath) : process.cwd();
+      // 将 token 缓存文件存储在项目根目录下的 `tmp` 文件夹中，并以 appId 命名
+      this.tokenFilePath = path.join(projectRoot, "tmp", `wechat-access-token-${this.appId}.json`);
+    }
   }
 
   /**
@@ -162,28 +174,3 @@ export class WeChatClient {
     return response.data.phone_info;
   }
 }
-
-// --- 初始化与导出 ---
-
-// 从环境变量中读取小程序的 AppID 和 AppSecret
-// 确保在生产环境中通过环境变量配置，而不是硬编码
-const appId = process.env.WECHAT_APPID;
-const appSecret = process.env.WECHAT_APPSECRET;
-
-// 向上查找 package.json，找到项目根目录
-// 将 token 缓存文件存储在项目根目录下的 `tmp` 文件夹中
-const packageJsonPath = findUpSync("package.json");
-const projectRoot = packageJsonPath ? path.dirname(packageJsonPath) : process.cwd();
-const defaultAccessTokenFilePath = path.join(projectRoot, "tmp", "wechat-access-token.json");
-
-// 如果环境变量未设置，打印警告信息，以便开发者发现配置问题
-if (!appId || !appSecret) {
-  console.warn(
-    "WeChat AppID or AppSecret is not configured. Please set WECHAT_APPID and WECHAT_APPSECRET environment variables.",
-  );
-}
-
-// 创建 WeChatClient 的单例，供整个应用使用
-// 即使 appId 或 appSecret 为空字符串，也创建实例，避免在应用启动时因配置缺失而崩溃
-// 具体的接口调用会在执行时因 appId 无效而失败
-export const wechatClient = new WeChatClient(appId || "", appSecret || "", defaultAccessTokenFilePath);

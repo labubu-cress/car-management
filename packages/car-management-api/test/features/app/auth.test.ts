@@ -1,35 +1,32 @@
 import app from "@/index";
 import { prisma } from "@/lib/db";
-import { wechatClient } from "@/lib/wechat";
+import { WeChatClient } from "@/lib/wechat";
 import type { User } from "@prisma/client";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { clearTestDb, createTestTenant, type TestTenant } from "../../helper";
 
-vi.mock("@/lib/wechat", () => {
-  return {
-    wechatClient: {
-      code2Session: vi.fn(),
-    },
-  };
-});
+vi.mock("@/lib/wechat");
 
 describe("App API: /api/v1/app/auth", () => {
   let tenant: TestTenant;
+  const mockCode2Session = vi.fn();
 
   beforeEach(async () => {
+    vi.resetAllMocks();
+
+    vi.mocked(WeChatClient).mockImplementation(() => {
+      return {
+        code2Session: mockCode2Session,
+      } as any;
+    });
+
     await clearTestDb(prisma);
     tenant = await createTestTenant(prisma);
-    vi.mocked(wechatClient.code2Session).mockResolvedValue({
+    mockCode2Session.mockResolvedValue({
       openid: "test_openid",
       unionid: "test_unionid",
       session_key: "test_session_key",
-      errcode: 0,
-      errmsg: "",
     });
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
   });
 
   it("should register a new user and return token", async () => {
@@ -41,6 +38,10 @@ describe("App API: /api/v1/app/auth", () => {
 
     expect(response.status).toBe(200);
     const { token, user } = (await response.json()) as { token: string; user: User };
+
+    expect(WeChatClient).toHaveBeenCalledWith(tenant.appId, tenant.appSecret);
+    expect(mockCode2Session).toHaveBeenCalledWith("test_code");
+
     expect(token).toBeDefined();
     expect(user).toBeDefined();
     expect(user.openId).toBe("test_openid");
@@ -73,6 +74,10 @@ describe("App API: /api/v1/app/auth", () => {
 
     expect(response.status).toBe(200);
     const { token, user } = (await response.json()) as { token: string; user: User };
+
+    expect(WeChatClient).toHaveBeenCalledWith(tenant.appId, tenant.appSecret);
+    expect(mockCode2Session).toHaveBeenCalledWith("any_code");
+
     expect(token).toBeDefined();
     expect(user).toBeDefined();
     expect(user.id).toBe(existingUser.id);
@@ -81,5 +86,22 @@ describe("App API: /api/v1/app/auth", () => {
 
     const userCount = await prisma.user.count();
     expect(userCount).toBe(1);
+  });
+
+  it("should return 400 if tenant wechat config is missing", async () => {
+    // Create a tenant without appId/appSecret
+    const tenantWithoutConfig = await prisma.tenant.create({
+      data: { name: "No Config Tenant", appId: "", appSecret: "" },
+    });
+
+    const response = await app.request(`/api/v1/app/tenants/${tenantWithoutConfig.id}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: "any_code" }),
+    });
+
+    expect(response.status).toBe(400);
+    const body = (await response.json()) as { message: string };
+    expect(body.message).toBe("Tenant WeChat configuration is missing or invalid.");
   });
 });
