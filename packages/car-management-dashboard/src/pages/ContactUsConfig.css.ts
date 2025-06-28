@@ -27,6 +27,12 @@ export const contactUsConfigStyles = {
     boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
   }),
 
+  fieldset: style({
+    border: "none",
+    padding: 0,
+    margin: 0,
+  }),
+
   actions: style({
     display: "flex",
     justifyContent: "flex-end",

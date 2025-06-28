@@ -134,7 +134,7 @@ const ContactUsConfigPage = () => {
         onSubmit={handleSubmit(onSubmit)}
         className={contactUsConfigStyles.form}
       >
-        <fieldset disabled={isViewer}>
+        <fieldset disabled={isViewer} className={contactUsConfigStyles.fieldset}>
           <FormField label="电话咨询描述" error={errors.contactPhoneDescription?.message}>
             <input type="text" {...register('contactPhoneDescription')} />
           </FormField>
