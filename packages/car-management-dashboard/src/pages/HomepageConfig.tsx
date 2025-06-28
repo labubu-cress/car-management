@@ -112,7 +112,7 @@ const HomepageConfigPage = () => {
         onSubmit={handleSubmit(onSubmit)}
         className={homepageConfigStyles.form}
       >
-        <fieldset disabled={isViewer}>
+        <fieldset disabled={isViewer} className={homepageConfigStyles.fieldset}>
           <FormField label="第一行标题" error={errors.firstTitle?.message}>
             <input type="text" {...register('firstTitle', { required: '第一行标题不能为空' })} />
           </FormField>
