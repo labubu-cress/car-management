@@ -15,7 +15,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { faCheck, faEdit, faGripVertical, faPlus, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faGripVertical, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import * as styles from './DataTable.css';
@@ -124,28 +124,19 @@ function SortableRow<T extends { id: string; isArchived?: boolean }>({
               <button
                 onClick={() => onArchiveToggle?.(record)}
                 className={record.isArchived ? styles.unarchiveButton : styles.archiveButton}
-                title={record.isArchived ? '上架' : '下架'}
               >
-                <FontAwesomeIcon icon={record.isArchived ? faCheck : faTimes} />
+                {record.isArchived ? '上架' : '下架'}
               </button>
             )}
 
             {!getActions && onEdit && (
-              <button
-                onClick={() => onEdit?.(record)}
-                className={styles.editButton}
-                title="编辑"
-              >
-                <FontAwesomeIcon icon={faEdit} />
+              <button onClick={() => onEdit?.(record)} className={styles.editButton}>
+                编辑
               </button>
             )}
             {!getActions && onDelete && (
-              <button
-                onClick={() => onDelete?.(record)}
-                className={styles.deleteButton}
-                title="删除"
-              >
-                <FontAwesomeIcon icon={faTrash} />
+              <button onClick={() => onDelete?.(record)} className={styles.deleteButton}>
+                删除
               </button>
             )}
           </div>

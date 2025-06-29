@@ -129,62 +129,46 @@ export const actionButtonDanger = style([
   },
 ]);
 
-export const archiveButton = style({
-  padding: "6px 8px",
-  background: "#888",
-  color: "white",
-  border: "none",
-  borderRadius: "4px",
-  cursor: "pointer",
-  fontSize: "12px",
-  transition: "background-color 0.2s ease",
-
-  ":hover": {
-    backgroundColor: "#666",
+export const archiveButton = style([
+  actionButton,
+  {
+    backgroundColor: "#f0f2f5",
+    color: "#595959",
+    ":hover": {
+      backgroundColor: "#e6e6e6",
+    },
   },
-});
+]);
 
-export const unarchiveButton = style({
-  padding: "6px 8px",
-  background: "#f97316",
-  color: "white",
-  border: "none",
-  borderRadius: "4px",
-  cursor: "pointer",
-  fontSize: "12px",
-  transition: "background-color 0.2s ease",
-
-  ":hover": {
-    backgroundColor: "#ea580c",
+export const unarchiveButton = style([
+  actionButton,
+  {
+    backgroundColor: "#fff7e6",
+    color: "#fa8c16",
+    ":hover": {
+      backgroundColor: "#ffe7ba",
+    },
   },
-});
+]);
 
-export const editButton = style({
-  padding: "6px 8px",
-  background: "#52c41a",
-  color: "white",
-  border: "none",
-  borderRadius: "4px",
-  cursor: "pointer",
-  fontSize: "12px",
-  transition: "background-color 0.2s ease",
-
-  ":hover": {
-    backgroundColor: "#389e0d",
+export const editButton = style([
+  actionButton,
+  {
+    backgroundColor: "#f6ffed",
+    color: "#52c41a",
+    ":hover": {
+      backgroundColor: "#d9f7be",
+    },
   },
-});
+]);
 
-export const deleteButton = style({
-  padding: "6px 8px",
-  background: "#ff4d4f",
-  color: "white",
-  border: "none",
-  borderRadius: "4px",
-  cursor: "pointer",
-  fontSize: "12px",
-  transition: "background-color 0.2s ease",
-
-  ":hover": {
-    backgroundColor: "#cf1322",
+export const deleteButton = style([
+  actionButton,
+  {
+    backgroundColor: "#fff1f0",
+    color: "#ff4d4f",
+    ":hover": {
+      backgroundColor: "#ffccc7",
+    },
   },
-});
+]);
