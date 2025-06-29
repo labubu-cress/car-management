@@ -54,18 +54,21 @@ export const Users: React.FC = () => {
       key: 'avatarUrl',
       title: '头像',
       width: '80px',
-      render: (value: string) => (
-        <img
-          src={value}
-          alt="用户头像"
-          style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '50%',
-            objectFit: 'cover',
-          }}
-        />
-      ),
+      render: (value: string) =>
+        value ? (
+          <img
+            src={value}
+            alt="用户头像"
+            style={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              objectFit: 'cover',
+            }}
+          />
+        ) : (
+          <span>默认</span>
+        ),
     },
     {
       key: 'nickname',
