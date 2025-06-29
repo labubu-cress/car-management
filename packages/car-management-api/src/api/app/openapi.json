@@ -730,8 +730,10 @@
         "type": "object",
         "properties": {
           "name": { "type": "string" },
-          "value": { "type": "string" }
-        }
+          "value": { "type": "string" },
+          "icon": { "type": "string" }
+        },
+        "required": ["name", "value"]
       },
       "CarCategory": {
         "type": "object",
