@@ -17,10 +17,10 @@ import { tenantMiddleware, type AppTenantEnv } from "./middleware/tenant";
 const app = new Hono<AppTenantEnv>();
 
 app.onError((err, c) => {
-  console.error(`App API Error: ${err}`);
   if (err instanceof HTTPException) {
     return err.getResponse();
   }
+  console.error(`App API Error: ${err}`);
   return c.json(
     {
       message: "An error occurred in the App API.",

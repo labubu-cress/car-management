@@ -20,7 +20,6 @@ import { authMiddleware, superAdminMiddleware, tenantAccessMiddleware } from "./
 const adminApi = new Hono();
 
 adminApi.onError((err: Error, c) => {
-  console.error("Admin API Error:", err);
   const httpError = err as HttpError;
   if (httpError.statusCode) {
     c.status(httpError.statusCode as any);
@@ -30,6 +29,7 @@ adminApi.onError((err: Error, c) => {
   if (err instanceof HTTPException) {
     return err.getResponse();
   }
+  console.error("Admin API Error:", err);
   return c.json(
     {
       message: "An error occurred in the Admin API.",
