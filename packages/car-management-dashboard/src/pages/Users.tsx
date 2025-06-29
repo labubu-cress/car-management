@@ -117,13 +117,13 @@ export const Users: React.FC = () => {
             <p>正在加载...</p>
           ) : userDetails && userDetails.favoriteCarTrims.length > 0 ? (
             <div>
-              <h4>收藏的车型</h4>
-              <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
+              <h4 style={{ marginTop: 0, marginBottom: '24px' }}>收藏的车型</h4>
+              <ul style={{ listStyleType: 'none', paddingLeft: 0, margin: 0 }}>
                 {userDetails.favoriteCarTrims.map((fav) => (
-                  <li key={fav.carTrimId} style={{ display: 'flex', alignItems: 'center', marginBottom: '12px' }}>
-                    <img src={fav.carTrim.image} alt={fav.carTrim.name} style={{ width: '80px', height: 'auto', marginRight: '12px', borderRadius: '4px' }}/>
-                    <div>
-                      <strong>{fav.carTrim.name}</strong><br />
+                  <li key={fav.carTrimId} style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
+                    <img src={fav.carTrim.image} alt={fav.carTrim.name} style={{ width: '100px', height: 'auto', marginRight: '16px', borderRadius: '8px', objectFit: 'cover' }}/>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <strong style={{ marginBottom: '8px' }}>{fav.carTrim.name}</strong>
                       <span style={{ fontSize: '12px', color: '#666' }}>收藏于: {new Date(fav.createdAt).toLocaleString('zh-CN')}</span>
                     </div>
                   </li>
