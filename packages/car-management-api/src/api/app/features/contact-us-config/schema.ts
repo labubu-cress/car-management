@@ -12,5 +12,4 @@ export const contactUsConfigSchema = z.object({
   workEndTime: z.number().nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
-  isServiceTime: z.boolean(),
 });
