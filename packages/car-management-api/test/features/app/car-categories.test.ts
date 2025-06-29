@@ -1,4 +1,4 @@
-import type { CarCategoryWithIsArchived } from "@/api/app/features/car-categories/types";
+import type { CarCategory } from "@/api/app/features/car-categories/types";
 import app from "@/index";
 import { prisma } from "@/lib/db";
 import { beforeEach, describe, expect, it } from "vitest";
@@ -160,7 +160,7 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-categories", () => {
 
     const response = await app.request(`/api/v1/app/tenants/${tenant.id}/car-categories`);
     expect(response.status).toBe(200);
-    const body = (await response.json()) as CarCategoryWithIsArchived[];
+    const body = (await response.json()) as CarCategory[];
 
     expect(body.length).toBe(2);
     expect(body[0].name).toBe("Category 2"); // displayOrder: 1
@@ -250,22 +250,16 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-categories", () => {
 
     const responseActive = await app.request(`/api/v1/app/tenants/${tenant.id}/car-categories/${categoryActive.id}`);
     expect(responseActive.status).toBe(200);
-    const bodyActive = (await responseActive.json()) as CarCategoryWithIsArchived;
+    const bodyActive = (await responseActive.json()) as CarCategory;
     expect(bodyActive.name).toBe("Active Category");
-    expect(bodyActive.isArchived).toBe(false);
     expect(bodyActive.minPrice).toBe(95);
     expect(bodyActive.maxPrice).toBe(205);
-    expect(bodyActive.tags).toEqual([]);
-    expect(bodyActive.highlights).toEqual([{ title: "Test Highlight", icon: "test_icon.jpg" }]);
+    expect(bodyActive.isArchived).toBe(false);
 
+    // Should not be able to get archived category
     const responseArchived = await app.request(
       `/api/v1/app/tenants/${tenant.id}/car-categories/${categoryArchived.id}`,
     );
-    expect(responseArchived.status).toBe(200);
-    const bodyArchived = (await responseArchived.json()) as CarCategoryWithIsArchived;
-    expect(bodyArchived.name).toBe("Archived Category");
-    expect(bodyArchived.isArchived).toBe(true);
-    expect(bodyArchived.minPrice).toBe(null);
-    expect(bodyArchived.maxPrice).toBe(null);
+    expect(responseArchived.status).toBe(404);
   });
 });

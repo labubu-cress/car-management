@@ -5,13 +5,13 @@ import type { CarTrimWithCategory } from "../car-trims/types";
 import type { CarFeature } from "../shared/schema";
 
 // This is getting repetitive. Maybe I should have a transformer file.
-const transformPrismaCategory = (category: any): CarCategory => {
+const transformPrismaCategory = (category: any, trimIsArchived: boolean): CarCategory => {
   const { highlights, tags, interiorImages, exteriorImages, offerPictures, minPrice, maxPrice, ...rest } = category;
   return {
     ...rest,
     minPrice: minPrice.toNumber(),
     maxPrice: maxPrice.toNumber(),
-    isArchived: false, // In favorites, we probably don't have archived things. Let's assume false.
+    isArchived: trimIsArchived, // Best effort approximation
     highlights: (highlights as CarFeature[]) ?? [],
     tags: (tags as string[]) ?? [],
     interiorImages: (interiorImages as string[]) ?? [],
@@ -29,13 +29,13 @@ const transformPrismaTrimWithCategory = (trim: any): CarTrimWithCategory => {
     currentPrice: currentPrice.toNumber(),
     features: (features as CarFeature[]) ?? [],
     isFavorited: true,
-    category: transformPrismaCategory(category),
+    category: transformPrismaCategory(category, trim.isArchived),
   };
 };
 
 export async function getFavorites(userId: string): Promise<CarTrimWithCategory[]> {
   const favorites = await prisma.userFavoriteCarTrim.findMany({
-    where: { userId, carTrim: { isArchived: false } },
+    where: { userId },
     include: {
       carTrim: {
         include: {
