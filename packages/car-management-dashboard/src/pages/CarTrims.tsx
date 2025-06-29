@@ -1,5 +1,6 @@
 import { Column, DataTable } from '@/components/DataTable';
 import { EmptyState } from '@/components/EmptyState';
+import { Modal } from '@/components/Modal';
 import { useAuth } from '@/contexts/AuthContext';
 import { carCategoriesApi, carTrimsApi } from '@/lib/api';
 import { CarTrim } from '@/types/api';
@@ -10,12 +11,28 @@ import toast from 'react-hot-toast';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 
+interface FavoritedByUser {
+  id: string;
+  nickname: string;
+  avatarUrl: string;
+}
+
+interface Favorite {
+  user: FavoritedByUser;
+  createdAt: string;
+}
+
+interface CarTrimDetail extends CarTrim {
+  favoritedBy: Favorite[];
+}
+
 export const CarTrims: React.FC = () => {
   const { currentTenant, isViewer } = useAuth();
   const navigate = useNavigate();
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<'all' | 'archived' | 'active'>('all');
+  const [favoritesModalTrim, setFavoritesModalTrim] = useState<CarTrim | null>(null);
 
   const { data: categories = [] } = useQuery(
     ['car-categories', currentTenant?.id],
@@ -195,8 +212,45 @@ export const CarTrims: React.FC = () => {
     }
   };
 
+  const handleViewFavorites = (trim: CarTrim) => {
+    setFavoritesModalTrim(trim);
+  };
+
   const handleReorder = (reorderedTrims: CarTrim[]) => {
     reorderMutation.mutate({ trimIds: reorderedTrims.map((t) => t.id) });
+  };
+
+  const getActions = (trim: CarTrim) => {
+    const actions = [
+      {
+        label: '编辑',
+        onClick: handleEdit,
+      },
+      {
+        label: '查看收藏',
+        onClick: handleViewFavorites,
+      },
+      {
+        label: trim.isArchived ? '上架' : '下架',
+        onClick: handleArchiveToggle,
+      },
+      {
+        label: '删除',
+        onClick: handleDelete,
+        isDanger: true,
+      },
+    ];
+
+    if (isViewer) {
+      return [
+        {
+          label: '查看收藏',
+          onClick: handleViewFavorites,
+        },
+      ];
+    }
+
+    return actions;
   };
 
   if (categories.length === 0) {
@@ -279,12 +333,79 @@ export const CarTrims: React.FC = () => {
         data={filteredTrims}
         loading={isLoading}
         onAdd={selectedCategoryId && !isViewer ? handleAdd : undefined}
-        onEdit={!isViewer ? handleEdit : undefined}
-        onDelete={!isViewer ? handleDelete : undefined}
-        onArchiveToggle={!isViewer ? handleArchiveToggle : undefined}
-        onReorder={!isViewer ? handleReorder : undefined}
+        onReorder={isViewer ? undefined : handleReorder}
+        getActions={getActions}
         addButtonText="创建车型参数"
       />
+      {favoritesModalTrim && (
+        <FavoritesModal trim={favoritesModalTrim} onClose={() => setFavoritesModalTrim(null)} />
+      )}
     </div>
+  );
+};
+
+const FavoritesModal: React.FC<{
+  trim: CarTrim;
+  onClose: () => void;
+}> = ({ trim, onClose }) => {
+  const { currentTenant } = useAuth();
+  const {
+    data: trimDetails,
+    isLoading,
+    error,
+  } = useQuery<CarTrimDetail>(
+    ['car-trim', currentTenant?.id, trim.id],
+    () => carTrimsApi.getById(currentTenant!.id, trim.id),
+    {
+      enabled: !!currentTenant,
+    },
+  );
+
+  const favoritedBy = trimDetails?.favoritedBy || [];
+  const typedError = error as any;
+
+  return (
+    <Modal isOpen={true} onClose={onClose} title={`收藏 " ${trim.name} " 的用户`}>
+      {isLoading && <p>加载中...</p>}
+      {typedError && <p style={{ color: 'red' }}>{typedError.response?.data?.message || '加载失败'}</p>}
+      {!isLoading && !typedError && (
+        <>
+          {favoritedBy.length === 0 ? (
+            <p>暂无用户收藏</p>
+          ) : (
+            <ul style={{ listStyle: 'none', padding: 0 }}>
+              {favoritedBy.map((fav) => (
+                <li
+                  key={fav.user.id}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '10px 0',
+                    borderBottom: '1px solid #eee',
+                  }}
+                >
+                  <img
+                    src={fav.user.avatarUrl}
+                    alt={fav.user.nickname}
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      marginRight: '10px',
+                    }}
+                  />
+                  <div>
+                    <strong>{fav.user.nickname}</strong>
+                    <div style={{ color: '#888', fontSize: '0.9em' }}>
+                      收藏于: {new Date(fav.createdAt).toLocaleString()}
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
+      )}
+    </Modal>
   );
 }; 

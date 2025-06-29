@@ -54,7 +54,7 @@ export const CarTrimForm: React.FC = () => {
   );
 
   // 获取车型参数详情（编辑模式）
-  const { data: carTrimDetails, isLoading } = useQuery(
+  const { isLoading } = useQuery(
     ['car-trim', currentTenant?.id, id],
     () => (currentTenant && id ? carTrimsApi.getById(currentTenant.id, id) : null),
     {
@@ -363,23 +363,6 @@ export const CarTrimForm: React.FC = () => {
           </button>
         </div>
       </form>
-
-      {isEdit && carTrimDetails && carTrimDetails.favoritedBy && carTrimDetails.favoritedBy.length > 0 && (
-        <div className={carTrimFormStyles.section}>
-          <h2 className={carTrimFormStyles.sectionTitle}>收藏用户列表 ({carTrimDetails.favoritedBy.length})</h2>
-          <ul className={carTrimFormStyles.userList}>
-            {carTrimDetails.favoritedBy.map(fav => (
-              <li key={fav.user.id} className={carTrimFormStyles.userListItem}>
-                <img src={fav.user.avatarUrl} alt={fav.user.nickname} className={carTrimFormStyles.userAvatar} />
-                <div className={carTrimFormStyles.userInfo}>
-                  <span className={carTrimFormStyles.userNickname}>{fav.user.nickname}</span>
-                  <span className={carTrimFormStyles.favoriteDate}>收藏于: {new Date(fav.createdAt).toLocaleString('zh-CN')}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 }; 
