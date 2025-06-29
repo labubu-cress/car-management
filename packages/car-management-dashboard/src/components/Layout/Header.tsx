@@ -1,5 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { faBuilding, faChevronDown, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faBuilding, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import * as styles from './Header.css';
@@ -47,7 +47,6 @@ export const Header: React.FC = () => {
                 </option>
               ))}
             </select>
-            {!isDisabled && <FontAwesomeIcon icon={faChevronDown} className={styles.chevronIcon} />}
           </div>
         </div>
       </div>
