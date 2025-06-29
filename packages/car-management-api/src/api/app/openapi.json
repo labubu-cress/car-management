@@ -810,6 +810,10 @@
           "contactPhoneNumber": { "type": "string", "nullable": true },
           "contactEmailDescription": { "type": "string", "nullable": true },
           "contactEmail": { "type": "string", "nullable": true },
+          "workdays": { "type": "array", "items": { "type": "integer" }, "nullable": true },
+          "workStartTime": { "type": "integer", "nullable": true },
+          "workEndTime": { "type": "integer", "nullable": true },
+          "isServiceTime": { "type": "boolean" },
           "createdAt": { "type": "string", "format": "date-time" },
           "updatedAt": { "type": "string", "format": "date-time" }
         }

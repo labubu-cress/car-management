@@ -1,12 +1,14 @@
 import { prisma } from "@/lib/db";
-import type { CarCategoryWithIsArchived } from "./types";
+import type { CarFeature } from "../shared/schema";
+import type { CarCategory } from "./types";
 
-export const getAllCarCategories = async (tenantId: string): Promise<CarCategoryWithIsArchived[]> => {
+export const getAllCarCategories = async (tenantId: string): Promise<CarCategory[]> => {
   const categories = await prisma.carCategory.findMany({
     where: { tenantId },
     include: {
       carTrims: {
         where: { isArchived: false },
+        select: { id: true },
       },
     },
     orderBy: {
@@ -15,53 +17,46 @@ export const getAllCarCategories = async (tenantId: string): Promise<CarCategory
   });
 
   return categories
+    .filter((c) => c.carTrims.length > 0)
     .map((c) => {
-      const isArchived = c.carTrims.length === 0;
-
-      if (isArchived) {
-        return {
-          ...c,
-          isArchived,
-          minPrice: null,
-          maxPrice: null,
-        };
-      }
-
+      const { carTrims, tags, highlights, interiorImages, exteriorImages, offerPictures, minPrice, maxPrice, ...rest } =
+        c;
       return {
-        ...c,
-        isArchived,
-        minPrice: c.minPrice.toNumber(),
-        maxPrice: c.maxPrice.toNumber(),
+        ...rest,
+        isArchived: false,
+        minPrice: minPrice.toNumber(),
+        maxPrice: maxPrice.toNumber(),
+        tags: (tags as string[]) ?? [],
+        highlights: (highlights as CarFeature[]) ?? [],
+        interiorImages: (interiorImages as string[]) ?? [],
+        exteriorImages: (exteriorImages as string[]) ?? [],
+        offerPictures: (offerPictures as string[]) ?? [],
       };
-    })
-    .filter((c) => !c.isArchived);
+    });
 };
 
-export const getCarCategoryById = async (tenantId: string, id: string): Promise<CarCategoryWithIsArchived | null> => {
+export const getCarCategoryById = async (tenantId: string, id: string): Promise<CarCategory | null> => {
   const category = await prisma.carCategory.findUnique({
     where: { id, tenantId },
-    include: { carTrims: { where: { isArchived: false } } },
+    include: { carTrims: { where: { isArchived: false }, select: { id: true } } },
   });
 
-  if (!category) {
+  if (!category || category.carTrims.length === 0) {
     return null;
   }
 
-  const isArchived = category.carTrims.length === 0;
-
-  if (isArchived) {
-    return {
-      ...category,
-      isArchived,
-      minPrice: null,
-      maxPrice: null,
-    };
-  }
+  const { carTrims, tags, highlights, interiorImages, exteriorImages, offerPictures, minPrice, maxPrice, ...rest } =
+    category;
 
   return {
-    ...category,
-    isArchived,
-    minPrice: category.minPrice.toNumber(),
-    maxPrice: category.maxPrice.toNumber(),
+    ...rest,
+    isArchived: false,
+    minPrice: minPrice.toNumber(),
+    maxPrice: maxPrice.toNumber(),
+    tags: (tags as string[]) ?? [],
+    highlights: (highlights as CarFeature[]) ?? [],
+    interiorImages: (interiorImages as string[]) ?? [],
+    exteriorImages: (exteriorImages as string[]) ?? [],
+    offerPictures: (offerPictures as string[]) ?? [],
   };
 };

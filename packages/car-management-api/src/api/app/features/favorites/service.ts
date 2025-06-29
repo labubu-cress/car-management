@@ -1,11 +1,41 @@
-import { prisma } from '@/lib/db';
-import type { CarCategory, CarTrim, UserFavoriteCarTrim } from '@prisma/client';
+import { prisma } from "@/lib/db";
+import type { UserFavoriteCarTrim } from "@prisma/client";
+import type { CarCategory } from "../car-categories/types";
+import type { CarTrimWithCategory } from "../car-trims/types";
+import type { CarFeature } from "../shared/schema";
 
-type CarTrimWithDetails = CarTrim & { category: CarCategory };
+// This is getting repetitive. Maybe I should have a transformer file.
+const transformPrismaCategory = (category: any): CarCategory => {
+  const { highlights, tags, interiorImages, exteriorImages, offerPictures, minPrice, maxPrice, ...rest } = category;
+  return {
+    ...rest,
+    minPrice: minPrice.toNumber(),
+    maxPrice: maxPrice.toNumber(),
+    isArchived: false, // In favorites, we probably don't have archived things. Let's assume false.
+    highlights: (highlights as CarFeature[]) ?? [],
+    tags: (tags as string[]) ?? [],
+    interiorImages: (interiorImages as string[]) ?? [],
+    exteriorImages: (exteriorImages as string[]) ?? [],
+    offerPictures: (offerPictures as string[]) ?? [],
+  };
+};
 
-export async function getFavorites(userId: string): Promise<CarTrimWithDetails[]> {
+const transformPrismaTrimWithCategory = (trim: any): CarTrimWithCategory => {
+  const { features, originalPrice, currentPrice, category, ...rest } = trim;
+
+  return {
+    ...rest,
+    originalPrice: originalPrice.toNumber(),
+    currentPrice: currentPrice.toNumber(),
+    features: (features as CarFeature[]) ?? [],
+    isFavorited: true,
+    category: transformPrismaCategory(category),
+  };
+};
+
+export async function getFavorites(userId: string): Promise<CarTrimWithCategory[]> {
   const favorites = await prisma.userFavoriteCarTrim.findMany({
-    where: { userId },
+    where: { userId, carTrim: { isArchived: false } },
     include: {
       carTrim: {
         include: {
@@ -14,13 +44,13 @@ export async function getFavorites(userId: string): Promise<CarTrimWithDetails[]
       },
     },
     orderBy: {
-      createdAt: 'desc',
+      createdAt: "desc",
     },
   });
-  return favorites.map((f) => f.carTrim as CarTrimWithDetails);
+  return favorites.map((f) => transformPrismaTrimWithCategory(f.carTrim));
 }
 
-export async function addFavorite(userId:string, carTrimId: string): Promise<UserFavoriteCarTrim> {
+export async function addFavorite(userId: string, carTrimId: string): Promise<UserFavoriteCarTrim> {
   return prisma.userFavoriteCarTrim.create({
     data: {
       userId,
@@ -30,16 +60,18 @@ export async function addFavorite(userId:string, carTrimId: string): Promise<Use
 }
 
 export async function removeFavorite(userId: string, carTrimId: string): Promise<UserFavoriteCarTrim | void> {
-  return prisma.userFavoriteCarTrim.delete({
-    where: {
-      userId_carTrimId: {
-        userId,
-        carTrimId,
+  return prisma.userFavoriteCarTrim
+    .delete({
+      where: {
+        userId_carTrimId: {
+          userId,
+          carTrimId,
+        },
       },
-    },
-  }).catch(() => {
-    // Ignore if not found
-  });
+    })
+    .catch(() => {
+      // Ignore if not found
+    });
 }
 
 export async function isFavorite(userId: string, carTrimId: string): Promise<boolean> {
@@ -52,4 +84,4 @@ export async function isFavorite(userId: string, carTrimId: string): Promise<boo
     },
   });
   return !!favorite;
-} 
+}

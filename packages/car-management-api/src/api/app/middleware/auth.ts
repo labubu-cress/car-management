@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/db';
+import { prisma } from "@/lib/db";
 import type { User } from "@prisma/client";
 import { type Context, type Next } from "hono";
 import { createMiddleware } from "hono/factory";
@@ -20,6 +20,12 @@ export type AppAuthEnv = {
   };
 };
 
+export type OptionalAppAuthEnv = {
+  Variables: AppTenantEnv["Variables"] & {
+    user?: User;
+  };
+};
+
 export const appAuthMiddleware = createMiddleware<AppAuthEnv>(async (c: Context<AppAuthEnv>, next: Next) => {
   const authHeader = c.req.header("Authorization");
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -32,7 +38,7 @@ export const appAuthMiddleware = createMiddleware<AppAuthEnv>(async (c: Context<
   if (!user) {
     throw new HTTPException(401, { message: "Invalid token" });
   }
-  
+
   const tenant = await prisma.tenant.findUnique({
     where: { id: user.tenantId },
   });
@@ -44,5 +50,21 @@ export const appAuthMiddleware = createMiddleware<AppAuthEnv>(async (c: Context<
   c.set("user", user);
   c.set("tenant" as any, tenant);
 
+  await next();
+});
+
+export const optionalAppAuthMiddleware = createMiddleware<OptionalAppAuthEnv>(async (c, next) => {
+  const authHeader = c.req.header("Authorization");
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const token = authHeader.split(" ")[1];
+    try {
+      const user = await appAuthService.verifyToken(token);
+      if (user) {
+        c.set("user", user);
+      }
+    } catch (error) {
+      // ignore, token might be expired or invalid
+    }
+  }
   await next();
 });

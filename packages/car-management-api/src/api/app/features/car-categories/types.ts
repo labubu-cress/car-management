@@ -1,9 +1,4 @@
-import type { CarCategory as PrismaCarCategory } from "@prisma/client";
+import { z } from "zod";
+import { carCategorySchema } from "./schema";
 
-export type CarCategory = PrismaCarCategory;
-
-export type CarCategoryWithIsArchived = Omit<PrismaCarCategory, "minPrice" | "maxPrice"> & {
-  isArchived: boolean;
-  minPrice: number | null;
-  maxPrice: number | null;
-};
+export type CarCategory = z.infer<typeof carCategorySchema>;
