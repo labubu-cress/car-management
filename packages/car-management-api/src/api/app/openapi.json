@@ -751,8 +751,8 @@
           "updatedAt": { "type": "string", "format": "date-time" },
           "vehicleScenarioId": { "type": "string" },
           "isArchived": { "type": "boolean" },
-          "minPrice": { "type": "number", "nullable": true },
-          "maxPrice": { "type": "number", "nullable": true }
+          "minPrice": { "type": "number" },
+          "maxPrice": { "type": "number" }
         }
       },
       "CarTrim": {
@@ -771,18 +771,22 @@
           "categoryId": { "type": "string" },
           "displayOrder": { "type": "integer" },
           "isArchived": { "type": "boolean" },
+          "isFavorited": { "type": "boolean", "description": "Whether the current user has favorited this trim. Only present when a user is authenticated." },
           "createdAt": { "type": "string", "format": "date-time" },
           "updatedAt": { "type": "string", "format": "date-time" }
         }
       },
       "CarTrimWithDetails": {
+        "description": "A car trim with its category details, returned for favorites.",
         "allOf": [
           { "$ref": "#/components/schemas/CarTrim" },
           {
             "type": "object",
             "properties": {
-              "category": { "$ref": "#/components/schemas/CarCategory" }
-            }
+              "category": { "$ref": "#/components/schemas/CarCategory" },
+              "isFavorited": { "type": "boolean", "enum": [true] }
+            },
+            "required": ["category", "isFavorited"]
           }
         ]
       },
