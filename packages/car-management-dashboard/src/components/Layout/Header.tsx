@@ -34,19 +34,21 @@ export const Header: React.FC = () => {
       <div className={styles.left}>
         <div className={styles.tenantSelector}>
           <FontAwesomeIcon icon={faBuilding} className={styles.tenantIcon} />
-          <select
-            value={currentTenant?.id || ''}
-            onChange={handleTenantChange}
-            className={styles.tenantSelect}
-            disabled={isDisabled}
-          >
-            {tenants.map(tenant => (
-              <option key={tenant.id} value={tenant.id}>
-                {tenant.name}
-              </option>
-            ))}
-          </select>
-          {!isDisabled && <FontAwesomeIcon icon={faChevronDown} className={styles.chevronIcon} />}
+          <div className={styles.selectWrapper}>
+            <select
+              value={currentTenant?.id || ''}
+              onChange={handleTenantChange}
+              className={styles.tenantSelect}
+              disabled={isDisabled}
+            >
+              {tenants.map(tenant => (
+                <option key={tenant.id} value={tenant.id}>
+                  {tenant.name}
+                </option>
+              ))}
+            </select>
+            {!isDisabled && <FontAwesomeIcon icon={faChevronDown} className={styles.chevronIcon} />}
+          </div>
         </div>
       </div>
 

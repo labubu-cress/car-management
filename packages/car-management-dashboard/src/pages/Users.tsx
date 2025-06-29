@@ -1,4 +1,5 @@
 import { Column, DataTable } from '@/components/DataTable';
+import * as tableStyles from '@/components/DataTable.css';
 import { Modal } from '@/components/Modal';
 import { useAuth } from '@/contexts/AuthContext';
 import { usersApi } from '@/lib/api';
@@ -91,7 +92,7 @@ export const Users: React.FC = () => {
       title: '操作',
       width: '120px',
       render: (_, record) => (
-        <button className="btn-link" onClick={() => handleViewDetails(record)}>
+        <button className={tableStyles.actionButton} onClick={() => handleViewDetails(record)}>
           查看收藏
         </button>
       ),

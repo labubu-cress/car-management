@@ -41,6 +41,12 @@ export const tenantIcon = style({
   fontSize: "16px",
 });
 
+export const selectWrapper = style({
+  position: "relative",
+  display: "flex",
+  alignItems: "center",
+});
+
 export const tenantSelect = style({
   border: "none",
   backgroundColor: "transparent",
@@ -52,7 +58,7 @@ export const tenantSelect = style({
   WebkitAppearance: "none",
   MozAppearance: "none",
   appearance: "none",
-  paddingRight: "30px",
+  paddingRight: "24px",
 
   selectors: {
     "&:disabled": {
@@ -64,7 +70,7 @@ export const tenantSelect = style({
 
 export const chevronIcon = style({
   position: "absolute",
-  right: "12px",
+  right: "8px",
   color: colors.textSecondary,
   fontSize: "12px",
   pointerEvents: "none",
