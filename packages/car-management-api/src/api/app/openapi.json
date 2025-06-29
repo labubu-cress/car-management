@@ -817,7 +817,6 @@
           "workdays": { "type": "array", "items": { "type": "integer" }, "nullable": true },
           "workStartTime": { "type": "integer", "nullable": true },
           "workEndTime": { "type": "integer", "nullable": true },
-          "isServiceTime": { "type": "boolean" },
           "createdAt": { "type": "string", "format": "date-time" },
           "updatedAt": { "type": "string", "format": "date-time" }
         }
