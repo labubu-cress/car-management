@@ -98,10 +98,6 @@ export const UserMessages: React.FC = () => {
       render: (value: string) => new Date(value).toLocaleString('zh-CN'),
     },
     {
-        key: 'user.phoneNumber',
-        title: '用户手机',
-    },
-    {
         key: 'user.createdAt',
         title: '注册时间',
         render: (value: string) => new Date(value).toLocaleString('zh-CN'),
