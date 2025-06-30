@@ -1,36 +1,41 @@
 import type {
-  AdminUser,
-  CarCategory,
-  CarTrim,
-  CarTrimWithFavorites,
-  ContactUsConfig,
-  CreateAdminUserInput,
-  CreateCarCategoryInput,
-  CreateCarTrimInput,
-  CreateFaqInput,
-  CreateTenantInput,
-  CreateVehicleScenarioInput,
-  DashboardStats,
-  Faq,
-  HomepageConfig,
-  LoginInput,
-  LoginResponse,
-  Tenant,
-  UpdateAdminUserInput,
-  UpdateCarCategoryInput,
-  UpdateCarTrimInput,
-  UpdateContactUsConfigInput,
-  UpdateFaqInput,
-  UpdateHomepageConfigInput,
-  UpdateTenantInput,
-  UpdateVehicleScenarioInput,
-  UploadToken,
-  User,
-  UserMessage,
-  UserWithFavorites,
-  VehicleScenario,
+    AdminUser,
+    CarCategory,
+    CarTrim,
+    CarTrimWithFavorites,
+    ContactUsConfig,
+    CreateAdminUserInput,
+    CreateCarCategoryInput,
+    CreateCarTrimInput,
+    CreateFaqInput,
+    CreateTenantInput,
+    CreateVehicleScenarioInput,
+    DashboardStats,
+    Faq,
+    HomepageConfig,
+    LoginInput,
+    LoginResponse,
+    Tenant,
+    UpdateAdminUserInput,
+    UpdateCarCategoryInput,
+    UpdateCarTrimInput,
+    UpdateContactUsConfigInput,
+    UpdateFaqInput,
+    UpdateHomepageConfigInput,
+    UpdateTenantInput,
+    UpdateVehicleScenarioInput,
+    UploadToken,
+    User,
+    UserMessage,
+    UserWithFavorites,
+    VehicleScenario,
 } from "@/types/api";
 import axios from "axios";
+
+export type ChangePasswordInput = {
+  oldPassword?: string;
+  newPassword?: string;
+};
 
 // 创建 axios 实例
 const api = axios.create({
@@ -65,6 +70,10 @@ api.interceptors.response.use(
 // 认证相关
 export const authApi = {
   login: (data: LoginInput): Promise<LoginResponse> => api.post("/auth/login", data).then((res) => res.data),
+};
+
+export const meApi = {
+  changePassword: (data: ChangePasswordInput): Promise<void> => api.put("/me/password", data).then(() => undefined),
 };
 
 // 租户管理

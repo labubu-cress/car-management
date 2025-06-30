@@ -20,6 +20,7 @@ import React from 'react';
 import { Toaster } from 'react-hot-toast';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Navigate, Route, HashRouter as Router, Routes } from 'react-router-dom';
+import ChangePassword from './pages/ChangePassword';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -74,6 +75,7 @@ const AppRoutes: React.FC = () => {
                 <Route path="/contact-us-config" element={<ContactUsConfigPage />} />
                 <Route path="/faqs" element={<Faqs />} />
                 <Route path="/user-messages" element={<UserMessages />} />
+                <Route path="/change-password" element={<ChangePassword />} />
               </Routes>
             </Layout>
           </ProtectedRoute>

@@ -1,11 +1,13 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { faBuilding, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faBuilding, faKey, faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as styles from './Header.css';
 
 export const Header: React.FC = () => {
   const { user, currentTenant, tenants, logout, selectTenant, isViewer } = useAuth();
+  const navigate = useNavigate();
 
   const handleTenantChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedTenant = tenants.find(t => t.id === e.target.value);
@@ -56,6 +58,10 @@ export const Header: React.FC = () => {
           <span className={styles.username}>{user?.username}</span>
           <span className={styles.role}>{getRoleName(user?.role)}</span>
         </div>
+        <button onClick={() => navigate('/change-password')} className={styles.logoutButton}>
+          <FontAwesomeIcon icon={faKey} />
+          修改密码
+        </button>
         <button onClick={logout} className={styles.logoutButton}>
           <FontAwesomeIcon icon={faSignOutAlt} />
           退出
