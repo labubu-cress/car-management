@@ -5,7 +5,7 @@ import { UserMessageQuerySchema } from "./schema";
 
 export const find = async (tenantId: string, { page, pageSize, status }: z.infer<typeof UserMessageQuerySchema>) => {
   const where = { tenantId, status };
-  const [messages, total] = await prisma.$transaction([
+  const [messagesFromDb, total] = await prisma.$transaction([
     prisma.userMessage.findMany({
       where,
       include: {
@@ -31,6 +31,13 @@ export const find = async (tenantId: string, { page, pageSize, status }: z.infer
     }),
     prisma.userMessage.count({ where }),
   ]);
+
+  const messages = messagesFromDb.map(({ phone, message, ...rest }) => ({
+    ...rest,
+    contact: phone,
+    content: message,
+  }));
+
   return { messages, total };
 };
 
