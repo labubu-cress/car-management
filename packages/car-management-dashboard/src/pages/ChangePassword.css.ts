@@ -12,6 +12,7 @@ export const container = style({
 });
 
 export const form = style({
+  marginTop: '1rem',
   display: 'flex',
   flexDirection: 'column',
   gap: '1.5rem',

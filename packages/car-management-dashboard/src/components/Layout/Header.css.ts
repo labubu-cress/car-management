@@ -58,7 +58,6 @@ export const tenantSelect = style({
   WebkitAppearance: "none",
   MozAppearance: "none",
   appearance: "none",
-  paddingRight: "24px",
 
   selectors: {
     "&:disabled": {
