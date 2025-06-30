@@ -10,6 +10,7 @@ import dashboardRoutes from "./features/dashboard";
 import faqsRoutes from "./features/faqs";
 import homepageConfigRoutes from "./features/homepage-config";
 import imgRoutes from "./features/img";
+import me from './features/me';
 import tenantsRoutes from "./features/tenants";
 import userMessagesRoutes from "./features/user-messages";
 import usersRoutes from "./features/users";
@@ -47,6 +48,7 @@ authProtected.use("*", authMiddleware);
 
 authProtected.route("/tenants", tenantsRoutes);
 authProtected.route("/admin-users", adminUsersRoutes);
+authProtected.route('/me', me);
 
 const tenantSpecificRoutes = new Hono<AdminAuthTenantEnv>();
 tenantSpecificRoutes.use("/*", tenantAccessMiddleware);
