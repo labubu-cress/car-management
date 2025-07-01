@@ -323,7 +323,7 @@ export const CarCategoryForm: React.FC = () => {
             />
           </FormField>
 
-          <FormField label="内部图片">
+          <FormField label="内饰图片">
             <MultiImageUpload
               values={formData.interiorImages}
               onChange={(urls) => setFormData({ ...formData, interiorImages: urls })}
@@ -332,7 +332,7 @@ export const CarCategoryForm: React.FC = () => {
             />
           </FormField>
 
-          <FormField label="外部图片">
+          <FormField label="外观图片">
             <MultiImageUpload
               values={formData.exteriorImages}
               onChange={(urls) => setFormData({ ...formData, exteriorImages: urls })}
