@@ -756,6 +756,25 @@
           "maxPrice": { "type": "number" }
         }
       },
+      "CarCategoryWithScenario": {
+        "allOf": [
+          { "$ref": "#/components/schemas/CarCategory" },
+          {
+            "type": "object",
+            "properties": {
+              "vehicleScenario": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "string" },
+                  "name": { "type": "string" }
+                },
+                "required": ["id", "name"]
+              }
+            },
+            "required": ["vehicleScenario"]
+          }
+        ]
+      },
       "CarTrim": {
         "type": "object",
         "properties": {
@@ -784,7 +803,7 @@
           {
             "type": "object",
             "properties": {
-              "category": { "$ref": "#/components/schemas/CarCategory" },
+              "category": { "$ref": "#/components/schemas/CarCategoryWithScenario" },
               "isFavorited": { "type": "boolean", "enum": [true] }
             },
             "required": ["category", "isFavorited"]
