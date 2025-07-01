@@ -341,7 +341,7 @@ export const CarCategoryForm: React.FC = () => {
             />
           </FormField>
 
-          <FormField label="报价图">
+          <FormField label="车主权益图片">
             <MultiImageUpload
               values={formData.offerPictures}
               onChange={(urls) => setFormData({ ...formData, offerPictures: urls })}
