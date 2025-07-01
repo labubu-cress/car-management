@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/db";
 import type { UserFavoriteCarTrim } from "@prisma/client";
 import type { CarCategory } from "../car-categories/types";
-import type { CarTrimWithCategory } from "../car-trims/types";
 import type { CarFeature } from "../shared/schema";
+import type { FavoriteCarTrim } from "./types";
 
 // This is getting repetitive. Maybe I should have a transformer file.
 const transformPrismaCategory = (category: any, trimIsArchived: boolean): CarCategory => {
@@ -20,8 +20,16 @@ const transformPrismaCategory = (category: any, trimIsArchived: boolean): CarCat
   };
 };
 
-const transformPrismaTrimWithCategory = (trim: any): CarTrimWithCategory => {
+const transformPrismaTrimWithCategory = (trim: any): FavoriteCarTrim => {
   const { features, originalPrice, currentPrice, category, ...rest } = trim;
+
+  const newCategory = transformPrismaCategory(category, trim.isArchived) as any;
+  if (category.vehicleScenario) {
+    newCategory.vehicleScenario = {
+      id: category.vehicleScenario.id,
+      name: category.vehicleScenario.name,
+    };
+  }
 
   return {
     ...rest,
@@ -29,17 +37,26 @@ const transformPrismaTrimWithCategory = (trim: any): CarTrimWithCategory => {
     currentPrice: currentPrice.toNumber(),
     features: (features as CarFeature[]) ?? [],
     isFavorited: true,
-    category: transformPrismaCategory(category, trim.isArchived),
+    category: newCategory,
   };
 };
 
-export async function getFavorites(userId: string): Promise<CarTrimWithCategory[]> {
+export async function getFavorites(userId: string): Promise<FavoriteCarTrim[]> {
   const favorites = await prisma.userFavoriteCarTrim.findMany({
     where: { userId },
     include: {
       carTrim: {
         include: {
-          category: true,
+          category: {
+            include: {
+              vehicleScenario: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
         },
       },
     },
