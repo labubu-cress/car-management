@@ -3,12 +3,12 @@ import { prisma } from "@/lib/db";
 import type { CarTrim } from "@prisma/client";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import {
-  clearTestDb,
-  createTestTenant,
-  createTestUser,
-  getTestAppUserToken,
-  type TestTenant,
-  type TestUser,
+    clearTestDb,
+    createTestTenant,
+    createTestUser,
+    getTestAppUserToken,
+    type TestTenant,
+    type TestUser,
 } from "../../helper";
 
 describe("App API: /api/v1/app/favorites", () => {
@@ -165,5 +165,31 @@ describe("App API: /api/v1/app/favorites", () => {
       where: { id: carTrim.id },
       data: { isArchived: false },
     });
+  });
+
+  it("should include vehicleScenario in the favorite list", async () => {
+    // Add trim to favorites
+    await prisma.userFavoriteCarTrim.create({
+      data: {
+        userId: user.id,
+        carTrimId: carTrim.id,
+      },
+    });
+
+    const listResponse = await app.request(`/api/v1/app/tenants/${tenant.id}/favorites`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    expect(listResponse.status).toBe(200);
+    const favorites = (await listResponse.json()) as any[];
+
+    expect(favorites).toHaveLength(1);
+    expect(favorites[0].category).toHaveProperty("vehicleScenario");
+
+    const scenarioInBeforeAll = await prisma.vehicleScenario.findFirst({
+      where: { name: "Test Scenario for Favorites" },
+    });
+    expect(favorites[0].category.vehicleScenario.id).toBe(scenarioInBeforeAll?.id);
+    expect(favorites[0].category.vehicleScenario.name).toBe(scenarioInBeforeAll?.name);
   });
 });
