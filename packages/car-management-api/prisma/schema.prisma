@@ -130,6 +130,7 @@ model CarTrim {
   badge          String?
   originalPrice  Decimal
   currentPrice   Decimal
+  priceOverrideText String?
   features       Json // CarFeature[]
   categoryId     String
   category       CarCategory @relation(fields: [categoryId], references: [id])
