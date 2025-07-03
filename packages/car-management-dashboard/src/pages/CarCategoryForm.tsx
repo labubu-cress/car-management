@@ -1,11 +1,13 @@
 import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { carCategoryFormStyles } from './CarCategoryForm.css';
 import { CarCategoryFormUI } from './CarCategoryFormUI';
 import { useCarCategoryForm } from './useCarCategoryForm';
 
 export const CarCategoryForm: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const vehicleScenarioId = searchParams.get('vehicleScenarioId');
   const navigate = useNavigate();
   const {
     isEdit,
@@ -19,7 +21,7 @@ export const CarCategoryForm: React.FC = () => {
     handleBack,
     currentTenant,
     isViewer,
-  } = useCarCategoryForm(id);
+  } = useCarCategoryForm(id, vehicleScenarioId);
 
   if (!currentTenant) {
     return <div>加载租户信息...</div>;

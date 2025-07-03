@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 
-export const useCarCategoryForm = (id?: string) => {
+export const useCarCategoryForm = (id?: string, vehicleScenarioIdFromQuery?: string | null) => {
   const navigate = useNavigate();
   const { currentTenant, isViewer } = useAuth();
   const queryClient = useQueryClient();
@@ -40,13 +40,18 @@ export const useCarCategoryForm = (id?: string) => {
     () => (currentTenant ? vehicleScenariosApi.getAll(currentTenant.id) : Promise.resolve([])),
     {
       enabled: !!currentTenant,
-      onSuccess: (data) => {
-        if (data.length > 0 && !formData.vehicleScenarioId && !isEdit) {
-          setFormData((prev) => ({ ...prev, vehicleScenarioId: data[0].id }));
-        }
-      },
     }
   );
+
+  useEffect(() => {
+    if (isEdit) return;
+
+    if (vehicleScenarioIdFromQuery) {
+      setFormData((prev) => ({ ...prev, vehicleScenarioId: vehicleScenarioIdFromQuery }));
+    } else if (scenarios.length > 0) {
+      setFormData((prev) => ({ ...prev, vehicleScenarioId: scenarios[0].id }));
+    }
+  }, [isEdit, vehicleScenarioIdFromQuery, scenarios]);
 
   const { isLoading } = useQuery(
     ['car-category', currentTenant?.id, id],

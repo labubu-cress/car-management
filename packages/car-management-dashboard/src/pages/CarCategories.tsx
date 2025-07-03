@@ -23,7 +23,7 @@ export const CarCategories: React.FC = () => {
   } = useCarCategories();
 
   const handleAdd = () => {
-    navigate('/car-categories/new');
+    navigate(`/car-categories/new?vehicleScenarioId=${selectedScenarioId}`);
   };
 
   const handleEdit = (category: CarCategory) => {
