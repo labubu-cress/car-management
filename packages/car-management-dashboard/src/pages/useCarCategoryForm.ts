@@ -89,7 +89,7 @@ export const useCarCategoryForm = (id?: string, vehicleScenarioIdFromQuery?: str
         toast.success('车型创建成功');
         queryClient.invalidateQueries(['car-categories', currentTenant?.id]);
         queryClient.invalidateQueries(['dashboard-stats', currentTenant?.id]);
-        navigate('/car-categories');
+        navigate(`/car-categories?vehicleScenarioId=${formData.vehicleScenarioId}`);
       },
       onError: (error: any) => {
         toast.error(error.response?.data?.message || '创建车型失败');
@@ -105,7 +105,7 @@ export const useCarCategoryForm = (id?: string, vehicleScenarioIdFromQuery?: str
         toast.success('车型更新成功');
         queryClient.invalidateQueries(['car-categories', currentTenant?.id]);
         queryClient.invalidateQueries(['dashboard-stats', currentTenant?.id]);
-        navigate('/car-categories');
+        navigate(`/car-categories?vehicleScenarioId=${formData.vehicleScenarioId}`);
       },
       onError: (error: any) => {
         toast.error(error.response?.data?.message || '更新车型失败');
@@ -166,7 +166,7 @@ export const useCarCategoryForm = (id?: string, vehicleScenarioIdFromQuery?: str
   };
 
   const handleBack = () => {
-    navigate('/car-categories');
+    navigate(`/car-categories?vehicleScenarioId=${formData.vehicleScenarioId || vehicleScenarioIdFromQuery || ''}`);
   };
 
   const isSubmitting = createMutation.isLoading || updateMutation.isLoading;

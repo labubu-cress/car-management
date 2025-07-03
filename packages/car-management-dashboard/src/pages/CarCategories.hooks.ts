@@ -4,11 +4,17 @@ import { CarCategory } from '@/types/api';
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useSearchParams } from 'react-router-dom';
 
 export const useCarCategories = () => {
   const { currentTenant, isViewer } = useAuth();
   const queryClient = useQueryClient();
-  const [selectedScenarioId, setSelectedScenarioId] = useState<string>('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedScenarioId = searchParams.get('vehicleScenarioId') || '';
+
+  const setSelectedScenarioId = (id: string) => {
+    setSearchParams({ vehicleScenarioId: id });
+  };
 
   const { data: scenarios = [] } = useQuery(
     ['vehicle-scenarios', currentTenant?.id],
