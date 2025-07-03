@@ -1,4 +1,4 @@
-import { CarCategory, VehicleScenario } from '@/types/api';
+import { CarCategory } from '@/types/api';
 import React from 'react';
 
 interface CarTrimsHeaderProps {
@@ -7,9 +7,6 @@ interface CarTrimsHeaderProps {
   onCategoryChange: (id: string) => void;
   statusFilter: 'all' | 'archived' | 'active';
   onStatusFilterChange: (status: 'all' | 'archived' | 'active') => void;
-  scenarios: VehicleScenario[];
-  selectedScenarioId: string;
-  onScenarioChange: (id:string) => void;
 }
 
 export const CarTrimsHeader: React.FC<CarTrimsHeaderProps> = ({
@@ -18,9 +15,6 @@ export const CarTrimsHeader: React.FC<CarTrimsHeaderProps> = ({
   onCategoryChange,
   statusFilter,
   onStatusFilterChange,
-  scenarios,
-  selectedScenarioId,
-  onScenarioChange,
 }) => {
   return (
     <div
@@ -33,31 +27,6 @@ export const CarTrimsHeader: React.FC<CarTrimsHeaderProps> = ({
       }}
     >
       <div style={{ display: 'flex', gap: '20px' }}>
-        <div>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151' }}>
-            选择场景：
-          </label>
-          <select
-            value={selectedScenarioId}
-            onChange={(e) => onScenarioChange(e.target.value)}
-            style={{
-              padding: '8px 32px 8px 12px',
-              border: '1px solid #d1d5db',
-              borderRadius: '6px',
-              fontSize: '14px',
-              minWidth: '200px',
-              outline: 'none',
-            }}
-            disabled={scenarios.length <= 1}
-          >
-            {scenarios.length > 1 && <option value="">请选择场景</option>}
-            {scenarios.map((scenario) => (
-              <option key={scenario.id} value={scenario.id}>
-                {scenario.name}
-              </option>
-            ))}
-          </select>
-        </div>
         <div>
           <label style={{ display: 'block', marginBottom: '8px', fontWeight: '600', color: '#374151' }}>
             选择车型：

@@ -1,5 +1,5 @@
 import { useAuth } from '@/contexts/AuthContext';
-import { carCategoriesApi, carTrimsApi, vehicleScenariosApi } from '@/lib/api';
+import { carCategoriesApi, carTrimsApi } from '@/lib/api';
 import { CarTrim } from '@/types/api';
 import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -12,29 +12,15 @@ export const useCarTrims = () => {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<'all' | 'archived' | 'active'>('all');
-  const [selectedScenarioId, setSelectedScenarioId] = useState<string>('');
-
-  const { data: scenarios = [] } = useQuery(
-    ['vehicle-scenarios', currentTenant?.id],
-    () => (currentTenant ? vehicleScenariosApi.getAll(currentTenant.id) : Promise.resolve([])),
-    {
-      enabled: !!currentTenant,
-      onSuccess: (data) => {
-        if (data.length > 0 && !selectedScenarioId) {
-          setSelectedScenarioId(data[0].id);
-        }
-      },
-    },
-  );
 
   const { data: categories = [] } = useQuery(
-    ['car-categories', currentTenant?.id, selectedScenarioId],
+    ['car-categories', currentTenant?.id],
     () =>
-      currentTenant && selectedScenarioId
-        ? carCategoriesApi.getAll(currentTenant.id, undefined, selectedScenarioId)
+      currentTenant
+        ? carCategoriesApi.getAll(currentTenant.id, undefined)
         : Promise.resolve([]),
     {
-      enabled: !!currentTenant && !!selectedScenarioId,
+      enabled: !!currentTenant,
       onSuccess: (data) => {
         if (data.length > 0 && !selectedCategoryId) {
           setSelectedCategoryId(data[0].id);
@@ -109,7 +95,7 @@ export const useCarTrims = () => {
   });
 
   const handleAdd = () => {
-    navigate(`/car-trims/new?categoryId=${selectedCategoryId}&vehicleScenarioId=${selectedScenarioId}`);
+    navigate(`/car-trims/new?categoryId=${selectedCategoryId}`);
   };
 
   const handleEdit = (trim: CarTrim) => {
@@ -167,8 +153,5 @@ export const useCarTrims = () => {
     handleReorder,
     getActions,
     currentTenant,
-    scenarios,
-    selectedScenarioId,
-    setSelectedScenarioId,
   };
 }; 

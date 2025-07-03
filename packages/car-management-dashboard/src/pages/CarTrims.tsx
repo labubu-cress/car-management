@@ -22,9 +22,6 @@ export const CarTrims: React.FC = () => {
     handleAdd,
     handleReorder,
     getActions,
-    scenarios,
-    selectedScenarioId,
-    setSelectedScenarioId,
   } = useCarTrims();
 
   if (categories.length === 0) {
@@ -47,9 +44,6 @@ export const CarTrims: React.FC = () => {
         onCategoryChange={setSelectedCategoryId}
         statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
-        scenarios={scenarios}
-        selectedScenarioId={selectedScenarioId}
-        onScenarioChange={setSelectedScenarioId}
       />
 
       <DataTable
