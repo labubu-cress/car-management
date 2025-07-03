@@ -4,14 +4,21 @@ import { CarTrim } from '@/types/api';
 import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export const useCarTrims = () => {
   const { currentTenant, isViewer } = useAuth();
   const navigate = useNavigate();
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedCategoryId = searchParams.get('categoryId') || '';
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<'all' | 'archived' | 'active'>('all');
+
+  const setSelectedCategoryId = (categoryId: string) => {
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set('categoryId', categoryId);
+    setSearchParams(newSearchParams);
+  };
 
   const { data: categories = [] } = useQuery(
     ['car-categories', currentTenant?.id],
@@ -154,4 +161,4 @@ export const useCarTrims = () => {
     getActions,
     currentTenant,
   };
-}; 
+};

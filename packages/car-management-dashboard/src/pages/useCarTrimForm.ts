@@ -86,7 +86,7 @@ export const useCarTrimForm = () => {
         toast.success('车型参数创建成功');
         queryClient.invalidateQueries(['car-trims']);
         queryClient.invalidateQueries(['dashboard-stats', currentTenant?.id]);
-        navigate('/car-trims');
+        navigate(`/car-trims?categoryId=${formData.categoryId}`);
       },
       onError: (error: any) => {
         toast.error(error.response?.data?.message || '创建车型参数失败');
@@ -102,7 +102,7 @@ export const useCarTrimForm = () => {
         toast.success('车型参数更新成功');
         queryClient.invalidateQueries(['car-trims']);
         queryClient.invalidateQueries(['dashboard-stats', currentTenant?.id]);
-        navigate('/car-trims');
+        navigate(`/car-trims?categoryId=${formData.categoryId}`);
       },
       onError: (error: any) => {
         toast.error(error.response?.data?.message || '更新车型参数失败');
@@ -176,7 +176,7 @@ export const useCarTrimForm = () => {
   };
 
   const handleBack = () => {
-    navigate('/car-trims');
+    navigate(`/car-trims?categoryId=${formData.categoryId}`);
   };
 
   const isSubmitting = createMutation.isLoading || updateMutation.isLoading;
