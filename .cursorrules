@@ -6,3 +6,4 @@ prisma generate 以后，编辑器不会马上更新类型，需要 restart ts l
 app 后端的接口变更，在测试通过后，需要跟新 openapi.json
 为接口编写的测试文件，在测试通过以后，需要被保留，除非是重复的测试。
 修改完前端代码，确保 npm run build 能编译通过。
+单个文件 ts 或 tsx 文件不要超过 200 行
