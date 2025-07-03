@@ -2,7 +2,7 @@ import { DataTable } from '@/components/DataTable';
 import { EmptyState } from '@/components/EmptyState';
 import { faCar } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCarTrims } from './CarTrims.hooks';
 import { columns } from './CarTrimsColumns';
@@ -23,6 +23,14 @@ export const CarTrims: React.FC = () => {
     handleReorder,
     getActions,
   } = useCarTrims();
+
+  const trimsWithCategory = useMemo(() => {
+    const categoryMap = new Map(categories.map((c) => [c.id, c.image]));
+    return filteredTrims.map((trim) => ({
+      ...trim,
+      categoryImage: categoryMap.get(trim.categoryId),
+    }));
+  }, [filteredTrims, categories]);
 
   if (categories.length === 0) {
     return (
@@ -49,7 +57,7 @@ export const CarTrims: React.FC = () => {
       <DataTable
         title="车型参数管理"
         columns={columns}
-        data={filteredTrims}
+        data={trimsWithCategory}
         loading={isLoading}
         addButtonText="创建车型参数"
         onAdd={selectedCategoryId && !isViewer ? handleAdd : undefined}

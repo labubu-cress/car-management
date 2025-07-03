@@ -17,7 +17,6 @@ export const useCarTrimForm = () => {
   const [formData, setFormData] = useState({
     name: '',
     subtitle: '',
-    image: '',
     configImageUrl: '',
     originalPrice: '',
     currentPrice: '',
@@ -59,7 +58,6 @@ export const useCarTrimForm = () => {
           setFormData({
             name: data.name,
             subtitle: data.subtitle,
-            image: data.image,
             configImageUrl: data.configImageUrl || '',
             originalPrice: data.originalPrice,
             currentPrice: data.currentPrice,
@@ -119,10 +117,6 @@ export const useCarTrimForm = () => {
       newErrors.subtitle = '请输入副标题';
     }
 
-    if (!formData.image.trim()) {
-      newErrors.image = '请上传车型参数图片';
-    }
-
     if (!formData.originalPrice.trim()) {
       newErrors.originalPrice = '请输入原价';
     }
@@ -157,7 +151,6 @@ export const useCarTrimForm = () => {
       ...restFormData,
       name: formData.name.trim(),
       subtitle: formData.subtitle.trim(),
-      image: formData.image.trim(),
       configImageUrl: formData.configImageUrl?.trim() || undefined,
       originalPrice: formData.originalPrice.trim(),
       badge: formData.badge.trim() || undefined,

@@ -121,7 +121,6 @@ export const Users: React.FC = () => {
               <ul style={{ listStyleType: 'none', paddingLeft: 0, margin: 0 }}>
                 {userDetails.favoriteCarTrims.map((fav) => (
                   <li key={fav.carTrimId} style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-                    <img src={fav.carTrim.image} alt={fav.carTrim.name} style={{ width: '100px', height: 'auto', marginRight: '16px', borderRadius: '8px', objectFit: 'cover' }}/>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
                       <strong style={{ marginBottom: '8px' }}>{fav.carTrim.name}</strong>
                       <span style={{ fontSize: '12px', color: '#666' }}>收藏于: {new Date(fav.createdAt).toLocaleString('zh-CN')}</span>

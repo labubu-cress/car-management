@@ -130,7 +130,6 @@ export interface CarTrim {
   tenantId: string;
   name: string;
   subtitle: string;
-  image: string;
   configImageUrl?: string;
   originalPrice: string;
   currentPrice: string;
@@ -146,7 +145,6 @@ export interface CarTrim {
 export interface CreateCarTrimInput {
   name: string;
   subtitle: string;
-  image: string;
   configImageUrl?: string;
   originalPrice: string;
   currentPrice: string;
@@ -160,7 +158,6 @@ export interface CreateCarTrimInput {
 export interface UpdateCarTrimInput {
   name?: string;
   subtitle?: string;
-  image?: string;
   configImageUrl?: string;
   originalPrice?: string;
   currentPrice?: string;

@@ -55,15 +55,6 @@ export const CarTrimFormUI: React.FC<CarTrimFormUIProps> = ({
             />
           </FormField>
 
-          <FormField label="车型参数图片" required error={errors.image}>
-            <ImageUpload
-              value={formData.image}
-              onChange={(url) => setFormData({ ...formData, image: url })}
-              tenantId={currentTenant!.id}
-              disabled={isSubmitting || isViewer}
-            />
-          </FormField>
-
           <FormField label="配置参数详情图片" error={errors.configImageUrl}>
             <ImageUpload
               value={formData.configImageUrl}
