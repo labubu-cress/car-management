@@ -5,25 +5,29 @@ import { CreateCarTrimInput, UpdateCarTrimInput } from '@/types/api';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 export const useCarTrimForm = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { search } = useLocation();
   const { currentTenant, isViewer } = useAuth();
   const queryClient = useQueryClient();
   const isEdit = !!id;
 
-  const [formData, setFormData] = useState({
-    name: '',
-    subtitle: '',
-    configImageUrl: '',
-    originalPrice: '',
-    currentPrice: '',
-    priceOverrideText: '',
-    badge: '',
-    features: [] as Highlight[],
-    categoryId: '',
+  const [formData, setFormData] = useState(() => {
+    const params = new URLSearchParams(search);
+    return {
+      name: '',
+      subtitle: '',
+      configImageUrl: '',
+      originalPrice: '',
+      currentPrice: '',
+      priceOverrideText: '',
+      badge: '',
+      features: [] as Highlight[],
+      categoryId: params.get('categoryId') || '',
+    };
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});

@@ -33,6 +33,24 @@ export const CarTrimFormUI: React.FC<CarTrimFormUIProps> = ({
         <div className={carTrimFormStyles.section}>
           <h2 className={carTrimFormStyles.sectionTitle}>基本信息</h2>
 
+          <FormField label="所属车型" required error={errors.categoryId}>
+            <select
+              value={formData.categoryId}
+              onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
+              className={formFieldStyles.select}
+              disabled={isSubmitting || isViewer}
+            >
+              <option value="" disabled>
+                请选择车型
+              </option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </FormField>
+
           <FormField label="车型参数名称" required error={errors.name}>
             <input
               type="text"
@@ -62,24 +80,6 @@ export const CarTrimFormUI: React.FC<CarTrimFormUIProps> = ({
               tenantId={currentTenant!.id}
               disabled={isSubmitting || isViewer}
             />
-          </FormField>
-
-          <FormField label="所属车型" required error={errors.categoryId}>
-            <select
-              value={formData.categoryId}
-              onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-              className={formFieldStyles.select}
-              disabled={isSubmitting || isViewer}
-            >
-              <option value="" disabled>
-                请选择车型
-              </option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
           </FormField>
 
           <FormField label="优惠政策亮点" required error={errors.badge}>
