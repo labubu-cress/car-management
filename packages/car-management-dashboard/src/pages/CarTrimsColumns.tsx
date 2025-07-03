@@ -1,23 +1,7 @@
 import { Column } from '@/components/DataTable';
 import { CarTrim } from '@/types/api';
 
-export interface CarTrimWithCategory extends CarTrim {
-  categoryImage?: string;
-}
-
-export const columns: Column<CarTrimWithCategory>[] = [
-  {
-    key: 'categoryImage',
-    title: '车型图片',
-    width: '100px',
-    render: (value: string) => (
-      <img
-        src={value}
-        alt="车型图片"
-        style={{ width: '60px', height: '40px', objectFit: 'cover', borderRadius: '4px' }}
-      />
-    ),
-  },
+export const columns: Column<CarTrim>[] = [
   {
     key: 'configImageUrl',
     title: '配置图片',
