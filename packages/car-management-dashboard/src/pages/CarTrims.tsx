@@ -142,7 +142,9 @@ export const CarTrims: React.FC = () => {
       key: 'currentPrice',
       title: '现价',
       width: '120px',
-      render: (value: string) => <span style={{ color: '#f50', fontWeight: '600' }}>{value}</span>,
+      render: (value: string, record: CarTrim) => (
+        <span style={{ color: '#f50', fontWeight: '600' }}>{record.priceOverrideText || value}</span>
+      ),
     },
     {
       key: 'badge',

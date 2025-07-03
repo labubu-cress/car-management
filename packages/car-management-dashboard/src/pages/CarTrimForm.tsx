@@ -161,7 +161,7 @@ export const CarTrimForm: React.FC = () => {
 
     const { features, ...restFormData } = formData;
 
-    const commonData = {
+    const baseData = {
       ...restFormData,
       name: formData.name.trim(),
       subtitle: formData.subtitle.trim(),
@@ -172,17 +172,17 @@ export const CarTrimForm: React.FC = () => {
       features: formData.features.length > 0 ? formData.features : undefined,
       categoryId: formData.categoryId,
     };
-    
-    if (commonData.priceOverrideText) {
-      commonData.currentPrice = commonData.originalPrice;
-    } else {
-      commonData.priceOverrideText = undefined;
-    }
+
+    const data = {
+      ...baseData,
+      currentPrice: baseData.priceOverrideText ? baseData.originalPrice : baseData.currentPrice,
+      priceOverrideText: baseData.priceOverrideText ? baseData.priceOverrideText : undefined,
+    };
 
     if (isEdit && id) {
-      updateMutation.mutate({ id, data: commonData });
+      updateMutation.mutate({ id, data });
     } else {
-      createMutation.mutate(commonData);
+      createMutation.mutate(data);
     }
   };
 
