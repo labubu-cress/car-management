@@ -146,4 +146,33 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims CREATE", () => {
     });
     expect(body.configImageUrl).toBeNull();
   });
+
+  it("should create a new car trim with priceOverrideText", async () => {
+    const newTrim: CreateCarTrimInput = {
+      name: "联系我们版",
+      subtitle: "具体价格请联系我们",
+      image: "https://example.com/trim-contact-us.jpg",
+      originalPrice: 600000,
+      currentPrice: 600000,
+      priceOverrideText: "具体价格请联系我们",
+      features: [],
+      categoryId: categoryId,
+    };
+    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/car-trims`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${adminUser.token}`,
+      },
+      body: JSON.stringify(newTrim),
+    });
+    expect(response.status).toBe(201);
+    const body = (await response.json()) as CarTrim;
+
+    expect(body).toMatchObject({
+      name: newTrim.name,
+      priceOverrideText: newTrim.priceOverrideText,
+    });
+    expect(body.priceOverrideText).toBe("具体价格请联系我们");
+  });
 }); 

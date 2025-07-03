@@ -787,6 +787,7 @@
           "badge": { "type": "string", "nullable": true },
           "originalPrice": { "type": "number" },
           "currentPrice": { "type": "number" },
+          "priceOverrideText": { "type": "string", "nullable": true },
           "features": { "type": "array", "items": { "$ref": "#/components/schemas/CarFeature" } },
           "categoryId": { "type": "string" },
           "displayOrder": { "type": "integer" },

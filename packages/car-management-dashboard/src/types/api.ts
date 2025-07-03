@@ -134,6 +134,7 @@ export interface CarTrim {
   configImageUrl?: string;
   originalPrice: string;
   currentPrice: string;
+  priceOverrideText?: string;
   badge?: string;
   features?: Feature[];
   categoryId: string;
@@ -149,6 +150,7 @@ export interface CreateCarTrimInput {
   configImageUrl?: string;
   originalPrice: string;
   currentPrice: string;
+  priceOverrideText?: string;
   badge?: string;
   features?: Feature[];
   categoryId: string;
@@ -162,6 +164,7 @@ export interface UpdateCarTrimInput {
   configImageUrl?: string;
   originalPrice?: string;
   currentPrice?: string;
+  priceOverrideText?: string;
   badge?: string;
   features?: Feature[];
   categoryId?: string;

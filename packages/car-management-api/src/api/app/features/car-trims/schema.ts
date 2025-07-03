@@ -12,6 +12,7 @@ export const carTrimSchema = z.object({
   badge: z.string().nullable(),
   originalPrice: z.coerce.number(),
   currentPrice: z.coerce.number(),
+  priceOverrideText: z.string().nullable(),
   features: z.array(carFeatureSchema),
   categoryId: z.string(),
   displayOrder: z.number(),

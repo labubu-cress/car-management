@@ -1,6 +1,6 @@
+import type { CarTrim } from "@/api/app/features/car-trims/types";
 import app from "@/index";
 import { prisma } from "@/lib/db";
-import type { CarTrim } from "@prisma/client";
 import { beforeEach, describe, expect, it } from "vitest";
 import { clearTestDb, createTestTenant, type TestTenant } from "../../helper";
 
@@ -45,6 +45,7 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-trims", () => {
         configImageUrl: "https://example.com/config-image-app.jpg",
         originalPrice: 100000,
         currentPrice: 90000,
+        priceOverrideText: "Contact us for price",
         features: [{ title: "Test Feature", icon: "test_icon.jpg" }],
         categoryId: categoryId,
         tenantId: tenant.id,
@@ -80,6 +81,7 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-trims", () => {
     expect(trimWithConfig?.configImageUrl).toBe("https://example.com/config-image-app.jpg");
     expect(trimWithConfig?.categoryId).toBe(categoryId);
     expect(trimWithConfig?.tenantId).toBe(tenant.id);
+    expect(trimWithConfig?.priceOverrideText).toBe("Contact us for price");
 
     const trimWithoutConfig = body.find((t) => t.name === "Test Trim App 2");
     expect(trimWithoutConfig).toBeDefined();
@@ -134,6 +136,7 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-trims", () => {
     expect(body.id).toBe(trimId);
     expect(body.name).toBe("Test Trim App");
     expect(body.configImageUrl).toBe("https://example.com/config-image-app.jpg");
+    expect(body.priceOverrideText).toBe("Contact us for price");
     expect(body.categoryId).toBe(categoryId);
     expect(body.tenantId).toBe(tenant.id);
     expect(body.features).toEqual([{ title: "Test Feature", icon: "test_icon.jpg" }]);

@@ -25,6 +25,7 @@ export const CarTrimForm: React.FC = () => {
     configImageUrl: '',
     originalPrice: '',
     currentPrice: '',
+    priceOverrideText: '',
     badge: '',
     features: [] as Highlight[],
     categoryId: '',
@@ -68,6 +69,7 @@ export const CarTrimForm: React.FC = () => {
             configImageUrl: data.configImageUrl || '',
             originalPrice: data.originalPrice,
             currentPrice: data.currentPrice,
+            priceOverrideText: data.priceOverrideText || '',
             badge: data.badge || '',
             features: data.features || [],
             categoryId: data.categoryId,
@@ -133,8 +135,8 @@ export const CarTrimForm: React.FC = () => {
       newErrors.originalPrice = '请输入原价';
     }
     
-    if (!formData.currentPrice.trim()) {
-      newErrors.currentPrice = '请输入现价';
+    if (!formData.currentPrice.trim() && !formData.priceOverrideText.trim()) {
+      newErrors.currentPrice = '请输入现价或相关说明文字';
     }
     
     if (!formData.categoryId) {
@@ -157,34 +159,30 @@ export const CarTrimForm: React.FC = () => {
       return;
     }
 
-    if (isEdit && id) {
-      const commonData = {
-        name: formData.name.trim(),
-        subtitle: formData.subtitle.trim(),
-        image: formData.image.trim(),
-        configImageUrl: formData.configImageUrl?.trim() || undefined,
-        originalPrice: formData.originalPrice.trim(),
-        currentPrice: formData.currentPrice.trim(),
-        badge: formData.badge.trim() || undefined,
-        features: formData.features.length > 0 ? formData.features : undefined,
-        categoryId: formData.categoryId,
-      };
-      const updateData: UpdateCarTrimInput = commonData;
-      updateMutation.mutate({ id, data: updateData });
+    const { features, ...restFormData } = formData;
+
+    const commonData = {
+      ...restFormData,
+      name: formData.name.trim(),
+      subtitle: formData.subtitle.trim(),
+      image: formData.image.trim(),
+      configImageUrl: formData.configImageUrl?.trim() || undefined,
+      originalPrice: formData.originalPrice.trim(),
+      badge: formData.badge.trim() || undefined,
+      features: formData.features.length > 0 ? formData.features : undefined,
+      categoryId: formData.categoryId,
+    };
+    
+    if (commonData.priceOverrideText) {
+      commonData.currentPrice = commonData.originalPrice;
     } else {
-      const commonData = {
-        name: formData.name.trim(),
-        subtitle: formData.subtitle.trim(),
-        image: formData.image.trim(),
-        configImageUrl: formData.configImageUrl?.trim() || undefined,
-        originalPrice: formData.originalPrice.trim(),
-        currentPrice: formData.currentPrice.trim(),
-        badge: formData.badge.trim() || undefined,
-        features: formData.features.length > 0 ? formData.features : undefined,
-        categoryId: formData.categoryId,
-      };
-      const createData: CreateCarTrimInput = commonData;
-      createMutation.mutate(createData);
+      commonData.priceOverrideText = undefined;
+    }
+
+    if (isEdit && id) {
+      updateMutation.mutate({ id, data: commonData });
+    } else {
+      createMutation.mutate(commonData);
     }
   };
 
@@ -310,24 +308,38 @@ export const CarTrimForm: React.FC = () => {
         <div className={carTrimFormStyles.section}>
           <h2 className={carTrimFormStyles.sectionTitle}>价格信息</h2>
           
-          <FormField label="原价（元）" required error={errors.originalPrice}>
+          <FormField label="原价" required error={errors.originalPrice}>
             <input
               type="text"
+              inputMode="decimal"
               value={formData.originalPrice}
-              onChange={(e) => setFormData({ ...formData, originalPrice: e.target.value })}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                  setFormData({ ...formData, originalPrice: value });
+                }
+              }}
               className={formFieldStyles.input}
-              placeholder="如: 299800"
+              placeholder="请输入厂商指导价"
               disabled={isSubmitting || isViewer}
             />
           </FormField>
 
-          <FormField label="现价（元）" required error={errors.currentPrice}>
+          <FormField label="现价" required error={errors.currentPrice}>
             <input
               type="text"
-              value={formData.currentPrice}
-              onChange={(e) => setFormData({ ...formData, currentPrice: e.target.value })}
+              value={formData.priceOverrideText || formData.currentPrice}
+              onChange={(e) => {
+                const value = e.target.value;
+                const isNumeric = value === '' || !isNaN(Number(value));
+                if (isNumeric) {
+                  setFormData({ ...formData, currentPrice: value, priceOverrideText: '' });
+                } else {
+                  setFormData({ ...formData, priceOverrideText: value });
+                }
+              }}
               className={formFieldStyles.input}
-              placeholder="如: 259800"
+              placeholder="请输入当前售价或说明文字"
               disabled={isSubmitting || isViewer}
             />
           </FormField>
