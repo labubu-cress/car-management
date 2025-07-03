@@ -782,7 +782,6 @@
           "tenantId": { "type": "string" },
           "name": { "type": "string" },
           "subtitle": { "type": "string" },
-          "image": { "type": "string" },
           "configImageUrl": { "type": "string", "nullable": true },
           "badge": { "type": "string", "nullable": true },
           "originalPrice": { "type": "number" },

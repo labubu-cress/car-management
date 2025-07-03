@@ -41,7 +41,6 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/dashboard", () => {
       data: {
         name: "Test Trim",
         subtitle: "A nice trim",
-        image: "https://example.com/image.jpg",
         originalPrice: 50000,
         currentPrice: 48000,
         features: [],

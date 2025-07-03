@@ -125,7 +125,6 @@ model CarTrim {
   tenant         Tenant      @relation(fields: [tenantId], references: [id])
   name           String
   subtitle       String
-  image          String
   configImageUrl String?
   badge          String?
   originalPrice  Decimal

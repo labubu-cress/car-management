@@ -43,7 +43,6 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims GET/UPDATE/DELETE
       data: {
         name: "Test Trim for Get",
         subtitle: "A nice trim",
-        image: "https://example.com/trim.jpg",
         configImageUrl: "https://example.com/trim-get-config.jpg",
         originalPrice: "50000",
         currentPrice: "48000",
@@ -95,7 +94,6 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims GET/UPDATE/DELETE
       data: {
         name: "Trim to Delete",
         subtitle: "A trim to be deleted",
-        image: "https://example.com/trim-delete.jpg",
         originalPrice: "600000",
         currentPrice: "560000",
         features: [],
@@ -124,7 +122,6 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims GET/UPDATE/DELETE
       data: {
         name: "Test Trim for Update",
         subtitle: "Initial subtitle",
-        image: "https://example.com/trim_initial.jpg",
         originalPrice: "60000",
         currentPrice: "55000",
         features: [],
@@ -156,7 +153,6 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims GET/UPDATE/DELETE
       data: {
         name: "Test Trim for Price Override",
         subtitle: "Initial subtitle",
-        image: "https://example.com/trim_initial.jpg",
         originalPrice: "60000",
         currentPrice: "55000",
         features: [],

@@ -7,7 +7,6 @@ export const carTrimSchema = z.object({
   tenantId: z.string(),
   name: z.string(),
   subtitle: z.string(),
-  image: z.string(),
   configImageUrl: z.string().nullable(),
   badge: z.string().nullable(),
   originalPrice: z.coerce.number(),

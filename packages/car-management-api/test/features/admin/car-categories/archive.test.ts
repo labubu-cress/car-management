@@ -62,7 +62,6 @@ describe("Admin API: car-categories isArchived logic", () => {
         isArchived: true,
         categoryId: categoryId,
         tenantId: tenantId,
-        image: "https://example.com/trim1.jpg",
       },
     });
     await prisma.carTrim.create({
@@ -75,7 +74,6 @@ describe("Admin API: car-categories isArchived logic", () => {
         isArchived: false,
         categoryId: categoryId,
         tenantId: tenantId,
-        image: "https://example.com/trim2.jpg",
       },
     });
 
@@ -110,7 +108,6 @@ describe("Admin API: car-categories isArchived logic", () => {
         isArchived: false,
         categoryId: categoryId,
         tenantId: tenantId,
-        image: "https://example.com/trim1.jpg",
       },
     });
     await prisma.carTrim.create({
@@ -123,7 +120,6 @@ describe("Admin API: car-categories isArchived logic", () => {
         isArchived: false,
         categoryId: categoryId,
         tenantId: tenantId,
-        image: "https://example.com/trim2.jpg",
       },
     });
 

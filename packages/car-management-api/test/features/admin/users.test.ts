@@ -91,7 +91,6 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/users", () => {
         categoryId: category.id,
         name: "Test Trim",
         subtitle: "Test Subtitle",
-        image: "image.jpg",
         originalPrice: 100000,
         currentPrice: 90000,
         features: [],

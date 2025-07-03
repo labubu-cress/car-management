@@ -41,7 +41,6 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-trims", () => {
       data: {
         name: "Test Trim App",
         subtitle: "Subtitle for App Trim",
-        image: "https://example.com/trim-app.jpg",
         configImageUrl: "https://example.com/config-image-app.jpg",
         originalPrice: 100000,
         currentPrice: 90000,
@@ -61,7 +60,6 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-trims", () => {
       data: {
         name: "Test Trim App 2",
         subtitle: "Subtitle for App Trim 2",
-        image: "https://example.com/trim-app2.jpg",
         originalPrice: 110000,
         currentPrice: 100000,
         features: [],
@@ -94,7 +92,6 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-trims", () => {
       data: {
         name: "Trim Last",
         subtitle: "Subtitle",
-        image: "https://example.com/image.jpg",
         originalPrice: 10000,
         currentPrice: 9000,
         features: [],
@@ -107,7 +104,6 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-trims", () => {
       data: {
         name: "Trim First",
         subtitle: "Subtitle",
-        image: "https://example.com/image.jpg",
         originalPrice: 10000,
         currentPrice: 9000,
         features: [],
@@ -148,7 +144,6 @@ describe("App API: /api/v1/app/tenants/:tenantId/car-trims", () => {
       data: {
         name: "Archived Trim",
         subtitle: "This one is archived",
-        image: "https://example.com/trim-archived.jpg",
         originalPrice: 120000,
         currentPrice: 110000,
         features: [],

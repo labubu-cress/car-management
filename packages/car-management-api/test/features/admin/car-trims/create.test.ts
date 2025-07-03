@@ -42,7 +42,6 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims CREATE", () => {
     const newTrim: CreateCarTrimInput = {
       name: "豪华版",
       subtitle: "旗舰豪华配置，尊享驾乘体验",
-      image: "https://example.com/trim-luxury.jpg",
       configImageUrl: "https://example.com/trim-luxury-config.jpg",
       originalPrice: 580000,
       currentPrice: 548000,
@@ -70,7 +69,6 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims CREATE", () => {
     expect(body).toMatchObject({
       name: newTrim.name,
       subtitle: newTrim.subtitle,
-      image: newTrim.image,
       configImageUrl: newTrim.configImageUrl,
       originalPrice: String(newTrim.originalPrice),
       currentPrice: String(newTrim.currentPrice),
@@ -106,7 +104,6 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims CREATE", () => {
     // 验证字段类型
     expect(typeof body.name).toBe("string");
     expect(typeof body.subtitle).toBe("string");
-    expect(typeof body.image).toBe("string");
     expect(typeof body.configImageUrl).toBe("string");
     expect(typeof body.originalPrice).toBe("string");
     expect(typeof body.currentPrice).toBe("string");
@@ -119,7 +116,6 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims CREATE", () => {
     const newTrim: CreateCarTrimInput = {
       name: "标准版",
       subtitle: "基础配置，经济实用",
-      image: "https://example.com/trim-standard.jpg",
       originalPrice: 480000,
       currentPrice: 450000,
       features: [],
@@ -138,7 +134,6 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims CREATE", () => {
     expect(body).toMatchObject({
       name: newTrim.name,
       subtitle: newTrim.subtitle,
-      image: newTrim.image,
       originalPrice: String(newTrim.originalPrice),
       currentPrice: String(newTrim.currentPrice),
       categoryId: categoryId,
@@ -151,7 +146,6 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims CREATE", () => {
     const newTrim: CreateCarTrimInput = {
       name: "联系我们版",
       subtitle: "具体价格请联系我们",
-      image: "https://example.com/trim-contact-us.jpg",
       originalPrice: 600000,
       currentPrice: 600000,
       priceOverrideText: "具体价格请联系我们",

@@ -14,7 +14,6 @@ export const carTrimSchema = z.object({
   tenantId: z.string(),
   name: z.string(),
   subtitle: z.string(),
-  image: z.string().url(),
   configImageUrl: z.string().url().nullable(),
   badge: z.string().nullable(),
   originalPrice: z.instanceof(Prisma.Decimal).transform((val) => val.toString()),
@@ -46,7 +45,6 @@ export type CarTrimWithFavorites = z.infer<typeof carTrimWithFavoritesSchema>;
 export const createCarTrimSchema = z.object({
   name: z.string().min(1),
   subtitle: z.string().min(1),
-  image: z.string().url(),
   configImageUrl: z.string().url().optional(),
   originalPrice: z.coerce.number().positive("价格必须是正数"),
   currentPrice: z.coerce.number().positive("价格必须是正数"),

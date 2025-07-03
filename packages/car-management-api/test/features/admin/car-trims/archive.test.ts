@@ -43,7 +43,6 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims Archive", () => {
       data: {
         name: "Test Trim for Update",
         subtitle: "Initial subtitle",
-        image: "https://example.com/trim_initial.jpg",
         originalPrice: 60000,
         currentPrice: 55000,
         features: [],
@@ -94,7 +93,6 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims Archive", () => {
       data: {
         name: "Test Trim",
         subtitle: "A nice trim",
-        image: "https://example.com/image.jpg",
         originalPrice: 50000,
         currentPrice: 48000,
         features: [],

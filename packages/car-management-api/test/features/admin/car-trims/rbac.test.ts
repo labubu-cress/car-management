@@ -42,7 +42,6 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims RBAC for TENANT_V
       data: {
         name: "Test Trim",
         subtitle: "A nice trim",
-        image: "https://example.com/image.jpg",
         originalPrice: 50000,
         currentPrice: 48000,
         features: [],
@@ -76,7 +75,6 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/car-trims RBAC for TENANT_V
     const newTrim: CreateCarTrimInput = {
       name: "Forbidden Trim",
       subtitle: "subtitle",
-      image: "https://example.com/image.jpg",
       originalPrice: 1,
       currentPrice: 1,
       features: [],

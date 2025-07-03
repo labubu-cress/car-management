@@ -50,7 +50,6 @@ describe("App API: /api/v1/app/favorites", () => {
       data: {
         name: "Test Trim for Favorites",
         subtitle: "Subtitle for Favorites Trim",
-        image: "https://example.com/trim-favorites.jpg",
         originalPrice: 120000,
         currentPrice: 110000,
         features: [],
