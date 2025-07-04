@@ -50,14 +50,14 @@ export const Dashboard: React.FC = () => {
       value: statsData?.pendingUserMessagesCount ?? '0',
       icon: faExclamationCircle,
       color: '#f5222d',
-      path: '/user-messages',
+      path: '/user-messages?status=PENDING',
     },
     {
       title: '已处理留言',
       value: statsData?.processedUserMessagesCount ?? '0',
       icon: faCheckCircle,
       color: '#52c41a',
-      path: '/user-messages',
+      path: '/user-messages?status=PROCESSED',
     },
   ];
 

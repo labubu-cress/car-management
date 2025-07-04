@@ -7,6 +7,7 @@ import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { useSearchParams } from 'react-router-dom';
 import * as styles from './UserMessages.css';
 
 type Status = 'PENDING' | 'PROCESSED';
@@ -16,7 +17,18 @@ export const UserMessages: React.FC = () => {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
-  const [status, setStatus] = useState<Status>('PENDING');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [status, setStatus] = useState<Status>((searchParams.get('status')?.toUpperCase() as Status) || 'PENDING');
+
+  useEffect(() => {
+    const statusFromQuery = searchParams.get('status')?.toUpperCase() as Status;
+    if (statusFromQuery && ['PENDING', 'PROCESSED'].includes(statusFromQuery)) {
+      setStatus(statusFromQuery);
+    } else {
+      setStatus('PENDING');
+      setSearchParams({ status: 'PENDING' });
+    }
+  }, [searchParams, setSearchParams]);
 
   const { data, isLoading } = useQuery(
     ['userMessages', currentTenant?.id, page, pageSize, status],
@@ -53,6 +65,12 @@ export const UserMessages: React.FC = () => {
   useEffect(() => {
     setPage(1);
   }, [status]);
+
+  const handleStatusChange = (newStatus: Status) => {
+    setStatus(newStatus);
+    setSearchParams({ status: newStatus });
+    setPage(1);
+  };
 
   const columns: Column<UserMessage>[] = [
     {
@@ -154,13 +172,13 @@ export const UserMessages: React.FC = () => {
       <div className={styles.filterGroup}>
         <button
           className={clsx(status === 'PENDING' ? buttonPrimary : buttonSecondary)}
-          onClick={() => setStatus('PENDING')}
+          onClick={() => handleStatusChange('PENDING')}
         >
           待处理
         </button>
         <button
           className={clsx(status === 'PROCESSED' ? buttonPrimary : buttonSecondary)}
-          onClick={() => setStatus('PROCESSED')}
+          onClick={() => handleStatusChange('PROCESSED')}
         >
           已处理
         </button>
