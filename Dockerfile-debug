@@ -1,0 +1,23 @@
+# Use mysql image as the base
+FROM mysql:8.0
+
+# Install debugging tools
+# - openssl: for checking SSL/TLS connections
+# - ca-certificates: for SSL/TLS certificate validation
+# - telnet: for testing port connectivity
+# - bind-utils: for DNS lookup tools like nslookup and dig
+# - iputils: contains basic network utilities like ping
+# - nmap-ncat: for arbitrary TCP and UDP connections and listens (nc)
+# mysql-client is already included in the base image
+RUN microdnf install -y dnf && \
+    dnf install -y \
+    openssl \
+    ca-certificates \
+    telnet \
+    bind-utils \
+    iputils \
+    nmap-ncat \
+    && dnf clean all
+
+# Keep the container running to allow for interactive debugging sessions
+CMD ["tail", "-f", "/dev/null"]
