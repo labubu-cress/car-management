@@ -27,7 +27,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   value,
   onChange,
   tenantId,
-  size,
+  size = 150,
   placeholder = '点击上传图片',
   disabled = false,
 }) => {
