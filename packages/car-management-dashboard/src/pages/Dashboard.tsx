@@ -28,7 +28,7 @@ export const Dashboard: React.FC = () => {
   );
 
   const stats = [
-    { title: '当前租户', value: currentTenant?.name || '-', icon: faBuilding, color: '#1890ff', path: '/tenants' },
+    { title: '当前小程序', value: currentTenant?.name || '-', icon: faBuilding, color: '#1890ff', path: '/tenants' },
     { title: '用户总数', value: statsData?.usersCount ?? '0', icon: faUsers, color: '#52c41a', path: '/users' },
     {
       title: '分类总数',
