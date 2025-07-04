@@ -61,6 +61,86 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/users", () => {
     expect(body[0].nickname).toBe("Test User");
   });
 
+  it("should return users with correct favoritesCount", async () => {
+    // Create a user for the tenant
+    const user = await prisma.user.create({
+      data: {
+        openId: "test-user-with-favorites",
+        nickname: "Test User Favorites",
+        avatarUrl: "avatar.jpg",
+        phoneNumber: "12345678903",
+        tenantId: tenantId,
+      },
+    });
+
+    const scenario = await prisma.vehicleScenario.create({
+      data: {
+        tenantId,
+        name: "Test Scenario",
+        description: "Test Scenario",
+        image: "image.jpg",
+      },
+    });
+
+    const category = await prisma.carCategory.create({
+      data: {
+        tenantId,
+        vehicleScenarioId: scenario.id,
+        name: "Test Category",
+        image: "image.jpg",
+        tags: [],
+        highlights: [],
+        interiorImages: [],
+        exteriorImages: [],
+        offerPictures: [],
+      },
+    });
+
+    const trim1 = await prisma.carTrim.create({
+      data: {
+        tenantId,
+        categoryId: category.id,
+        name: "Test Trim 1",
+        subtitle: "Test Subtitle 1",
+        originalPrice: "100000",
+        currentPrice: "90000",
+        features: [],
+      },
+    });
+
+    const trim2 = await prisma.carTrim.create({
+      data: {
+        tenantId,
+        categoryId: category.id,
+        name: "Test Trim 2",
+        subtitle: "Test Subtitle 2",
+        originalPrice: "120000",
+        currentPrice: "110000",
+        features: [],
+      },
+    });
+
+    await prisma.userFavoriteCarTrim.createMany({
+      data: [
+        { userId: user.id, carTrimId: trim1.id },
+        { userId: user.id, carTrimId: trim2.id },
+      ],
+    });
+
+    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/users`, {
+      headers: {
+        Authorization: `Bearer ${adminUser.token}`,
+      },
+    });
+
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as (User & { favoritesCount: number })[];
+    expect(body.length).toBe(1);
+    const userWithFavorites = body.find(u => u.id === user.id);
+    expect(userWithFavorites).toBeDefined();
+    expect(userWithFavorites?.favoritesCount).toBe(2);
+  });
+
   it("should get a user by id with favorite car trims", async () => {
     const scenario = await prisma.vehicleScenario.create({
       data: {
