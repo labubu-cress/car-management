@@ -3,7 +3,7 @@
 # --- 部署脚本说明 ---
 #
 # 用法:
-#   bash scripts/deploy.sh [environment]
+#   bash scripts/deploy.sh [environment] [remote_host]
 #
 #   [environment] - 必需参数，指定部署环境。可选值为 `staging` 或 `production`。
 #                   例如: `bash scripts/deploy.sh staging`
@@ -43,7 +43,7 @@ set -e
 
 # --- 配置 ---
 ENV=$1
-REMOTE_HOST="aliyun-car"
+REMOTE_HOST=$2
 REMOTE_APP_DIR="/apps/car-management" # 远程服务器上的应用目录
 CONTAINER_NAME="car-management"
 LOCAL_ENV_FILE="packages/car-management-api/.env.${ENV}"
@@ -52,8 +52,8 @@ LOCAL_CERT_DIR="packages/car-management-api/.certificates"
 REMOTE_CERT_DIR="${REMOTE_APP_DIR}/.certificates"
 
 # --- 检查环境参数 ---
-if [ -z "$ENV" ]; then
-  echo "错误: 未指定部署环境。用法: $0 [staging|production]"
+if [ -z "$ENV" ] || [ -z "$REMOTE_HOST" ]; then
+  echo "错误: 未指定部署环境或远程主机。用法: $0 [staging|production] [remote_host]"
   exit 1
 fi
 
