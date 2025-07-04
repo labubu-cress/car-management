@@ -37,7 +37,7 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/dashboard", () => {
         vehicleScenarioId: scenario.id,
       },
     });
-    await prisma.carTrim.create({
+    const trim = await prisma.carTrim.create({
       data: {
         name: "Test Trim",
         subtitle: "A nice trim",
@@ -49,6 +49,12 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/dashboard", () => {
       },
     });
     const user = await createTestUser(prisma, tenantId);
+    await prisma.userFavoriteCarTrim.create({
+      data: {
+        userId: user.id,
+        carTrimId: trim.id,
+      },
+    });
     await prisma.userMessage.create({
       data: {
         tenantId,
@@ -75,6 +81,7 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/dashboard", () => {
       vehicleScenariosCount: 1,
       pendingUserMessagesCount: 1,
       processedUserMessagesCount: 0,
+      favoritesCount: 1,
     });
   });
 
@@ -93,6 +100,7 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/dashboard", () => {
       vehicleScenariosCount: 1,
       pendingUserMessagesCount: 1,
       processedUserMessagesCount: 0,
+      favoritesCount: 1,
     });
   });
 });

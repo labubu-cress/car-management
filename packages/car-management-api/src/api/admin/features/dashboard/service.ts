@@ -39,6 +39,14 @@ export const getDashboardStats = async (tenantId: string) => {
     },
   });
 
+  const favoritesCount = await prisma.userFavoriteCarTrim.count({
+    where: {
+      user: {
+        tenantId,
+      }
+    }
+  });
+
   return {
     usersCount,
     carCategoriesCount,
@@ -46,5 +54,6 @@ export const getDashboardStats = async (tenantId: string) => {
     vehicleScenariosCount,
     pendingUserMessagesCount,
     processedUserMessagesCount,
+    favoritesCount,
   };
 };

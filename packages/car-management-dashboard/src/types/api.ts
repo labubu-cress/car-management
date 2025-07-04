@@ -237,6 +237,7 @@ export interface DashboardStats {
   vehicleScenariosCount: number;
   pendingUserMessagesCount: number;
   processedUserMessagesCount: number;
+  favoritesCount: number;
 }
 
 export interface HomepageConfig {
