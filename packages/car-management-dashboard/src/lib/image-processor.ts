@@ -1,16 +1,22 @@
 import {
-    decode as decodeJpeg,
-    encode as encodeJpeg,
+  decode as decodeJpeg,
+  encode as encodeJpeg,
 } from '@jsquash/jpeg';
 import {
-    decode as decodePng,
+  decode as decodePng,
 } from '@jsquash/png';
 import resize from '@jsquash/resize';
 import {
-    encode as encodeWebp,
+  encode as encodeWebp,
 } from '@jsquash/webp';
 
 const MAX_WIDTH = 2250;
+const WEBP_QUALITY = 85;
+const WEBP_EFFORT = 5;
+const WEBP_LOSSLESS_QUALITY = 1;
+const WEBP_NEAR_LOSSLESS_QUALITY = 90;
+const LOSSLESS_WEBP_SIZE_RATIO = 0.95;
+const JPEG_FALLBACK_QUALITY = 90;
 
 async function decodeImage(file: File): Promise<any | null> {
   const imageBuffer = await file.arrayBuffer();
@@ -39,16 +45,16 @@ async function encodeImage(
 
   if (originalFile.type === 'image/jpeg') {
     webpBuffer = await encodeWebp(imageData, {
-      quality: 75,
-      effort: 4,
+      quality: WEBP_QUALITY,
+      effort: WEBP_EFFORT,
     } as any);
   } else { // PNG
-    const losslessWebp = await encodeWebp(imageData, { lossless: 1, effort: 4 } as any);
+    const losslessWebp = await encodeWebp(imageData, { lossless: WEBP_LOSSLESS_QUALITY, effort: WEBP_EFFORT } as any);
     // This is a naive comparison, but it's a reasonable heuristic
-    if (losslessWebp.byteLength < originalFile.size * 0.95) {
+    if (losslessWebp.byteLength < originalFile.size * LOSSLESS_WEBP_SIZE_RATIO) {
       webpBuffer = losslessWebp;
     } else {
-      webpBuffer = await encodeWebp(imageData, { near_lossless: 80, effort: 4 } as any);
+      webpBuffer = await encodeWebp(imageData, { near_lossless: WEBP_NEAR_LOSSLESS_QUALITY, effort: WEBP_EFFORT } as any);
     }
   }
 
@@ -57,7 +63,7 @@ async function encodeImage(
   // Safety net: if WebP is larger, return original as JPEG
   // (All images are converted to JPEG as a fallback to avoid complexity with PNGs)
   if (webpBlob.size > originalFile.size) {
-    const jpegBuffer = await encodeJpeg(imageData, { quality: 90 });
+    const jpegBuffer = await encodeJpeg(imageData, { quality: JPEG_FALLBACK_QUALITY });
     return new Blob([jpegBuffer], { type: 'image/jpeg' });
   }
 
