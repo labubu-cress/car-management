@@ -40,6 +40,7 @@
 
 # 如果任何命令失败，立即退出脚本
 set -e
+set -x
 
 # --- 配置 ---
 ENV=$1
@@ -89,6 +90,7 @@ echo "正在检查远程环境文件..."
 LOCAL_CHECKSUM=$(shasum -a 256 "$LOCAL_ENV_FILE" | awk '{print $1}')
 
 REMOTE_CHECKSUM=$(ssh "$REMOTE_HOST" "
+  set -x
   mkdir -p $REMOTE_APP_DIR && \\
   if [ -f \\"$REMOTE_ENV_FILE_PATH\\" ]; then
     sha256sum \\"$REMOTE_ENV_FILE_PATH\\" | awk '{print \\\$1}'
@@ -140,6 +142,7 @@ echo "使用镜像: $FULL_IMAGE_NAME"
 
 ssh "$REMOTE_HOST" "
   set -e
+  set -x
   echo '正在拉取最新镜像...'
   docker pull $FULL_IMAGE_NAME
 
