@@ -31,7 +31,7 @@ export const Dashboard: React.FC = () => {
   const stats = [
     { title: '当前小程序', value: currentTenant?.name || '-', icon: faBuilding, color: '#1890ff', path: '/tenants' },
     { title: '用户总数', value: statsData?.usersCount ?? '0', icon: faUsers, color: '#52c41a', path: '/users' },
-    { title: '总收藏数', value: statsData?.favoritesCount ?? '0', icon: faHeart, color: '#eb2f96' },
+    { title: '总收藏数', value: statsData?.favoritesCount ?? '0', icon: faHeart, color: '#eb2f96', path: '/users' },
     {
       title: '分类总数',
       value: statsData?.vehicleScenariosCount ?? '0',
