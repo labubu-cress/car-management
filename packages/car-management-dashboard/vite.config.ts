@@ -9,6 +9,9 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react(), vanillaExtractPlugin()],
     base: env.VITE_BASE_URL || "/dashboard/",
+    optimizeDeps: {
+      exclude: ["@jsquash/resize", "@jsquash/jpeg", "@jsquash/png", "@jsquash/webp"]
+    },
     server: {
       port: 3001,
       proxy: {
