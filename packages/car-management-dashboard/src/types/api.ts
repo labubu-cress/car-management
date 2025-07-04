@@ -192,6 +192,7 @@ export interface User {
   unionId: string | null;
   createdAt: string;
   updatedAt: string;
+  favoritesCount?: number;
 }
 
 export interface UserFavoriteCarTrim {

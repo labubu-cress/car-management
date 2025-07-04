@@ -82,6 +82,12 @@ export const Users: React.FC = () => {
       width: '150px',
     },
     {
+      key: 'favoriteCarTrims',
+      title: '收藏数',
+      width: '100px',
+      render: (_, record) => <span>{record.favoritesCount ?? 0}</span>,
+    },
+    {
       key: 'createdAt',
       title: '注册时间',
       width: '180px',
