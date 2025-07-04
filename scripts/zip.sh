@@ -1,5 +1,5 @@
 #!/bin/bash
-# 将所有的 .env 以及 .env.* , 以及 .certificates , .ssh 打包到 zip ,  要保持目录结构
+# 将所有的 .env 以及 .env.* , 以及 .certificates/* , .ssh/* 打包到 zip ,  要保持目录结构
 
 set -e
 
@@ -27,6 +27,6 @@ echo "正在创建压缩包 $ZIP_FILE..."
 # remove old zip file if it exists
 rm -f "$ZIP_FILE"
 
-echo "$files" | zip -@ "$ZIP_FILE"
+echo "$files" | zip -r "$ZIP_FILE" -@
 
 echo "成功创建 $ZIP_FILE"
