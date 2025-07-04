@@ -12,10 +12,12 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { useQuery } from 'react-query';
+import { useNavigate } from 'react-router-dom';
 import * as styles from './Dashboard.css';
 
 export const Dashboard: React.FC = () => {
   const { currentTenant } = useAuth();
+  const navigate = useNavigate();
 
   const { data: statsData, isLoading } = useQuery(
     ['dashboard-stats', currentTenant?.id],
@@ -45,6 +47,39 @@ export const Dashboard: React.FC = () => {
     },
   ];
 
+  const quickActions = [
+    {
+      title: '1. 配置首页',
+      description: '管理首页的轮播图和推荐内容',
+      path: '/homepage-config',
+    },
+    {
+      title: '2. 配置车辆分类',
+      description: '创建各种车辆分类，定义您的服务范围',
+      path: '/vehicle-scenarios',
+    },
+    {
+      title: '3. 添加车系',
+      description: '创建车系，包括图片、标签和亮点信息',
+      path: '/car-categories',
+    },
+    {
+      title: '4. 配置车型',
+      description: '为每个车系添加具体的车型和价格信息',
+      path: '/car-trims',
+    },
+    {
+      title: '5. 联系我们',
+      description: '配置联系方式和地址等信息',
+      path: '/contact-us-config',
+    },
+    {
+      title: '6. 常见问题',
+      description: '管理用户常见问题和解答',
+      path: '/faqs',
+    },
+  ];
+
   return (
     <div className={styles.dashboard}>
       <div className={styles.header}>
@@ -70,22 +105,12 @@ export const Dashboard: React.FC = () => {
         <div className={styles.card}>
           <h2 className={styles.cardTitle}>快速开始</h2>
           <div className={styles.quickActions}>
-            <div className={styles.quickAction}>
-              <h3>1. 管理租户</h3>
-              <p>创建和管理不同的租户，每个租户都有独立的数据空间</p>
-            </div>
-            <div className={styles.quickAction}>
-              <h3>2. 配置车辆分类</h3>
-              <p>创建各种车辆分类，定义您的服务范围</p>
-            </div>
-            <div className={styles.quickAction}>
-              <h3>3. 添加车型</h3>
-              <p>创建车型，包括图片、标签和亮点信息</p>
-            </div>
-            <div className={styles.quickAction}>
-              <h3>4. 配置车型参数</h3>
-              <p>为每个车型添加具体的车型参数和价格信息</p>
-            </div>
+            {quickActions.map((action) => (
+              <div key={action.title} className={styles.quickAction} onClick={() => navigate(action.path)}>
+                <h3>{action.title}</h3>
+                <p>{action.description}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
