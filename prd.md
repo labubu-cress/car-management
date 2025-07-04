@@ -1,50 +1,245 @@
-# goal 
-管理后台前端的图片上传功能，要做修改：
-如果是  非 svg 图片，是用智能策略压缩以后再上传。
+# goal
+前面的 agent 做完图片上传压缩的功能后，图片上传输入框的大小就发生了变化，比之前大了很多。
+这个是我不希望的变更，我希望把样式还原到原来的大小。
 
-# 策略
-目标：对于用户上传的非 SVG 图片，在前端通过以下流程进行处理，以生成优化后的图片文件（优先为 WebP），然后再进行上传。
-
-**处理流程:**
-
-1.  **解码图片**: 将用户选择的图片文件（PNG/JPEG）解码为原始像素数据 (`ImageData`)。
-
-2.  **预处理 - 缩放**:
-    *   检查图片尺寸。如果图片宽度大于一个预设的最大值（例如 `2250px`），则使用 `@jsquash/resize` 将其宽度缩减至该值，高度按比例缩放。
-
-3.  **编码为 WebP - 根据源文件类型选择策略**:
-    *   **如果源文件是 JPEG (通常是照片):**
-        *   使用 **有损 WebP** (`lossy WebP`) 模式进行编码。
-        *   **参数**:
-            *   `quality`: `75` (在高质量和文件大小之间取得极佳平衡)。
-            *   `effort`: `4` (平衡压缩速度和效果)。
-    *   **如果源文件是 PNG (通常是图形、截图):**
-        *   **步骤 a (首选)**: 尝试使用 **无损 WebP** (`lossless: 1`) 模式进行编码，设置 `effort: 4`。
-        *   **步骤 b (备选)**: 比较步骤 a 生成的 WebP 文件和原始 PNG 文件的大小。如果 WebP 文件没有明显更小，则废弃该结果，并尝试使用 **视觉无损 WebP** (`nearLossless`) 模式重新编码。
-        *   **参数**:
-            *   `nearLossless`: `80` (在保留清晰边缘和细节的同时显著减小体积)。
-            *   `effort`: `4`。
-
-4.  **最终决策 - 大小比较 (安全网)**:
-    *   将步骤 3 中最终生成的 WebP 文件与 **原始图片文件** 进行大小比较。
-    *   如果 WebP 文件体积更小，则上传 WebP 文件。
-    *   如果原始文件体积更小（在极少数情况下可能发生），则直接上传原始文件。
-
-# task A (partial)
-完成准备工作，安装库，做配置（假设有的话）；
-
-logs:
-已经找到了所有需要的 .wasm 文件。列表如下：
-JPEG:
-mozjpeg_dec.wasm
-mozjpeg_enc.wasm
-PNG:
-squoosh_png_bg.wasm
-WebP:
-webp_dec.wasm
-webp_enc.wasm
-webp_enc_simd.wasm
-现在，我将把所有这些文件复制到 packages/car-management-dashboard/public/ 目录下。
-
-# task B
-完成功能
+# diff
+```diff
+diff --git a/packages/car-management-dashboard/src/components/ImageUpload.tsx b/packages/car-management-dashboard/src/components/ImageUpload.tsx
+index 4ecdd12..448446e 100644
+--- a/packages/car-management-dashboard/src/components/ImageUpload.tsx
++++ b/packages/car-management-dashboard/src/components/ImageUpload.tsx
+@@ -1,19 +1,21 @@
+ import COS from 'cos-js-sdk-v5';
+-import React, { useRef, useState } from 'react';
++import { useRef, useState } from 'react';
+ import toast from 'react-hot-toast';
++
+ import { imageApi } from '../lib/api';
++import { processImage } from '../lib/image-processor';
+ import { uploadStyles } from './ImageUpload.css';
+ 
+ interface ImageUploadProps {
+-  value: string | null;
++  value?: string | null;
+   onChange: (url: string) => void;
+-  tenantId: string; // To construct the upload path
++  tenantId: string;
+   size?: number;
+   placeholder?: string;
+   disabled?: boolean;
+ }
+ 
+-async function calculateSHA256(file: File): Promise<string> {
++async function calculateSHA256(file: File | Blob): Promise<string> {
+   const buffer = await file.arrayBuffer();
+   const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+   const hashArray = Array.from(new Uint8Array(hashBuffer));
+@@ -25,18 +27,18 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
+   value,
+   onChange,
+   tenantId,
+-  size = 150,
++  size,
+   placeholder = '点击上传图片',
+   disabled = false,
+ }) => {
+   const [isUploading, setIsUploading] = useState(false);
++  const [isProcessing, setIsProcessing] = useState(false);
+   const [progress, setProgress] = useState(0);
+   const fileInputRef = useRef<HTMLInputElement>(null);
+ 
+   const handleContainerClick = () => {
+-    if (!isUploading && !disabled) {
+-      fileInputRef.current?.click();
+-    }
++    if (isUploading || isProcessing || disabled) return;
++    fileInputRef.current?.click();
+   };
+ 
+   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+@@ -45,11 +47,24 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
+ 
+     const inputElement = event.target;
+ 
++    setIsProcessing(true);
++    let processedFile: Blob;
++    try {
++      processedFile = await processImage(file);
++    } catch (error) {
++      toast.error('图片处理失败，请重试');
++      console.error('Image processing error:', error);
++      setIsProcessing(false);
++      inputElement.value = '';
++      return;
++    }
++    setIsProcessing(false);
++
+     setIsUploading(true);
+     setProgress(0);
+     
+     try {
+-      const fileHash = await calculateSHA256(file);
++      const fileHash = await calculateSHA256(processedFile);
+       const tokenData = await imageApi.getUploadToken(tenantId);
+       const cos = new COS({
+         getAuthorization: (_options, callback) => {
+@@ -63,7 +78,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
+         },
+       });
+ 
+-      const fileExtension = file.name.split('.').pop() || '';
++      const fileExtension = processedFile.type.split('/')[1] || 'jpg';
+       const fileName = `${fileHash}.${fileExtension}`;
+       const uploadPath = `tenants/${tenantId}/uploads/${fileName}`;
+ 
+@@ -72,7 +87,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
+           Bucket: tokenData.bucket,
+           Region: tokenData.region,
+           Key: uploadPath,
+-          Body: file,
++          Body: processedFile,
+           onProgress: (progressData) => {
+             setProgress(Math.round(progressData.percent * 100));
+           },
+@@ -87,13 +102,11 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
+             onChange(imageUrl);
+             toast.success('上传成功');
+           }
+-          // Clear the input value so the same file can be selected again
+           inputElement.value = '';
+         }
+       );
+     } catch (error) {
+       setIsUploading(false);
+-      // Clear the input value so the same file can be selected again
+       inputElement.value = '';
+       toast.error('获取上传凭证或处理文件失败');
+       console.error('Get upload token error:', error);
+@@ -101,6 +114,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
+   };
+ 
+   const containerStyle = size ? { width: `${size}px`, height: `${size}px` } : {};
++  const isLoading = isProcessing || isUploading;
+ 
+   return (
+     <div
+@@ -110,14 +124,16 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
+     >
+       <input
+         type="file"
+-        accept="image/*"
+         ref={fileInputRef}
+         onChange={handleFileChange}
+-        className={uploadStyles.input}
+-        disabled={isUploading || disabled}
++        style={{ display: 'none' }}
++        accept="image/png, image/jpeg, image/svg+xml"
++        disabled={isLoading || disabled}
+       />
+-      {isUploading ? (
+-        <div className={uploadStyles.progressOverlay}>{progress}%</div>
++      {isLoading ? (
++        <div className={uploadStyles.progressOverlay}>
++          {isProcessing ? '处理中...' : `${progress}%`}
++        </div>
+       ) : value ? (
+         <img src={value} alt="preview" className={uploadStyles.imagePreview} />
+       ) : (
+diff --git a/packages/car-management-dashboard/src/lib/image-processor.ts b/packages/car-management-dashboard/src/lib/image-processor.ts
+new file mode 100644
+index 0000000..db92bea
+--- /dev/null
++++ b/packages/car-management-dashboard/src/lib/image-processor.ts
+@@ -0,0 +1,89 @@
++import {
++  decode as decodeJpeg,
++  encode as encodeJpeg,
++} from '@jsquash/jpeg';
++import {
++  decode as decodePng,
++} from '@jsquash/png';
++import resize from '@jsquash/resize';
++import {
++  encode as encodeWebp,
++} from '@jsquash/webp';
++
++const MAX_WIDTH = 2250;
++const WEBP_QUALITY = 85;
++const WEBP_EFFORT = 5;
++const WEBP_LOSSLESS_QUALITY = 1;
++const WEBP_NEAR_LOSSLESS_QUALITY = 90;
++const LOSSLESS_WEBP_SIZE_RATIO = 0.95;
++const JPEG_FALLBACK_QUALITY = 90;
++
++async function decodeImage(file: File): Promise<any | null> {
++  const imageBuffer = await file.arrayBuffer();
++  let imageData: any | null = null;
++  if (file.type === 'image/jpeg') {
++    imageData = await decodeJpeg(imageBuffer);
++  } else if (file.type === 'image/png') {
++    imageData = await decodePng(imageBuffer);
++  }
++  return imageData;
++}
++
++async function resizeImage(imageData: any): Promise<any> {
++  if (imageData.width > MAX_WIDTH) {
++    const height = Math.round(imageData.height * (MAX_WIDTH / imageData.width));
++    return resize(imageData, { width: MAX_WIDTH, height });
++  }
++  return imageData;
++}
++
++async function encodeImage(
++  imageData: any,
++  originalFile: File
++): Promise<Blob> {
++  let webpBuffer: ArrayBuffer;
++
++  if (originalFile.type === 'image/jpeg') {
++    webpBuffer = await encodeWebp(imageData, {
++      quality: WEBP_QUALITY,
++      effort: WEBP_EFFORT,
++    } as any);
++  } else { // PNG
++    const losslessWebp = await encodeWebp(imageData, { lossless: WEBP_LOSSLESS_QUALITY, effort: WEBP_EFFORT } as any);
++    // This is a naive comparison, but it's a reasonable heuristic
++    if (losslessWebp.byteLength < originalFile.size * LOSSLESS_WEBP_SIZE_RATIO) {
++      webpBuffer = losslessWebp;
++    } else {
++      webpBuffer = await encodeWebp(imageData, { near_lossless: WEBP_NEAR_LOSSLESS_QUALITY, effort: WEBP_EFFORT } as any);
++    }
++  }
++
++  const webpBlob = new Blob([webpBuffer], { type: 'image/webp' });
++
++  // Safety net: if WebP is larger, return original as JPEG
++  // (All images are converted to JPEG as a fallback to avoid complexity with PNGs)
++  if (webpBlob.size > originalFile.size) {
++    const jpegBuffer = await encodeJpeg(imageData, { quality: JPEG_FALLBACK_QUALITY });
++    return new Blob([jpegBuffer], { type: 'image/jpeg' });
++  }
++
++  return webpBlob;
++}
++
++
++export async function processImage(file: File): Promise<Blob> {
++  if (file.type === 'image/svg+xml') {
++    return file;
++  }
++
++  let imageData = await decodeImage(file);
++  if (!imageData) {
++    // If decoding fails, return original file
++    return file;
++  }
++
++  imageData = await resizeImage(imageData);
++  const processedBlob = await encodeImage(imageData, file);
++
++  return processedBlob;
++} 
+```
+# task
+从 diff 中看看，前一个 agent 不小心改了什么导致的问题
