@@ -43,6 +43,7 @@ export const statCard = style({
   borderRadius: '12px',
   boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
   transition: 'transform 0.2s',
+  cursor: 'pointer',
   ':hover': {
     transform: 'translateY(-2px)',
   },
@@ -104,6 +105,7 @@ export const quickAction = style({
   border: `1px solid ${colors.border}`,
   borderRadius: '8px',
   transition: 'border-color 0.2s',
+  cursor: 'pointer',
   ':hover': {
     borderColor: '#1890ff',
   },

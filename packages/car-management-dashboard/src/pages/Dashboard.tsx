@@ -28,22 +28,36 @@ export const Dashboard: React.FC = () => {
   );
 
   const stats = [
-    { title: '当前租户', value: currentTenant?.name || '-', icon: faBuilding, color: '#1890ff' },
-    { title: '用户总数', value: statsData?.usersCount ?? '0', icon: faUsers, color: '#52c41a' },
-    { title: '分类总数', value: statsData?.vehicleScenariosCount ?? '0', icon: faCubes, color: '#13c2c2' },
-    { title: '车型总数', value: statsData?.carCategoriesCount ?? '0', icon: faLayerGroup, color: '#faad14' },
-    { title: '参数总数', value: statsData?.carTrimsCount ?? '0', icon: faCar, color: '#722ed1' },
+    { title: '当前租户', value: currentTenant?.name || '-', icon: faBuilding, color: '#1890ff', path: '/tenants' },
+    { title: '用户总数', value: statsData?.usersCount ?? '0', icon: faUsers, color: '#52c41a', path: '/users' },
+    {
+      title: '分类总数',
+      value: statsData?.vehicleScenariosCount ?? '0',
+      icon: faCubes,
+      color: '#13c2c2',
+      path: '/vehicle-scenarios',
+    },
+    {
+      title: '车型总数',
+      value: statsData?.carCategoriesCount ?? '0',
+      icon: faLayerGroup,
+      color: '#faad14',
+      path: '/car-categories',
+    },
+    { title: '参数总数', value: statsData?.carTrimsCount ?? '0', icon: faCar, color: '#722ed1', path: '/car-trims' },
     {
       title: '待处理留言',
       value: statsData?.pendingUserMessagesCount ?? '0',
       icon: faExclamationCircle,
       color: '#f5222d',
+      path: '/user-messages',
     },
     {
       title: '已处理留言',
       value: statsData?.processedUserMessagesCount ?? '0',
       icon: faCheckCircle,
       color: '#52c41a',
+      path: '/user-messages',
     },
   ];
 
@@ -89,7 +103,15 @@ export const Dashboard: React.FC = () => {
 
       <div className={styles.statsGrid}>
         {stats.map((stat, index) => (
-          <div key={index} className={styles.statCard}>
+          <div
+            key={index}
+            className={styles.statCard}
+            onClick={() => {
+              if (stat.path) {
+                navigate(stat.path);
+              }
+            }}
+          >
             <div className={styles.statIcon} style={{ backgroundColor: `${stat.color}20` }}>
               <FontAwesomeIcon icon={stat.icon} style={{ color: stat.color }} />
             </div>
