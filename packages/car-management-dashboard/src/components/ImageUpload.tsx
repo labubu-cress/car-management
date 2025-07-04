@@ -1,19 +1,21 @@
 import COS from 'cos-js-sdk-v5';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+
 import { imageApi } from '../lib/api';
+import { processImage } from '../lib/image-processor';
 import { uploadStyles } from './ImageUpload.css';
 
 interface ImageUploadProps {
-  value: string | null;
+  value?: string | null;
   onChange: (url: string) => void;
-  tenantId: string; // To construct the upload path
+  tenantId: string;
   size?: number;
   placeholder?: string;
   disabled?: boolean;
 }
 
-async function calculateSHA256(file: File): Promise<string> {
+async function calculateSHA256(file: File | Blob): Promise<string> {
   const buffer = await file.arrayBuffer();
   const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -25,18 +27,18 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   value,
   onChange,
   tenantId,
-  size = 150,
+  size,
   placeholder = '点击上传图片',
   disabled = false,
 }) => {
   const [isUploading, setIsUploading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleContainerClick = () => {
-    if (!isUploading && !disabled) {
-      fileInputRef.current?.click();
-    }
+    if (isUploading || isProcessing || disabled) return;
+    fileInputRef.current?.click();
   };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,11 +47,24 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 
     const inputElement = event.target;
 
+    setIsProcessing(true);
+    let processedFile: Blob;
+    try {
+      processedFile = await processImage(file);
+    } catch (error) {
+      toast.error('图片处理失败，请重试');
+      console.error('Image processing error:', error);
+      setIsProcessing(false);
+      inputElement.value = '';
+      return;
+    }
+    setIsProcessing(false);
+
     setIsUploading(true);
     setProgress(0);
     
     try {
-      const fileHash = await calculateSHA256(file);
+      const fileHash = await calculateSHA256(processedFile);
       const tokenData = await imageApi.getUploadToken(tenantId);
       const cos = new COS({
         getAuthorization: (_options, callback) => {
@@ -63,7 +78,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         },
       });
 
-      const fileExtension = file.name.split('.').pop() || '';
+      const fileExtension = processedFile.type.split('/')[1] || 'jpg';
       const fileName = `${fileHash}.${fileExtension}`;
       const uploadPath = `tenants/${tenantId}/uploads/${fileName}`;
 
@@ -72,7 +87,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
           Bucket: tokenData.bucket,
           Region: tokenData.region,
           Key: uploadPath,
-          Body: file,
+          Body: processedFile,
           onProgress: (progressData) => {
             setProgress(Math.round(progressData.percent * 100));
           },
@@ -87,13 +102,11 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
             onChange(imageUrl);
             toast.success('上传成功');
           }
-          // Clear the input value so the same file can be selected again
           inputElement.value = '';
         }
       );
     } catch (error) {
       setIsUploading(false);
-      // Clear the input value so the same file can be selected again
       inputElement.value = '';
       toast.error('获取上传凭证或处理文件失败');
       console.error('Get upload token error:', error);
@@ -101,6 +114,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   };
 
   const containerStyle = size ? { width: `${size}px`, height: `${size}px` } : {};
+  const isLoading = isProcessing || isUploading;
 
   return (
     <div
@@ -110,14 +124,16 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
     >
       <input
         type="file"
-        accept="image/*"
         ref={fileInputRef}
         onChange={handleFileChange}
-        className={uploadStyles.input}
-        disabled={isUploading || disabled}
+        style={{ display: 'none' }}
+        accept="image/png, image/jpeg, image/svg+xml"
+        disabled={isLoading || disabled}
       />
-      {isUploading ? (
-        <div className={uploadStyles.progressOverlay}>{progress}%</div>
+      {isLoading ? (
+        <div className={uploadStyles.progressOverlay}>
+          {isProcessing ? '处理中...' : `${progress}%`}
+        </div>
       ) : value ? (
         <img src={value} alt="preview" className={uploadStyles.imagePreview} />
       ) : (
