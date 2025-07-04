@@ -1,5 +1,5 @@
 #!/bin/bash
-# 将所有的 .env 以及 .env.* 打包到 zip , 要保持目录结构
+# 将所有的 .env 以及 .env.* , 以及 .certificates , .ssh 打包到 zip ,  要保持目录结构
 
 set -e
 
@@ -8,14 +8,14 @@ cd "$(dirname "$0")/.."
 
 ZIP_FILE="env_backup.zip"
 
-echo "正在查找 .env 和 .env.* 文件..."
+echo "正在查找 .env, .env.*, .certificates, .ssh 文件..."
 
 # Find .env and .env.* files, excluding node_modules and .git, and zip them
 # The paths in the zip will be like ./packages/api/.env
-files=$(find . -path '*/node_modules/*' -prune -o -path '*/.git/*' -prune -o \( -name ".env" -o -name ".env.*" \) -print)
+files=$(find . -path '*/node_modules/*' -prune -o -path '*/.git/*' -prune -o \( -name ".env" -o -name ".env.*" -o -name ".certificates" -o -name ".ssh" \) -print)
 
 if [ -z "$files" ]; then
-  echo "没有找到任何 .env 文件。"
+  echo "没有找到任何要备份的文件。"
   exit 0
 fi
 
