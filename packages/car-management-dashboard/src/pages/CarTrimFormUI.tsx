@@ -82,7 +82,7 @@ export const CarTrimFormUI: React.FC<CarTrimFormUIProps> = ({
             />
           </FormField>
 
-          <FormField label="优惠政策亮点" required error={errors.badge}>
+          <FormField label="优惠政策亮点" error={errors.badge}>
             <input
               type="text"
               value={formData.badge}
