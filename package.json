@@ -1,5 +1,6 @@
 {
   "name": "cars-management-monorepo",
+  "version": "1.1.0",
   "type": "module",
   "private": true,
   "workspaces": [
@@ -22,7 +23,6 @@
     "preview:backend:serve": "while [ ! -f packages/car-management-api/dist/index.js ]; do sleep 1; done &&  npm run start -w car-management-api",
     "clean": "rimraf packages/car-management-api/dist"
   },
-  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "keywords": [],
