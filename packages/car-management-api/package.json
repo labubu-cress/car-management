@@ -10,6 +10,7 @@
     "test": "dotenv -e .env.integration -- prisma migrate reset --force && vitest",
     "test:debug": "dotenv -e .env.integration -- prisma migrate reset --force && npx vitest --inspect-brk",
     "prisma:seed:staging": "dotenv -e .env.staging.forward -- prisma db seed",
+    "prisma:seed:production": "dotenv -e .env.production.forward -- prisma db seed",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
