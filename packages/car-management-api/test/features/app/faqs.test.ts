@@ -36,8 +36,10 @@ describe("App API: /api/v1/app/tenants/:tenantId/faqs", () => {
     const body = (await response.json()) as Faq[];
     expect(Array.isArray(body)).toBe(true);
     expect(body.length).toBe(2);
-    expect(body[0].question).toBe("Test Question 2?");
-    expect(body[0].icon).toBe("test-icon-2");
+    expect(body[0].question).toBe("Test Question 1?");
+    expect(body[0].icon).toBe("test-icon-1");
+    expect(body[1].question).toBe("Test Question 2?");
+    expect(body[1].icon).toBe("test-icon-2");
     expect(body[0].tenantId).toBe(tenant.id);
   });
 });
