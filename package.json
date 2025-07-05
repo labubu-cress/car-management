@@ -10,7 +10,7 @@
     "debug:image": "dotenv -- sh -c 'docker run -it -p 3000:3000 --env-file packages/car-management-api/.env.preview.docker $IMAGE_REGISTRY/$IMAGE_NAME:latest sh'",
     "preview:image": "dotenv -- sh -c 'docker run -it -p 3000:3000 --env-file packages/car-management-api/.env.preview.docker $IMAGE_REGISTRY/$IMAGE_NAME:latest'",
     "build-and-push:image": "dotenv -- sh -c 'docker buildx build --platform linux/amd64,linux/arm64 --push --load -t $IMAGE_REGISTRY/$IMAGE_NAME:latest .'",
-    "build-and-push:image:production": "dotenv -- sh -c 'docker buildx build --platform linux/amd64,linux/arm64 --push --load -t $IMAGE_REGISTRY/$IMAGE_NAME:$npm_package_version .'",
+    "build-and-push:image:production": "dotenv -- sh -c 'docker buildx build --platform linux/amd64,linux/arm64 --push -t $IMAGE_REGISTRY/$IMAGE_NAME:$npm_package_version .'",
     "build-and-push:image:debug-tools": "dotenv -- sh -c 'docker buildx build --platform linux/amd64,linux/arm64 --push --load -f Dockerfile-debug -t $IMAGE_REGISTRY/deug-tools:latest .'",
     "deploy:staging": "bash scripts/deploy.sh staging aliyun-car",
     "deploy:production": "bash scripts/deploy.sh production aliyun-car-prod",
