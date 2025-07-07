@@ -1,5 +1,11 @@
 import { style } from "@vanilla-extract/css";
 
+const spacing = {
+  s: '4px',
+  m: '8px',
+  l: '16px',
+};
+
 export const homepageConfigStyles = {
   container: style({
     maxWidth: "800px",
@@ -25,12 +31,30 @@ export const homepageConfigStyles = {
     borderRadius: "8px",
     padding: "24px",
     boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.1)",
+    display: 'grid',
+    gap: spacing.m,
   }),
 
   fieldset: style({
     border: "none",
     padding: 0,
     margin: 0,
+    display: 'grid',
+    gap: spacing.m,
+  }),
+
+  bannerTypeSelector: style({
+    display: 'flex',
+    gap: spacing.l,
+    alignItems: 'center',
+    marginBottom: spacing.m,
+  }),
+
+  bannerLabel: style({
+    display: 'flex',
+    alignItems: 'center',
+    gap: spacing.s,
+    cursor: 'pointer',
   }),
 
   actions: style({

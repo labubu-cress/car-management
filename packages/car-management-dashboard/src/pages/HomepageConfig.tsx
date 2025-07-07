@@ -9,13 +9,17 @@ import toast from 'react-hot-toast';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { FormField } from '../components/FormField';
 import { ImageUpload } from '../components/ImageUpload';
+import { VideoUpload } from '../components/VideoUpload';
 import { useAuth } from '../contexts/AuthContext';
 import { homepageConfigStyles } from './HomepageConfig.css';
+
+type BannerType = 'image' | 'video';
 
 const HomepageConfigPage = () => {
   const { currentTenant, isViewer } = useAuth();
   const queryClient = useQueryClient();
   const [isCreating, setIsCreating] = useState(false);
+  const [bannerType, setBannerType] = useState<BannerType>('image');
 
   const {
     data: config,
@@ -40,6 +44,11 @@ const HomepageConfigPage = () => {
   useEffect(() => {
     if (config) {
       reset(config);
+      if (config.bannerVideo) {
+        setBannerType('video');
+      } else {
+        setBannerType('image');
+      }
     } else {
       reset({
         firstTitle: '',
@@ -47,6 +56,9 @@ const HomepageConfigPage = () => {
         secondTitle: '',
         secondTitleIcon: '',
         bannerImage: '',
+        bannerVideo: '',
+        bannerTitle: '',
+        bannerDescription: '',
         benefitsImage: '',
       });
     }
@@ -76,7 +88,18 @@ const HomepageConfigPage = () => {
       toast.error('您没有权限执行此操作');
       return;
     }
-    updateMutation.mutate(data);
+
+    const submissionData = { ...data };
+
+    if (bannerType === 'image') {
+      submissionData.bannerVideo = null;
+      submissionData.bannerTitle = null;
+      submissionData.bannerDescription = null;
+    } else {
+      submissionData.bannerImage = null;
+    }
+
+    updateMutation.mutate(submissionData);
   };
 
   if (isLoading || !currentTenant) {
@@ -148,20 +171,68 @@ const HomepageConfigPage = () => {
             />
           </FormField>
 
-          <FormField label="主 Banner 图" error={errors.bannerImage?.message}>
-            <Controller
-              name="bannerImage"
-              control={control}
-              rules={{ required: "主 Banner 图不能为空" }}
-              render={({ field }) => (
-                <ImageUpload
-                  value={field.value ?? null}
-                  onChange={field.onChange}
-                  tenantId={currentTenant.id}
+          <div className={homepageConfigStyles.bannerTypeSelector}>
+            <label className={homepageConfigStyles.bannerLabel}>
+              <input
+                type="radio"
+                value="image"
+                checked={bannerType === 'image'}
+                onChange={() => setBannerType('image')}
+                disabled={isViewer}
+              />
+              图片 Banner
+            </label>
+            <label className={homepageConfigStyles.bannerLabel}>
+              <input
+                type="radio"
+                value="video"
+                checked={bannerType === 'video'}
+                onChange={() => setBannerType('video')}
+                disabled={isViewer}
+              />
+              视频 Banner
+            </label>
+          </div>
+
+          {bannerType === 'image' ? (
+            <FormField label="主 Banner 图" error={errors.bannerImage?.message}>
+              <Controller
+                name="bannerImage"
+                control={control}
+                rules={{ required: bannerType === 'image' ? "主 Banner 图不能为空" : false }}
+                render={({ field }) => (
+                  <ImageUpload
+                    value={field.value}
+                    onChange={field.onChange}
+                    tenantId={currentTenant.id}
+                  />
+                )}
+              />
+            </FormField>
+          ) : (
+            <>
+              <FormField label="主 Banner 视频" error={errors.bannerVideo?.message}>
+                <Controller
+                  name="bannerVideo"
+                  control={control}
+                  rules={{ required: bannerType === 'video' ? "主 Banner 视频不能为空" : false }}
+                  render={({ field }) => (
+                    <VideoUpload
+                      value={field.value}
+                      onChange={field.onChange}
+                      tenantId={currentTenant.id}
+                    />
+                  )}
                 />
-              )}
-            />
-          </FormField>
+              </FormField>
+              <FormField label="Banner 视频标题" error={errors.bannerTitle?.message}>
+                <input type="text" {...register('bannerTitle')} />
+              </FormField>
+              <FormField label="Banner 视频描述" error={errors.bannerDescription?.message}>
+                <textarea {...register('bannerDescription')} />
+              </FormField>
+            </>
+          )}
 
           <FormField label="权益图" error={errors.benefitsImage?.message}>
             <Controller

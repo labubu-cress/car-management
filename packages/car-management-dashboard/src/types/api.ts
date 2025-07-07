@@ -254,7 +254,10 @@ export interface HomepageConfig {
   firstTitleIcon: string;
   secondTitle: string;
   secondTitleIcon: string;
-  bannerImage: string;
+  bannerImage?: string | null;
+  bannerVideo?: string | null;
+  bannerTitle?: string | null;
+  bannerDescription?: string | null;
   benefitsImage: string;
   createdAt: string;
   updatedAt: string;
@@ -265,7 +268,10 @@ export interface UpdateHomepageConfigInput {
   firstTitleIcon: string;
   secondTitle: string;
   secondTitleIcon: string;
-  bannerImage: string;
+  bannerImage?: string | null;
+  bannerVideo?: string | null;
+  bannerTitle?: string | null;
+  bannerDescription?: string | null;
   benefitsImage: string;
 }
 
