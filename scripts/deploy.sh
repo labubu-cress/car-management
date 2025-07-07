@@ -158,6 +158,12 @@ ssh "$REMOTE_HOST" "
     -v ${REMOTE_CERT_DIR}:/app/packages/car-management-api/.certificates:ro \
     $FULL_IMAGE_NAME
 
+  echo '等待容器启动...'
+  sleep 5 # 等待几秒钟，确保容器有时间生成日志
+
+  echo '显示最新的容器日志...'
+  docker logs --tail 100 $CONTAINER_NAME
+
   echo '正在清理旧镜像...'
   docker image prune -f
 
