@@ -123,21 +123,63 @@ export const Users: React.FC = () => {
             <p>正在加载...</p>
           ) : userDetails && userDetails.favoriteCarTrims.length > 0 ? (
             <div>
-              <h4 style={{ marginTop: 0, marginBottom: '24px' }}>收藏的车型</h4>
+              <h4 style={{ marginTop: 0, marginBottom: '16px' }}>收藏的车型</h4>
               <ul style={{ listStyleType: 'none', paddingLeft: 0, margin: 0 }}>
-                {userDetails.favoriteCarTrims.map((fav) => (
-                  <li key={fav.carTrimId} style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <strong style={{ marginBottom: '4px' }}>{fav.carTrim.name}</strong>
-                      <span style={{ fontSize: '13px', color: '#333', marginBottom: '4px' }}>
-                        {fav.carTrim.category?.name} ({fav.carTrim.category?.vehicleScenario?.name})
-                      </span>
-                      <span style={{ fontSize: '12px', color: '#666' }}>
-                        收藏于: {new Date(fav.createdAt).toLocaleString('zh-CN')}
-                      </span>
-                    </div>
-                  </li>
-                ))}
+                {userDetails.favoriteCarTrims.map((fav, index) => {
+                  const carTrimImage = fav.carTrim.images?.[0]?.url ?? fav.carTrim.category?.image;
+                  return (
+                    <li
+                      key={fav.carTrimId}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        marginBottom: index === userDetails.favoriteCarTrims.length - 1 ? 0 : '24px',
+                      }}
+                    >
+                      {carTrimImage ? (
+                        <img
+                          src={carTrimImage}
+                          alt={fav.carTrim.name}
+                          style={{
+                            width: '100px',
+                            height: '75px',
+                            objectFit: 'cover',
+                            marginRight: '16px',
+                            borderRadius: '8px',
+                            flexShrink: 0,
+                          }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            width: '100px',
+                            height: '75px',
+                            backgroundColor: '#f0f0f0',
+                            marginRight: '16px',
+                            borderRadius: '8px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: '#999',
+                            fontSize: '12px',
+                            flexShrink: 0,
+                          }}
+                        >
+                          无图片
+                        </div>
+                      )}
+                      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                        <strong style={{ marginBottom: '8px', fontSize: '16px' }}>{fav.carTrim.name}</strong>
+                        <span style={{ fontSize: '14px', color: '#555', marginBottom: '8px' }}>
+                          {fav.carTrim.category?.name} ({fav.carTrim.category?.vehicleScenario?.name})
+                        </span>
+                        <span style={{ fontSize: '12px', color: '#888' }}>
+                          收藏于: {new Date(fav.createdAt).toLocaleString('zh-CN')}
+                        </span>
+                      </div>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ) : (

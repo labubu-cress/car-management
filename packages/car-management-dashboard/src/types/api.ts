@@ -120,6 +120,11 @@ export interface UpdateCarCategoryInput {
   maxPrice?: number;
 }
 
+export interface Image {
+  id: string;
+  url: string;
+}
+
 export interface Feature {
   title: string;
   icon: string;
@@ -141,6 +146,7 @@ export interface CarTrim {
   createdAt: string;
   updatedAt: string;
   isArchived: boolean;
+  images?: Image[];
 }
 
 export interface CreateCarTrimInput {
