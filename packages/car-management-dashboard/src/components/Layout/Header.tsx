@@ -82,11 +82,23 @@ export const Header: React.FC = () => {
           </div>
           {isDropdownOpen && (
             <div className={styles.dropdownMenu}>
-              <div className={styles.dropdownItem} onClick={() => navigate('/change-password')}>
+              <div
+                className={styles.dropdownItem}
+                onClick={() => {
+                  navigate('/change-password');
+                  setIsDropdownOpen(false);
+                }}
+              >
                 <FontAwesomeIcon icon={faKey} />
                 <span>修改密码</span>
               </div>
-              <div className={styles.dropdownItem} onClick={logout}>
+              <div
+                className={styles.dropdownItem}
+                onClick={() => {
+                  logout();
+                  setIsDropdownOpen(false);
+                }}
+              >
                 <FontAwesomeIcon icon={faSignOutAlt} />
                 <span>退出</span>
               </div>
