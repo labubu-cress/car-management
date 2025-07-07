@@ -79,9 +79,17 @@ export const right = style({
   display: "flex",
   alignItems: "center",
   gap: "16px",
+  position: "relative",
 });
 
 export const userInfo = style({
+  display: "flex",
+  alignItems: "center",
+  cursor: "pointer",
+  gap: "8px",
+});
+
+export const userDetails = style({
   display: "flex",
   flexDirection: "column",
   alignItems: "flex-end",
@@ -96,6 +104,43 @@ export const username = style({
 export const role = style({
   fontSize: "12px",
   color: colors.textSecondary,
+});
+
+export const dropdownIcon = style({
+  color: colors.textSecondary,
+  transition: "transform 0.2s",
+});
+
+export const dropdownIconOpen = style({
+  transform: "rotate(180deg)",
+});
+
+export const dropdownMenu = style({
+  position: "absolute",
+  top: "50px",
+  right: 0,
+  backgroundColor: colors.background,
+  borderRadius: "6px",
+  border: `1px solid ${colors.border}`,
+  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+  padding: "8px 0",
+  width: "160px",
+  zIndex: 100,
+});
+
+export const dropdownItem = style({
+  display: "flex",
+  alignItems: "center",
+  gap: "8px",
+  padding: "10px 16px",
+  fontSize: "14px",
+  color: colors.text,
+  cursor: "pointer",
+  transition: "background-color 0.2s",
+
+  ":hover": {
+    backgroundColor: "#f5f5f5",
+  },
 });
 
 export const logoutButton = style({
