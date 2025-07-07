@@ -17,6 +17,14 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/homepage-config", () => {
     tenantId = setup.tenantId;
   });
 
+  const baseHomepageConfigData = {
+    firstTitle: "First Title",
+    firstTitleIcon: "first-icon.png",
+    secondTitle: "Second Title",
+    secondTitleIcon: "second-icon.png",
+    benefitsImage: "benefits.jpg",
+  };
+
   it("should get null if homepage config does not exist", async () => {
     const response = await app.request(`/api/v1/admin/tenants/${tenantId}/homepage-config`, {
       method: "GET",
@@ -29,15 +37,11 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/homepage-config", () => {
     expect(body).toBeNull();
   });
 
-  it("should create and update homepage config", async () => {
+  it("should create and update homepage config with bannerImage", async () => {
     // Create
     const createData = {
-      firstTitle: "First Title",
-      firstTitleIcon: "first-icon.png",
-      secondTitle: "Second Title",
-      secondTitleIcon: "second-icon.png",
+      ...baseHomepageConfigData,
       bannerImage: "banner.jpg",
-      benefitsImage: "benefits.jpg",
     };
     const createResponse = await app.request(`/api/v1/admin/tenants/${tenantId}/homepage-config`, {
       method: "PUT",
@@ -51,6 +55,7 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/homepage-config", () => {
     const createdBody = (await createResponse.json()) as HomepageConfig;
     expect(createdBody).toMatchObject(createData);
     expect(createdBody.tenantId).toBe(tenantId);
+    expect(createdBody.bannerVideo).toBeNull();
 
     // Verify it was created by getting it
     const getResponse = await app.request(`/api/v1/admin/tenants/${tenantId}/homepage-config`, {
@@ -64,12 +69,9 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/homepage-config", () => {
 
     // Update
     const updateData = {
+      ...baseHomepageConfigData,
       firstTitle: "Updated First Title",
-      firstTitleIcon: "updated-first-icon.png",
-      secondTitle: "Updated Second Title",
-      secondTitleIcon: "updated-second-icon.png",
       bannerImage: "new-banner.jpg",
-      benefitsImage: "new-benefits.jpg",
     };
     const updateResponse = await app.request(`/api/v1/admin/tenants/${tenantId}/homepage-config`, {
       method: "PUT",
@@ -82,6 +84,7 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/homepage-config", () => {
     expect(updateResponse.status).toBe(200);
     const updatedBody = (await updateResponse.json()) as HomepageConfig;
     expect(updatedBody).toMatchObject(updateData);
+    expect(updatedBody.bannerVideo).toBeNull();
 
     // Verify it was updated
     const getAfterUpdateResponse = await app.request(`/api/v1/admin/tenants/${tenantId}/homepage-config`, {
@@ -93,16 +96,86 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/homepage-config", () => {
     expect(getAfterUpdateBody).toMatchObject(updateData);
   });
 
+  it("should create and update homepage config with bannerVideo", async () => {
+    // Create with bannerVideo
+    const createData = {
+      ...baseHomepageConfigData,
+      bannerVideo: "video.mp4",
+      bannerTitle: "Video Title",
+      bannerDescription: "Video Description",
+    };
+    const createResponse = await app.request(`/api/v1/admin/tenants/${tenantId}/homepage-config`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${adminUser.token}`,
+      },
+      body: JSON.stringify(createData),
+    });
+    expect(createResponse.status).toBe(200);
+    const createdBody = (await createResponse.json()) as HomepageConfig;
+    expect(createdBody).toMatchObject(createData);
+    expect(createdBody.bannerImage).toBeNull();
+
+    // Update to bannerImage
+    const updateData = {
+      ...baseHomepageConfigData,
+      bannerImage: "new-banner.jpg",
+    };
+    const updateResponse = await app.request(`/api/v1/admin/tenants/${tenantId}/homepage-config`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${adminUser.token}`,
+      },
+      body: JSON.stringify(updateData),
+    });
+    expect(updateResponse.status).toBe(200);
+    const updatedBody = (await updateResponse.json()) as HomepageConfig;
+    expect(updatedBody.bannerImage).toBe(updateData.bannerImage);
+    expect(updatedBody.bannerVideo).toBeNull();
+    expect(updatedBody.bannerTitle).toBeNull();
+    expect(updatedBody.bannerDescription).toBeNull();
+  });
+
+  it("should return 400 if both bannerImage and bannerVideo are provided", async () => {
+    const data = {
+      ...baseHomepageConfigData,
+      bannerImage: "banner.jpg",
+      bannerVideo: "video.mp4",
+    };
+    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/homepage-config`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${adminUser.token}`,
+      },
+      body: JSON.stringify(data),
+    });
+    expect(response.status).toBe(400);
+  });
+
+  it("should return 400 if neither bannerImage nor bannerVideo is provided", async () => {
+    const data = {
+      ...baseHomepageConfigData,
+    };
+    const response = await app.request(`/api/v1/admin/tenants/${tenantId}/homepage-config`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${adminUser.token}`,
+      },
+      body: JSON.stringify(data),
+    });
+    expect(response.status).toBe(400);
+  });
+
   describe("as tenant_viewer", () => {
     it("should get homepage config if it exists", async () => {
       // First create a config as admin
       const createData = {
-        firstTitle: "First Title",
-        firstTitleIcon: "first-icon.png",
-        secondTitle: "Second Title",
-        secondTitleIcon: "second-icon.png",
+        ...baseHomepageConfigData,
         bannerImage: "banner.jpg",
-        benefitsImage: "benefits.jpg",
       };
       await app.request(`/api/v1/admin/tenants/${tenantId}/homepage-config`, {
         method: "PUT",
@@ -126,12 +199,8 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/homepage-config", () => {
 
     it("should return 403 when trying to update homepage config", async () => {
       const updateData = {
-        firstTitle: "Updated First Title",
-        firstTitleIcon: "updated-first-icon.png",
-        secondTitle: "Updated Second Title",
-        secondTitleIcon: "updated-second-icon.png",
+        ...baseHomepageConfigData,
         bannerImage: "new-banner.jpg",
-        benefitsImage: "new-benefits.jpg",
       };
       const response = await app.request(`/api/v1/admin/tenants/${tenantId}/homepage-config`, {
         method: "PUT",
