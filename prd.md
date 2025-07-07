@@ -4,13 +4,13 @@
 1. bannerImage
 2. bannerVideo + bannerTitle + bannerDescription
 
-# task A 
+# task A (completed)
 修改 schema.prisma, 并 migrate dev
 
-# task B
+# task B (completed)
 修改 admin 后端代码并跟新测试。
 
-# task C
+# task C (completed)
 修改 app 后端代码并更新测试，再跟新 openapi.json
 
 # task D
