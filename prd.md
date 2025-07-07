@@ -1,12 +1,18 @@
 # goal
-## 管理后台的产品逻辑变更
-查看用户收藏，弹出的收藏列表，要添加 2 个信息：
-* trim 对应的 category 名字
-* trim 对应的 scenario 名字
+## 首页配置的产品逻辑变更
+首页的 bannerImage 改为下面两种方式 2 选一：
+1. bannerImage
+2. bannerVideo + bannerTitle + bannerDescription
 
-# task A (completed)
-检查 admin 后端是否已支持该功能，修改并跟新测试。
+# task A 
+修改 schema.prisma, 并 migrate dev
 
 # task B
+修改 admin 后端代码并跟新测试。
+
+# task C
+修改 app 后端代码并更新测试，再跟新 openapi.json
+
+# task D
 管理后台前端完成该功能
 
