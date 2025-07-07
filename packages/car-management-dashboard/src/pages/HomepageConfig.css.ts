@@ -55,6 +55,7 @@ export const homepageConfigStyles = {
     alignItems: 'center',
     gap: spacing.s,
     cursor: 'pointer',
+    whiteSpace: 'nowrap',
   }),
 
   actions: style({
