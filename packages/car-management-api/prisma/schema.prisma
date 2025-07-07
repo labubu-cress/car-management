@@ -152,7 +152,10 @@ model HomepageConfig {
   firstTitleIcon  String
   secondTitle     String
   secondTitleIcon String
-  bannerImage     String
+  bannerImage     String?
+  bannerVideo     String?
+  bannerTitle     String?
+  bannerDescription String?
   benefitsImage   String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
