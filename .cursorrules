@@ -7,3 +7,4 @@ app 后端的接口变更，在测试通过后，需要跟新 openapi.json
 为接口编写的测试文件，在测试通过以后，需要被保留，除非是重复的测试。
 修改完前端代码，确保 npm run build 能编译通过。
 单个文件 ts 或 tsx 文件不要超过 200 行
+admin 后端的接口定义不要去找 openapi.json，openapi.json 只包含 app 后端的接口定义。
