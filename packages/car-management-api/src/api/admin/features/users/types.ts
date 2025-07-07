@@ -1,4 +1,4 @@
-import type { CarTrim, User as PrismaUser, UserFavoriteCarTrim } from "@prisma/client";
+import type { CarCategory, CarTrim, User as PrismaUser, UserFavoriteCarTrim, VehicleScenario } from "@prisma/client";
 
 export type User = PrismaUser & {
   favoritesCount?: number;
@@ -6,6 +6,10 @@ export type User = PrismaUser & {
 
 export type UserWithFavorites = PrismaUser & {
   favoriteCarTrims: (UserFavoriteCarTrim & {
-    carTrim: CarTrim;
+    carTrim: CarTrim & {
+      category: CarCategory & {
+        vehicleScenario: VehicleScenario;
+      };
+    };
   })[];
 };

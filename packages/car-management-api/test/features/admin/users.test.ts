@@ -210,6 +210,10 @@ describe("Admin API: /api/v1/admin/tenants/:tenantId/users", () => {
     expect(body.favoriteCarTrims.length).toBe(1);
     expect(body.favoriteCarTrims[0].carTrimId).toBe(trim.id);
     expect(body.favoriteCarTrims[0].carTrim.name).toBe("Test Trim");
+    expect(body.favoriteCarTrims[0].carTrim.category).toBeDefined();
+    expect(body.favoriteCarTrims[0].carTrim.category.name).toBe("Test Category");
+    expect(body.favoriteCarTrims[0].carTrim.category.vehicleScenario).toBeDefined();
+    expect(body.favoriteCarTrims[0].carTrim.category.vehicleScenario.name).toBe("Test Scenario");
   });
 
   describe("as tenant_viewer", () => {

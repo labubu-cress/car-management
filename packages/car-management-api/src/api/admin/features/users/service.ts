@@ -34,7 +34,15 @@ export const getUserById = async (
     include: {
       favoriteCarTrims: {
         include: {
-          carTrim: true,
+          carTrim: {
+            include: {
+              category: {
+                include: {
+                  vehicleScenario: true,
+                },
+              },
+            },
+          },
         },
       },
     },
