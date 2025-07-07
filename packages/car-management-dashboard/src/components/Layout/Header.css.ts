@@ -87,12 +87,22 @@ export const userInfo = style({
   alignItems: "center",
   cursor: "pointer",
   gap: "8px",
+  padding: "8px 12px",
+  borderRadius: "6px",
+  border: `1px solid ${colors.border}`,
+  transition: "background-color 0.2s, border-color 0.2s",
+
+  ":hover": {
+    backgroundColor: "#f5f5f5",
+    borderColor: colors.primary,
+  },
 });
 
 export const userDetails = style({
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "flex-end",
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: '8px',
 });
 
 export const username = style({
