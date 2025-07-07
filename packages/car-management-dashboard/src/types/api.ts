@@ -137,6 +137,7 @@ export interface CarTrim {
   badge?: string;
   features?: Feature[];
   categoryId: string;
+  category?: CarCategory;
   createdAt: string;
   updatedAt: string;
   isArchived: boolean;

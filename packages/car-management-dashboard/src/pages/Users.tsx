@@ -128,8 +128,13 @@ export const Users: React.FC = () => {
                 {userDetails.favoriteCarTrims.map((fav) => (
                   <li key={fav.carTrimId} style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
-                      <strong style={{ marginBottom: '8px' }}>{fav.carTrim.name}</strong>
-                      <span style={{ fontSize: '12px', color: '#666' }}>收藏于: {new Date(fav.createdAt).toLocaleString('zh-CN')}</span>
+                      <strong style={{ marginBottom: '4px' }}>{fav.carTrim.name}</strong>
+                      <span style={{ fontSize: '13px', color: '#333', marginBottom: '4px' }}>
+                        {fav.carTrim.category?.name} ({fav.carTrim.category?.vehicleScenario?.name})
+                      </span>
+                      <span style={{ fontSize: '12px', color: '#666' }}>
+                        收藏于: {new Date(fav.createdAt).toLocaleString('zh-CN')}
+                      </span>
                     </div>
                   </li>
                 ))}
