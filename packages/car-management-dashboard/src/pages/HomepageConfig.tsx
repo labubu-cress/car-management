@@ -89,17 +89,17 @@ const HomepageConfigPage = () => {
       return;
     }
 
-    const submissionData = { ...data };
+    const submissionData: Partial<UpdateHomepageConfigInput> = { ...data };
 
     if (bannerType === 'image') {
-      submissionData.bannerVideo = null;
-      submissionData.bannerTitle = null;
-      submissionData.bannerDescription = null;
+      submissionData.bannerVideo = undefined;
+      submissionData.bannerTitle = undefined;
+      submissionData.bannerDescription = undefined;
     } else {
-      submissionData.bannerImage = null;
+      submissionData.bannerImage = undefined;
     }
 
-    updateMutation.mutate(submissionData);
+    updateMutation.mutate(submissionData as UpdateHomepageConfigInput);
   };
 
   if (isLoading || !currentTenant) {
