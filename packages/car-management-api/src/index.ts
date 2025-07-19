@@ -45,15 +45,9 @@ if (process.env.NODE_ENV !== "test") {
     console.log("HTTPS is enabled. Attempting to start HTTPS server.");
 
     const keyPath =
-      process.env.KEY_PATH ||
-      (process.env.SSL_DOMAIN
-        ? `.certificates/${process.env.SSL_DOMAIN}.key`
-        : ".certificates/car-management.guanjiecar.com.key");
+      process.env.KEY_PATH || ".certificates/guanjiecar.com.key";
     const certPath =
-      process.env.CERT_PATH ||
-      (process.env.SSL_DOMAIN
-        ? `.certificates/${process.env.SSL_DOMAIN}_bundle.crt`
-        : ".certificates/car-management.guanjiecar.com_bundle.crt");
+      process.env.CERT_PATH || ".certificates/guanjiecar.com.pem";
     const port = Number(process.env.PORT) || 443;
 
     try {
